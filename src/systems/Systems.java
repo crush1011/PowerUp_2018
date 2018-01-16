@@ -20,12 +20,16 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import systems.subsystems.Controls;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
 public class Systems {
 	
 	private static Systems systems;
-	HashMap<SysObj, Object> sysObjects;
+	private HashMap<SysObj, Object> sysObjects;
+	
+	private Controls controls;
+	
 	
 	/*
 	 * Constructor
@@ -70,10 +74,12 @@ public class Systems {
 		sysObjects.put(SysObj.Sensors.RIGHT_ENCODER, new Encoder(1,0));
 		
 		// Joysticks
-		sysObjects.put(SysObj.Sensors.DRIVER_STICK, new Joystick(0));
-		sysObjects.put(SysObj.Sensors.OPERATOR_STICK, new Joystick(1));
+		Joystick drive = new Joystick(0), operator = new Joystick(1);
+		sysObjects.put(SysObj.Sensors.DRIVER_STICK, drive);
+		sysObjects.put(SysObj.Sensors.OPERATOR_STICK, operator);
 		((Joystick)sysObjects.get(SysObj.Sensors.OPERATOR_STICK)).setRumble(RumbleType.kLeftRumble, 0);
 		((Joystick)sysObjects.get(SysObj.Sensors.OPERATOR_STICK)).setRumble(RumbleType.kRightRumble, 0);
+		controls = new Controls(drive, operator);
 		
 		// Other Sensors
 		sysObjects.put(SysObj.Sensors.PDP, new PowerDistributionPanel(0));
@@ -95,6 +101,16 @@ public class Systems {
 			systems = new Systems();
 		}
 		return systems;
+	}
+	
+	/*
+	 * update
+	 * Author: Jeremiah Hanson
+	 * ------------------------------------------------
+	 * Purpose: updates all the systems
+	 */
+	public void update() {
+		controls.update();
 	}
 
 }
