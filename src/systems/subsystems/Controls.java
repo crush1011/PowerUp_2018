@@ -11,8 +11,9 @@ package systems.subsystems;
 import java.util.HashMap;
 
 import edu.wpi.first.wpilibj.Joystick;
+import systems.Subsystem;
 
-public class Controls {
+public class Controls implements Subsystem{
 	
 	private HashMap<Button, Boolean> driverButtons;
 	private HashMap<Button, Boolean> operatorButtons;
@@ -110,6 +111,7 @@ public class Controls {
 	 * ------------------------------------------------
 	 * Purpose: updates the hashmaps for the controls
 	 */
+	@Override
 	public void update(){
 		updateButtonHash(driverButtons, driverJoystick);
 		updateButtonHash(operatorButtons, operatorJoystick);
@@ -149,6 +151,16 @@ public class Controls {
 		hash.put(Axis.LEFT_Y, stick.getRawAxis(Axis.LEFT_Y.getIndex()));
 		hash.put(Axis.RIGHT_X, stick.getRawAxis(Axis.RIGHT_X.getIndex()));
 		hash.put(Axis.RIGHT_Y, stick.getRawAxis(Axis.RIGHT_Y.getIndex()));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see systems.Subsystem#toSmartDashboard()
+	 */
+	@Override
+	public void toSmartDashboard() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

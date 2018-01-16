@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import systems.subsystems.Controls;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
-public class Systems {
+public class Systems{
 	
 	private static Systems systems;
 	private HashMap<SysObj, Object> sysObjects;
