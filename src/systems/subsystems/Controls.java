@@ -152,6 +152,17 @@ public class Controls implements Subsystem{
 		hash.put(Axis.RIGHT_X, stick.getRawAxis(Axis.RIGHT_X.getIndex()));
 		hash.put(Axis.RIGHT_Y, stick.getRawAxis(Axis.RIGHT_Y.getIndex()));
 	}
+	
+	/*
+	 * getDriverAxis
+	 * Author: Jeremiah Hanson
+	 * --------------------------------------------
+	 * Purpose: gets the drivers current axis hashmap
+	 * Returns: HashMap
+	 */
+	public HashMap<Axis, Double> getDriverAxis() {
+		return driverAxis;
+	}
 
 	/*
 	 * (non-Javadoc)

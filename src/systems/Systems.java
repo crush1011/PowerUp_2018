@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import systems.subsystems.Controls;
+import systems.subsystems.Controls.Axis;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
 public class Systems{
@@ -111,6 +112,28 @@ public class Systems{
 	 */
 	public void update() {
 		controls.update();
+	}
+	
+	/*
+	 * getDriverAxisLeftX
+	 * Author: Jeremiah Hanson
+	 * --------------------------------------------
+	 * Purpose: gets the drivers current axis hashmap
+	 * Returns: HashMap
+	 */
+	public double getDriverAxisLeftX() {
+		return controls.getDriverAxis().get(Axis.LEFT_X);
+	}
+	
+	/*
+	 * getDriverAxisRightY
+	 * Author: Jeremiah Hanson
+	 * --------------------------------------------
+	 * Purpose: gets the drivers current axis hashmap
+	 * Returns: HashMap
+	 */
+	public double getDriverAxisRightY() {
+		return controls.getDriverAxis().get(Axis.RIGHT_Y);
 	}
 
 }
