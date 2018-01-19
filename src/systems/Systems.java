@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import systems.subsystems.Controls;
 import systems.subsystems.Controls.Axis;
+import systems.subsystems.DriveTrain;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
 public class Systems{
@@ -30,6 +31,7 @@ public class Systems{
 	private HashMap<SysObj, Object> sysObjects;
 	
 	private Controls controls;
+	private DriveTrain driveTrain;
 	
 	
 	/*
@@ -42,10 +44,14 @@ public class Systems{
 
 		sysObjects = new HashMap<SysObj, Object>();
 		
+		System.out.println("Start building bot");
+		
 //=======================================================================================
 // Motor Controllers
 //=======================================================================================
 
+		System.out.println("Start with motors");
+		
 		// Left Motor Controllers
 		sysObjects.put(SysObj.MotorController.LEFT_1, new WPI_TalonSRX(2));
 		sysObjects.put(SysObj.MotorController.LEFT_2, new WPI_TalonSRX(4));
@@ -55,6 +61,14 @@ public class Systems{
 		sysObjects.put(SysObj.MotorController.RIGHT_1, new WPI_TalonSRX(1));
 		sysObjects.put(SysObj.MotorController.RIGHT_2, new WPI_TalonSRX(3));
 		sysObjects.put(SysObj.MotorController.RIGHT_3, new WPI_TalonSRX(5));
+		
+		// Create the driveTrain
+		driveTrain = new DriveTrain((WPI_TalonSRX) sysObjects.get(SysObj.MotorController.LEFT_1), 
+									(WPI_TalonSRX) sysObjects.get(SysObj.MotorController.LEFT_2), 
+									(WPI_TalonSRX) sysObjects.get(SysObj.MotorController.LEFT_3), 
+									(WPI_TalonSRX) sysObjects.get(SysObj.MotorController.RIGHT_1), 
+									(WPI_TalonSRX) sysObjects.get(SysObj.MotorController.RIGHT_2), 
+									(WPI_TalonSRX) sysObjects.get(SysObj.MotorController.RIGHT_3));
 		
 		// Arm Motor Controllers
 		sysObjects.put(SysObj.MotorController.COLLECTOR_ARM, new WPI_TalonSRX(0));
@@ -68,11 +82,15 @@ public class Systems{
 // Sensors
 //=======================================================================================
 
+		System.out.println("Next, encoders");
+		
 		// Encoders
 		sysObjects.put(SysObj.Sensors.CLIMB_ENCODER, new Encoder(8,9));
 		sysObjects.put(SysObj.Sensors.ARM_ENCODER, new Encoder(4,5));
 		sysObjects.put(SysObj.Sensors.LEFT_ENCODER, new Encoder(2,3));
 		sysObjects.put(SysObj.Sensors.RIGHT_ENCODER, new Encoder(1,0));
+		
+		System.out.println("Don't forget controls");
 		
 		// Joysticks
 		Joystick drive = new Joystick(0), operator = new Joystick(1);
@@ -81,6 +99,8 @@ public class Systems{
 		((Joystick)sysObjects.get(SysObj.Sensors.OPERATOR_STICK)).setRumble(RumbleType.kLeftRumble, 0);
 		((Joystick)sysObjects.get(SysObj.Sensors.OPERATOR_STICK)).setRumble(RumbleType.kRightRumble, 0);
 		controls = new Controls(drive, operator);
+		
+		System.out.println("Gotta have power");
 		
 		// Other Sensors
 		sysObjects.put(SysObj.Sensors.PDP, new PowerDistributionPanel(0));
@@ -112,6 +132,7 @@ public class Systems{
 	 */
 	public void update() {
 		controls.update();
+		driveTrain.update();
 	}
 	
 	/*
