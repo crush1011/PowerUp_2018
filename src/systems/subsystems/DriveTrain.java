@@ -17,7 +17,7 @@ public class DriveTrain implements Subsystem{
 	
 	private WPI_TalonSRX ltMain, ltSlave1, ltSlave2;
 	private WPI_TalonSRX rtMain, rtSlave1, rtSlave2;
-	private Systems systems;
+	private static Systems systems;
 	private DifferentialDrive drive;
 	
 	/*
@@ -42,14 +42,16 @@ public class DriveTrain implements Subsystem{
 		rtSlave1.follow(rtM);
 		rtSlave2.follow(rtM);
 		
-		systems.getInstance();
 		
 		drive = new DifferentialDrive(ltMain, rtMain);
 	}
 
 	@Override
 	public void update() {
-		drive.arcadeDrive(systems.getDriverAxisLeftX(), systems.getDriverAxisRightY());
+		if (systems == null) {
+			systems = Systems.getInstance();
+		}
+		drive.arcadeDrive(systems.getDriverAxisLeftY(), systems.getDriverAxisRightX());
 	}
 
 	@Override

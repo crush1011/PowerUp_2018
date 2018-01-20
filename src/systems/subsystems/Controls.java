@@ -148,7 +148,7 @@ public class Controls implements Subsystem{
 		hash.put(Axis.LEFT_TRIGGER, stick.getRawAxis(Axis.LEFT_TRIGGER.getIndex()));
 		hash.put(Axis.RIGHT_TRIGGER, stick.getRawAxis(Axis.RIGHT_TRIGGER.getIndex()));
 		hash.put(Axis.LEFT_X, stick.getRawAxis(Axis.LEFT_X.getIndex()));
-		hash.put(Axis.LEFT_Y, stick.getRawAxis(Axis.LEFT_Y.getIndex()));
+		hash.put(Axis.LEFT_Y, -stick.getRawAxis(Axis.LEFT_Y.getIndex()));
 		hash.put(Axis.RIGHT_X, stick.getRawAxis(Axis.RIGHT_X.getIndex()));
 		hash.put(Axis.RIGHT_Y, stick.getRawAxis(Axis.RIGHT_Y.getIndex()));
 	}

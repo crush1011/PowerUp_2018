@@ -117,7 +117,7 @@ public class Systems{
 	 * 	Systems if one does not exist
 	 * Returns: a Systems object
 	 */
-	public Systems getInstance() {
+	public static Systems getInstance() {
 		if (systems == null) {
 			systems = new Systems();
 		}
@@ -142,8 +142,8 @@ public class Systems{
 	 * Purpose: gets the drivers current axis hashmap
 	 * Returns: HashMap
 	 */
-	public double getDriverAxisLeftX() {
-		return controls.getDriverAxis().get(Axis.LEFT_X);
+	public double getDriverAxisLeftY() {
+		return controls.getDriverAxis().get(Axis.LEFT_Y);
 	}
 	
 	/*
@@ -153,8 +153,8 @@ public class Systems{
 	 * Purpose: gets the drivers current axis hashmap
 	 * Returns: HashMap
 	 */
-	public double getDriverAxisRightY() {
-		return controls.getDriverAxis().get(Axis.RIGHT_Y);
+	public double getDriverAxisRightX() {
+		return controls.getDriverAxis().get(Axis.RIGHT_X);
 	}
 
 }
