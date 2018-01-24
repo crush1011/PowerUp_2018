@@ -169,4 +169,14 @@ public class Systems{
 		return controls.getOperatorAxes().get(Axis.RIGHT_TRIGGER);
 	}
 	
+	/*
+	 * getOperatorLtTrigger
+	 * Author: Nitesh Puri
+	 * ---------------------------------------------
+	 * Purpose: gets the operator's current trigger value
+	 * Returns: Operator's Trigger Value As Double
+	 */
+	public double getOperatorLtTrigger() {
+		return controls.getOperatorAxes().get(Axis.LEFT_TRIGGER);
+	}
 }
