@@ -34,7 +34,7 @@ public class Collector implements Subsystem {
 		this.collectorArm = collectorArm;
 		this.intakeLeft = intakeLeft;
 		this.intakeRight = intakeRight;
-		intakeLeft.setInverted(true);
+		//intakeLeft.setInverted(true);
 	}
 	
 	/*
@@ -46,12 +46,13 @@ public class Collector implements Subsystem {
 		if (systems == null) {
 			systems = Systems.getInstance();
 		}
-		
-		if(systems.getOperatorRtTrigger()>5) {
+		 
+		//Controls for intake
+		if(systems.getOperatorRtTrigger()>.2) {
 			intakeLeft.set(systems.getOperatorRtTrigger());
 			intakeRight.set(systems.getOperatorRtTrigger());
 		}
-		else if(systems.getOperatorRtTrigger()>5) {
+		else if(systems.getOperatorLtTrigger()>.2) {
 			intakeLeft.set(-systems.getOperatorLtTrigger());
 			intakeRight.set(-systems.getOperatorLtTrigger());
 		}
@@ -59,6 +60,9 @@ public class Collector implements Subsystem {
 			intakeLeft.set(0.0);
 			intakeRight.set(0.0);
 		}
+		
+		//Controls for arm
+		collectorArm.set(systems.getOperatorLJoystick());
 	}
 
 	@Override

@@ -75,8 +75,8 @@ public class Systems{
 		
 		// Arm Motor Controllers
 		sysObjects.put(SysObj.MotorController.COLLECTOR_ARM, new WPI_TalonSRX(0));
-		sysObjects.put(SysObj.MotorController.INTAKE_LEFT, new Spark(7));
-		sysObjects.put(SysObj.MotorController.INTAKE_RIGHT, new Spark(8));
+		sysObjects.put(SysObj.MotorController.INTAKE_LEFT, new Spark(6));
+		sysObjects.put(SysObj.MotorController.INTAKE_RIGHT, new Spark(5));
 		
 		// Create the Collector
 		collector = new Collector((WPI_TalonSRX) sysObjects.get(SysObj.MotorController.COLLECTOR_ARM),
@@ -186,5 +186,16 @@ public class Systems{
 	 */
 	public double getOperatorLtTrigger() {
 		return controls.getOperatorAxes().get(Axis.LEFT_TRIGGER);
+	}
+	
+	/*
+	 * getOperatorLJostick
+	 * Author: Nitesh Puri
+	 * ---------------------------------------------
+	 * Purpose: gets the operator's current left joystick value
+	 * Returns: Operator's Left Joystick Value As Double
+	 */
+	public double getOperatorLJoystick(){
+		return controls.getOperatorAxes().get(Axis.LEFT_Y);
 	}
 }
