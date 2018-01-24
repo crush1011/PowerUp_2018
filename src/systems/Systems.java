@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.Spark;
+import systems.subsystems.Collector;
 import systems.subsystems.Controls;
 import systems.subsystems.Controls.Axis;
 import systems.subsystems.DriveTrain;
@@ -33,6 +34,7 @@ public class Systems{
 	
 	private Controls controls;
 	private DriveTrain driveTrain;
+	private Collector collector;
 	
 	
 	/*
@@ -75,6 +77,11 @@ public class Systems{
 		sysObjects.put(SysObj.MotorController.COLLECTOR_ARM, new WPI_TalonSRX(0));
 		sysObjects.put(SysObj.MotorController.INTAKE_LEFT, new Spark(7));
 		sysObjects.put(SysObj.MotorController.INTAKE_RIGHT, new Spark(8));
+		
+		// Create the Collector
+		collector = new Collector((WPI_TalonSRX) sysObjects.get(SysObj.MotorController.COLLECTOR_ARM),
+								  (Spark) sysObjects.get(SysObj.MotorController.INTAKE_LEFT), 
+								  (Spark) sysObjects.get(SysObj.MotorController.INTAKE_RIGHT));
 		
 		// Climber Motor Controller(s)
 		sysObjects.put(SysObj.MotorController.CLIMBER, new WPI_TalonSRX(9));
@@ -134,6 +141,7 @@ public class Systems{
 	public void update() {
 		controls.update();
 		driveTrain.update();
+		collector.update();
 	}
 	
 	/*

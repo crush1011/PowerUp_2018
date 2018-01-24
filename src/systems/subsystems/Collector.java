@@ -43,6 +43,10 @@ public class Collector implements Subsystem {
 	 */
 	@Override
 	public void update() {
+		if (systems == null) {
+			systems = Systems.getInstance();
+		}
+		
 		if(systems.getOperatorRtTrigger()>5) {
 			intakeLeft.set(systems.getOperatorRtTrigger());
 			intakeRight.set(systems.getOperatorRtTrigger());
