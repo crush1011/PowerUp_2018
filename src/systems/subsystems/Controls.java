@@ -163,7 +163,18 @@ public class Controls implements Subsystem{
 	public HashMap<Axis, Double> getDriverAxis() {
 		return driverAxis;
 	}
-
+	
+	/*
+	 * getOperatorAxes
+	 * Author: Nitesh Puri
+	 * -------------------------------------------
+	 * Purpose: gets the operator's current axis value
+	 * Returns: Operator's Axis Value As Double
+	 */
+	public HashMap<Axis, Double> getOperatorAxes(){
+		return operatorAxis;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see systems.Subsystem#toSmartDashboard()

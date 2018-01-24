@@ -20,6 +20,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.Spark;
 import systems.subsystems.Controls;
 import systems.subsystems.Controls.Axis;
 import systems.subsystems.DriveTrain;
@@ -72,8 +73,8 @@ public class Systems{
 		
 		// Arm Motor Controllers
 		sysObjects.put(SysObj.MotorController.COLLECTOR_ARM, new WPI_TalonSRX(0));
-		sysObjects.put(SysObj.MotorController.INTAKE_LEFT, new WPI_TalonSRX(7));
-		sysObjects.put(SysObj.MotorController.INTAKE_RIGHT, new WPI_TalonSRX(8));
+		sysObjects.put(SysObj.MotorController.INTAKE_LEFT, new Spark(7));
+		sysObjects.put(SysObj.MotorController.INTAKE_RIGHT, new Spark(8));
 		
 		// Climber Motor Controller(s)
 		sysObjects.put(SysObj.MotorController.CLIMBER, new WPI_TalonSRX(9));
@@ -156,5 +157,16 @@ public class Systems{
 	public double getDriverAxisRightX() {
 		return controls.getDriverAxis().get(Axis.RIGHT_X);
 	}
-
+	
+	/*
+	 * getOperatorRtTrigger
+	 * Author: Nitesh Puri
+	 * ---------------------------------------------
+	 * Purpose: gets the operator's current trigger value
+	 * Returns: Operator's Trigger Value As Double
+	 */
+	public double getOperatorRtTrigger() {
+		return controls.getOperatorAxes().get(Axis.RIGHT_TRIGGER);
+	}
+	
 }
