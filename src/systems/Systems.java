@@ -16,15 +16,18 @@ package systems;
 import java.util.HashMap;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Spark;
 import systems.subsystems.Collector;
 import systems.subsystems.Controls;
 import systems.subsystems.Controls.Axis;
 import systems.subsystems.DriveTrain;
+import systems.subsystems.NavX;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
 public class Systems{
@@ -35,7 +38,9 @@ public class Systems{
 	private Controls controls;
 	private DriveTrain driveTrain;
 	private Collector collector;
+	private NavX navX;
 	
+	public boolean inAuto;
 	
 	/*
 	 * Constructor
@@ -112,8 +117,8 @@ public class Systems{
 		
 		// Other Sensors
 		sysObjects.put(SysObj.Sensors.PDP, new PowerDistributionPanel(0));
-		
-		
+		sysObjects.put(SysObj.Sensors.NAVX, new AHRS(SPI.Port.kMXP));
+		navX = new NavX((AHRS) sysObjects.get(SysObj.Sensors.NAVX));
 		
 	}
 	
@@ -142,6 +147,7 @@ public class Systems{
 		controls.update();
 		driveTrain.update();
 		collector.update();
+		navX.update();
 	}
 	
 	/*

@@ -46,23 +46,24 @@ public class Collector implements Subsystem {
 		if (systems == null) {
 			systems = Systems.getInstance();
 		}
-		 
-		//Controls for intake
-		if(systems.getOperatorRtTrigger()>.2) {
-			intakeLeft.set(systems.getOperatorRtTrigger());
-			intakeRight.set(systems.getOperatorRtTrigger());
+		 if(!systems.inAuto) {
+			//Controls for intake
+			if(systems.getOperatorRtTrigger()>.2) {
+				intakeLeft.set(systems.getOperatorRtTrigger());
+				intakeRight.set(systems.getOperatorRtTrigger());
+			}
+			else if(systems.getOperatorLtTrigger()>.2) {
+				intakeLeft.set(-systems.getOperatorLtTrigger());
+				intakeRight.set(-systems.getOperatorLtTrigger());
+			}
+			else {
+				intakeLeft.set(0.0);
+				intakeRight.set(0.0);
+			}
+			
+			//Controls for arm
+			collectorArm.set(systems.getOperatorLJoystick());
 		}
-		else if(systems.getOperatorLtTrigger()>.2) {
-			intakeLeft.set(-systems.getOperatorLtTrigger());
-			intakeRight.set(-systems.getOperatorLtTrigger());
-		}
-		else {
-			intakeLeft.set(0.0);
-			intakeRight.set(0.0);
-		}
-		
-		//Controls for arm
-		collectorArm.set(systems.getOperatorLJoystick());
 	}
 
 	@Override

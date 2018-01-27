@@ -51,9 +51,13 @@ public class DriveTrain implements Subsystem{
 		if (systems == null) {
 			systems = Systems.getInstance();
 		}
-		drive.arcadeDrive(systems.getDriverAxisLeftY(), systems.getDriverAxisRightX());
+		
+		if (systems.inAuto){
+			return;
+		}
+		
+		drive.arcadeDrive(.75*systems.getDriverAxisLeftY(), .75*systems.getDriverAxisRightX());
 	}
-
 	@Override
 	public void toSmartDashboard() {
 		// TODO Auto-generated method stub

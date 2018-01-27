@@ -26,7 +26,7 @@ public class Robot extends IterativeRobot {
 	private String m_autoSelected;
 	private SendableChooser<String> m_chooser = new SendableChooser<>();
 	private static Systems systems;
-
+	
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
@@ -54,6 +54,7 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousInit() {
+		systems.inAuto = true;
 		String gameData;
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
 		System.out.println(gameData);
@@ -88,6 +89,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		
+		systems.inAuto = false;
 		systems.update();
 	}
 
