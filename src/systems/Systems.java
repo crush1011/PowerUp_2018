@@ -28,6 +28,7 @@ import systems.subsystems.Controls;
 import systems.subsystems.Controls.Axis;
 import systems.subsystems.DriveTrain;
 import systems.subsystems.NavX;
+import systems.subsystems.RobotEncoder;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
 public class Systems{
@@ -39,6 +40,7 @@ public class Systems{
 	private DriveTrain driveTrain;
 	private Collector collector;
 	private NavX navX;
+	private RobotEncoder lEncoder, rEncoder, armEncoder;
 	
 	public boolean inAuto;
 	
@@ -102,6 +104,9 @@ public class Systems{
 		sysObjects.put(SysObj.Sensors.ARM_ENCODER, new Encoder(4,5));
 		sysObjects.put(SysObj.Sensors.LEFT_ENCODER, new Encoder(2,3));
 		sysObjects.put(SysObj.Sensors.RIGHT_ENCODER, new Encoder(1,0));
+		lEncoder = new RobotEncoder((Encoder) sysObjects.get(SysObj.Sensors.LEFT_ENCODER));
+		rEncoder = new RobotEncoder((Encoder) sysObjects.get(SysObj.Sensors.RIGHT_ENCODER));
+		armEncoder = new RobotEncoder((Encoder) sysObjects.get(SysObj.Sensors.ARM_ENCODER));
 		
 		System.out.println("Don't forget controls");
 		
@@ -148,6 +153,9 @@ public class Systems{
 		driveTrain.update();
 		collector.update();
 		navX.update();
+		lEncoder.update();
+		rEncoder.update();
+		armEncoder.update();
 	}
 	
 	/*

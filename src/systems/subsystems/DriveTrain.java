@@ -19,6 +19,7 @@ public class DriveTrain implements Subsystem{
 	private WPI_TalonSRX rtMain, rtSlave1, rtSlave2;
 	private static Systems systems;
 	private DifferentialDrive drive;
+	private double driveConstant;
 	
 	/*
 	 * Constructor
@@ -42,7 +43,7 @@ public class DriveTrain implements Subsystem{
 		rtSlave1.follow(rtM);
 		rtSlave2.follow(rtM);
 		
-		
+		driveConstant = 0.75;
 		drive = new DifferentialDrive(ltMain, rtMain);
 	}
 
@@ -56,7 +57,7 @@ public class DriveTrain implements Subsystem{
 			return;
 		}
 		
-		drive.arcadeDrive(.75*systems.getDriverAxisLeftY(), .75*systems.getDriverAxisRightX());
+		drive.arcadeDrive(driveConstant*systems.getDriverAxisLeftY(), driveConstant*systems.getDriverAxisRightX());
 	}
 	@Override
 	public void toSmartDashboard() {
