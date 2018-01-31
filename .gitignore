@@ -11,8 +11,8 @@ local.properties
 .loadpath
 .recommenders
 .classpath
-.jar
-.class
+*.jar
+*.class
 
 # External tool builders
 .externalToolBuilders/
