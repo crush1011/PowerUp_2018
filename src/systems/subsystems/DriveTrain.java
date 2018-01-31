@@ -57,12 +57,27 @@ public class DriveTrain implements Subsystem{
 			return;
 		}
 		
-		drive.arcadeDrive(driveConstant*systems.getDriverAxisLeftY(), driveConstant*systems.getDriverAxisRightX());
+		drive.arcadeDrive(driveConstant*systems.getDriverAxisLeftY(), driveConstant*systems.getDriverAxisRightX(), true);
 	}
 	@Override
 	public void toSmartDashboard() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	/*
+	 * drive
+	 * Author: Finlay Parsons
+	 * Collaborators: Jeremiah Hanson
+	 * -------------------------------
+	 * Purpose: Set velocity and rotation of robot.
+	 * Parameters: 
+	 * 	x: Speed of the motors (-1 to 1)
+	 *  z: Rotation of the robot (-1 to 1 - Clockwise is positive)
+	 * Return: None
+	 */
+	public void drive(double x, double z){
+		drive.arcadeDrive(x, z);
 	}
 
 }

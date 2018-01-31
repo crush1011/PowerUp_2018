@@ -7,6 +7,7 @@
 
 package org.usfirst.frc.team1011.robot;
 
+import autonomous.LeftSideLeftScore;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -26,6 +27,7 @@ public class Robot extends IterativeRobot {
 	private String m_autoSelected;
 	private SendableChooser<String> m_chooser = new SendableChooser<>();
 	private static Systems systems;
+	private LeftSideLeftScore leftSideLeftScore;
 	
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -59,12 +61,12 @@ public class Robot extends IterativeRobot {
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
 		System.out.println(gameData);
 		
-		/*
 		m_autoSelected = m_chooser.getSelected();
 		// autoSelected = SmartDashboard.getString("Auto Selector",
 		// defaultAuto);
 		System.out.println("Auto selected: " + m_autoSelected);
-		*/
+		leftSideLeftScore = new LeftSideLeftScore();
+		
 	}
 
 	/**
@@ -77,8 +79,10 @@ public class Robot extends IterativeRobot {
 				// Put custom auto code here
 				break;
 			case kDefaultAuto:
+				leftSideLeftScore.update();
+				break;
 			default:
-				// Put default auto code here
+				leftSideLeftScore.update();
 				break;
 		}
 	}

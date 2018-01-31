@@ -36,11 +36,11 @@ public class Systems{
 	private static Systems systems;
 	private HashMap<SysObj, Object> sysObjects;
 	
-	private Controls controls;
-	private DriveTrain driveTrain;
-	private Collector collector;
-	private NavX navX;
-	private RobotEncoder lEncoder, rEncoder, armEncoder;
+	private static Controls controls;
+	private static DriveTrain driveTrain;
+	private static Collector collector;
+	private static NavX navX;
+	private static RobotEncoder lEncoder, rEncoder, armEncoder;
 	
 	public boolean inAuto;
 	
@@ -212,4 +212,63 @@ public class Systems{
 	public double getOperatorLJoystick(){
 		return controls.getOperatorAxes().get(Axis.LEFT_Y);
 	}
+	
+	/*
+	 * getDriveTrain
+	 * Author: Finlay Parsons
+	 * Collaborators: Jeremiah Hanson
+	 * ---------------------------------
+	 * Purpose: Returns Systems instance of DriveTrain
+	 * Returns: DriveTrain
+	 */
+	public static DriveTrain getDriveTrain(){
+		return driveTrain;
+	}
+	
+	/*
+	 * getCollector
+	 * Author Finlay Parsons
+	 * Collaborators: Jeremiah Hanson
+	 * ----------------------------------
+	 * Purpose: Returns Systems instance of Collector
+	 * Returns: Collector
+	 */
+	public static Collector getCollector(){
+		return collector;
+	}
+	
+	/*
+	 * getNavX
+	 * Author Finlay Parsons
+	 * Collaborators: Jeremiah Hanson
+	 * ----------------------------------
+	 * Purpose: Returns Systems instance of NavX
+	 * Returns: NavX
+	 */
+	public static NavX getNavX(){
+		return navX;
+	}
+	
+	/*
+	 * getRobotEncoder
+	 * Author Finlay Parsons
+	 * Collaborators: Jeremiah Hanson
+	 * ----------------------------------
+	 * Purpose: Returns Systems instance of RobotEncoder
+	 * Returns: RobotEncoder
+	 */
+	public static RobotEncoder getRobotEncoder(SysObj.Sensors sensor){
+		switch(sensor){
+		case LEFT_ENCODER:
+			return lEncoder;
+		case RIGHT_ENCODER:
+			return rEncoder;
+		case ARM_ENCODER:
+			return armEncoder;
+		default:
+			return null;
+		
+		}
+	}
+	
 }
