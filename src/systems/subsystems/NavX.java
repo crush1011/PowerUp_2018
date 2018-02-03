@@ -44,7 +44,7 @@ public class NavX implements Subsystem {
 		}
 		
 		currentAngle = navX.getFusedHeading();
-		currentAngle = ((currentAngle % 360) + 360) % 360;
+		currentAngle = (((currentAngle % 360) + 360) % 360);
 		this.toSmartDashboard();
 		
 		
@@ -60,7 +60,20 @@ public class NavX implements Subsystem {
 	 */
 	public double getCurrentAngle() {
 		//update();
-		return currentAngle-zeroAngle;
+		return currentAngle;
+	}
+	
+	/*
+	 * getDriveAngle
+	 * Author: Finlay Parsons
+	 * Collaborators: Nitesh Puri, Jeremiah Hanson, Ethan Ngo
+	 * -------------------------------------------------------
+	 * Purpose: Gets the angle that the robot is pointing in
+	 * Returns: A double in between -1 and 1. 0 is forward, positive is right.
+	 */
+	public double getDriveAngle(){
+		if(currentAngle>180) return (currentAngle - 360)/360;
+		else return currentAngle/360;
 	}
 	
 	/*
@@ -72,8 +85,7 @@ public class NavX implements Subsystem {
 	 *Returns nothing
 	 */
 	public void zeroAngler() {
-		//update();
-		zeroAngle = currentAngle;
+		navX.reset();
 	}
 
 	@Override

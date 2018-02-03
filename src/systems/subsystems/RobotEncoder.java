@@ -9,6 +9,7 @@ package systems.subsystems;
 import java.util.function.Function;
 
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import systems.Subsystem;
 
 public class RobotEncoder implements Subsystem{
@@ -27,12 +28,8 @@ public class RobotEncoder implements Subsystem{
 	 */
 	public RobotEncoder(Encoder e){
 		this.e=e;
-		conversion = (val) ->{
-			return val;
-		};
-		negative=false;
-		startPos = 0;
-		currentPos = startPos;
+		startPos=e.getDistance();
+		e.setDistancePerPulse(0.047);
 	}
 	
 	/*
@@ -44,11 +41,20 @@ public class RobotEncoder implements Subsystem{
 	 */
 	
 	public double getValue(){
-		return conversion.apply(currentPos);
-		
+		update();
+		return currentPos;
+	}
+	
+	public double getPulse(){
+		return e.get();
+	}
+	
+	public double getRate(){
+		return e.getRate();
 	}
 	
 	public void reset(){
+		e.reset();
 		startPos = e.getDistance();
 	}
 
@@ -56,9 +62,10 @@ public class RobotEncoder implements Subsystem{
 	public void update() {
 		// TODO Auto-generated method stub
 		if(e!=null){
-			currentPos = e.getDistance();
-			currentPos -= startPos;
-			currentPos = negative? -currentPos:currentPos;
+			currentPos = e.getDistance()-startPos;
+			if(currentPos < 0) {
+				currentPos = currentPos * -1;
+		}
 		}
 	}
 

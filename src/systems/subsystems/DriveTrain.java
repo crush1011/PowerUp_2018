@@ -7,10 +7,12 @@
 
 package systems.subsystems;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import systems.Subsystem;
+import systems.SysObj;
 import systems.Systems;
 
 public class DriveTrain implements Subsystem{
@@ -36,12 +38,18 @@ public class DriveTrain implements Subsystem{
 		ltSlave2 = ltS2;
 		ltSlave1.follow(ltM);
 		ltSlave2.follow(ltM);
+		ltMain.setNeutralMode(NeutralMode.Brake);
+		ltSlave1.setNeutralMode(NeutralMode.Brake);
+		ltSlave2.setNeutralMode(NeutralMode.Brake);
 		
 		rtMain = rtM;
 		rtSlave1 = rtS1;
 		rtSlave2 = rtS2;
 		rtSlave1.follow(rtM);
 		rtSlave2.follow(rtM);
+		rtMain.setNeutralMode(NeutralMode.Brake);
+		rtSlave1.setNeutralMode(NeutralMode.Brake);
+		rtSlave2.setNeutralMode(NeutralMode.Brake);
 		
 		driveConstant = 0.75;
 		drive = new DifferentialDrive(ltMain, rtMain);
@@ -58,6 +66,7 @@ public class DriveTrain implements Subsystem{
 		}
 		
 		drive.arcadeDrive(driveConstant*systems.getDriverAxisLeftY(), driveConstant*systems.getDriverAxisRightX(), true);
+		System.out.println("" + systems.getPulse());
 	}
 	@Override
 	public void toSmartDashboard() {
@@ -77,7 +86,18 @@ public class DriveTrain implements Subsystem{
 	 * Return: None
 	 */
 	public void drive(double x, double z){
-		drive.arcadeDrive(x, z);
+		drive.arcadeDrive(x, z, true);
+	}
+	
+	public void driveDistance(double distance, double speed){
+		if(systems.getEncoderDistance(SysObj.Sensors.RIGHT_ENCODER)<distance){
+			drive.arcadeDrive(speed, -2*systems.getNavXDriveAngle());
+		}
+		else {
+			drive.arcadeDrive(0,0);
+			systems.resetEncoders();
+		}
+	
 	}
 
 }

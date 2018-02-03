@@ -27,6 +27,7 @@ import systems.subsystems.Collector;
 import systems.subsystems.Controls;
 import systems.subsystems.Controls.Axis;
 import systems.subsystems.DriveTrain;
+import systems.subsystems.EthanDrive;
 import systems.subsystems.NavX;
 import systems.subsystems.RobotEncoder;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -38,6 +39,7 @@ public class Systems{
 	
 	private static Controls controls;
 	private static DriveTrain driveTrain;
+	private static EthanDrive ethanDrive;
 	private static Collector collector;
 	private static NavX navX;
 	private static RobotEncoder lEncoder, rEncoder, armEncoder;
@@ -80,6 +82,13 @@ public class Systems{
 									(WPI_TalonSRX) sysObjects.get(SysObj.MotorController.RIGHT_2), 
 									(WPI_TalonSRX) sysObjects.get(SysObj.MotorController.RIGHT_3));
 		
+		ethanDrive = new EthanDrive((WPI_TalonSRX) sysObjects.get(SysObj.MotorController.LEFT_1), 
+				(WPI_TalonSRX) sysObjects.get(SysObj.MotorController.LEFT_2), 
+				(WPI_TalonSRX) sysObjects.get(SysObj.MotorController.LEFT_3), 
+				(WPI_TalonSRX) sysObjects.get(SysObj.MotorController.RIGHT_1), 
+				(WPI_TalonSRX) sysObjects.get(SysObj.MotorController.RIGHT_2), 
+				(WPI_TalonSRX) sysObjects.get(SysObj.MotorController.RIGHT_3));
+		
 		// Arm Motor Controllers
 		sysObjects.put(SysObj.MotorController.COLLECTOR_ARM, new WPI_TalonSRX(0));
 		sysObjects.put(SysObj.MotorController.INTAKE_LEFT, new Spark(6));
@@ -102,8 +111,9 @@ public class Systems{
 		// Encoders
 		sysObjects.put(SysObj.Sensors.CLIMB_ENCODER, new Encoder(8,9));
 		sysObjects.put(SysObj.Sensors.ARM_ENCODER, new Encoder(4,5));
-		sysObjects.put(SysObj.Sensors.LEFT_ENCODER, new Encoder(2,3));
-		sysObjects.put(SysObj.Sensors.RIGHT_ENCODER, new Encoder(1,0));
+		sysObjects.put(SysObj.Sensors.LEFT_ENCODER, new Encoder(2,3, true, Encoder.EncodingType.k4X));
+		sysObjects.put(SysObj.Sensors.RIGHT_ENCODER, new Encoder(1,0, true, Encoder.EncodingType.k4X));
+		//((Encoder) sysObjects.get(SysObj.Sensors.LEFT_ENCODER)).setDistancePerPulse(Math.PI);
 		lEncoder = new RobotEncoder((Encoder) sysObjects.get(SysObj.Sensors.LEFT_ENCODER));
 		rEncoder = new RobotEncoder((Encoder) sysObjects.get(SysObj.Sensors.RIGHT_ENCODER));
 		armEncoder = new RobotEncoder((Encoder) sysObjects.get(SysObj.Sensors.ARM_ENCODER));
@@ -156,6 +166,10 @@ public class Systems{
 		lEncoder.update();
 		rEncoder.update();
 		armEncoder.update();
+		if(controls.getButton(Controls.Button.BACK, SysObj.Sensors.DRIVER_STICK)){
+			navX.zeroAngler();
+		}
+		//ethanDrive.update();
 	}
 	
 	/*
@@ -225,6 +239,10 @@ public class Systems{
 		return driveTrain;
 	}
 	
+	public static EthanDrive getEthanDrive(){
+		return ethanDrive;
+	}
+	
 	/*
 	 * getCollector
 	 * Author Finlay Parsons
@@ -268,6 +286,131 @@ public class Systems{
 		default:
 			return null;
 		
+		}
+	}
+	
+	/*
+	 * resetEncoders
+	 * Author: Finlay Parsons
+	 * Collaborators: Jeremiah Hanson, Ethan Ngo, Nitesh Puri
+	 * --------------------------------------------------------
+	 * Purpose: Resets the value of the encoders before to make the starting
+	 * position equal to 0
+	 */
+	public void resetEncoders(){
+		lEncoder.reset();
+		rEncoder.reset();
+		armEncoder.reset();
+	}
+	
+	/*
+	 * getPulse
+	 * Author: Nitesh Puri
+	 * Contributors: Jeremiah Hanson, Finlay Parsons
+	 * -----------------------------------------------
+	 * Purpose: Gets the pulse
+	 * Return: Returns a double
+	 */
+	public double getPulse(){
+		return lEncoder.getPulse();
+	}
+	
+	/*
+	 * printEncoderInfo
+	 * Author: Finlay Parsons
+	 * Contrubitors: Jeremiah Hanson
+	 * -------------------------------------
+	 * Purpose: prints encoder info to system.out
+	 * Parameters:
+	 * 	a: print distance
+	 * 	b: print rate
+	 *  c: print pulse
+	 * returns nothing
+	 */
+	public void printEncoderInfo(boolean a, boolean b, boolean c, SysObj.Sensors sensor){
+		
+		switch(sensor){
+			case LEFT_ENCODER: 
+				if(a) System.out.print("Left Distance: "+ lEncoder.getValue());
+				if(b) System.out.print("    Left Rate: " + lEncoder.getRate());
+				if(c) System.out.print("    Left Pulse: " + lEncoder.getPulse());
+				break;
+			case RIGHT_ENCODER:
+				if(a) System.out.print("Right Distance: "+ rEncoder.getValue());
+				if(b) System.out.print("    Right Rate: " + rEncoder.getRate());
+				if(c) System.out.print("    Right Pulse: " + rEncoder.getPulse());
+				break;
+			case ARM_ENCODER:
+				if(a) System.out.print("Arm Distance: "+ armEncoder.getValue());
+				if(b) System.out.print("    Arm Rate: " + armEncoder.getRate());
+				if(c) System.out.print("    Arm Pulse: " + armEncoder.getPulse());
+				break;
+			default:
+				System.out.println("ERROR: no encoder selected!");
+				break;
+		}
+		
+		
+		System.out.println();
+	
+	}
+	
+	/*
+	 * getNavXAngle
+	 * Author: Finlay Parsons
+	 * Collaborators: Nitesh Puri, Jeremiah Hanson
+	 * ----------------------------------------------
+	 * Purpose: Gets the current angle of the robot
+	 * Returns: Double
+	 */
+	public double getNavXAngle(){
+		return navX.getCurrentAngle();
+	}
+	
+	/*
+	 * resetNavXAngle
+	 * Author: Finlay Parsons
+	 * Collaborators: Nitesh Puri, Jeremiah Hanson, Ethan Yes
+	 * -------------------------------------------------------
+	 * Purpose: Sets the current navX angle to 0
+	 * Returns: nothing
+	 */
+	public void resetNavXAngle(){
+		navX.zeroAngler();
+	}
+	
+	/*
+	 * getNavXDriveAngle
+	 * Author: Finlay Parsons
+	 * Collaborators: Nitesh Puri, Jeremiah Hanson, Ethan Yes
+	 * -------------------------------------------------------
+	 * Purpose: Gets the current angle that the robot is pointing
+	 * Returns: A double in between -1 and 1. 0 is forward, positive is right.
+	 */
+	public double getNavXDriveAngle(){
+		return navX.getDriveAngle();
+	}
+	
+	/*
+	 * getEncoderDistance
+	 * Author: Finlay Parsons
+	 * Collaborators: Nitesh Puri, Jeremiah Hanson, Ethan Yes
+	 * -------------------------------------------------------
+	 * Purpose: Gets the current distance travelled by the encoders.
+	 * Parameters:
+	 * 	Encoders
+	 * Returns a double
+	 */
+	public double getEncoderDistance(SysObj.Sensors encoder){
+		switch(encoder){
+		case LEFT_ENCODER:
+			return lEncoder.getValue();
+		case RIGHT_ENCODER:
+			return rEncoder.getValue();
+		case ARM_ENCODER:
+			return armEncoder.getValue();
+		default:
+			return 0;
 		}
 	}
 	

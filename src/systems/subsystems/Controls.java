@@ -12,6 +12,7 @@ import java.util.HashMap;
 
 import edu.wpi.first.wpilibj.Joystick;
 import systems.Subsystem;
+import systems.SysObj;
 
 public class Controls implements Subsystem{
 	
@@ -92,7 +93,7 @@ public class Controls implements Subsystem{
 	 * Author: Ruben Castro
 	 * Contributor(s): Jeremiah Hanson
 	 * --------------------------------------------------
-	 * Prupose: this created the controls class there should
+	 * Purpose: this created the controls class there should
 	 * 	only be one.
 	 */
 	public Controls(Joystick driverJoystick, Joystick operatorJoystick){
@@ -173,6 +174,28 @@ public class Controls implements Subsystem{
 	 */
 	public HashMap<Axis, Double> getOperatorAxes(){
 		return operatorAxis;
+	}
+	
+	/*
+	 * getButton
+	 * Author: Finlay Parsons
+	 * Collaborators: Jeremiah Hanson, Nitesh Puri, Ethan Ngo
+	 * --------------------------------------------------------
+	 * Purpose: Gets current button being pressed
+	 * Parameters: 
+	 * 	button: enum representing the button to get
+	 * Returns: boolean
+	 */
+	public boolean getButton(Button button, SysObj.Sensors controller){
+		if(controller == SysObj.Sensors.DRIVER_STICK) {
+			return driverButtons.get(button);
+		}
+		else if(controller == SysObj.Sensors.OPERATOR_STICK){
+			return operatorButtons.get(button);
+		}
+		else {
+			return false;
+		}
 	}
 	
 	/*

@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import systems.SysObj;
 import systems.Systems;
 
 /**
@@ -61,6 +62,8 @@ public class Robot extends IterativeRobot {
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
 		System.out.println(gameData);
 		
+		systems.resetEncoders();
+		
 		m_autoSelected = m_chooser.getSelected();
 		// autoSelected = SmartDashboard.getString("Auto Selector",
 		// defaultAuto);
@@ -74,6 +77,9 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
+		
+		systems.update();
+		
 		switch (m_autoSelected) {
 			case kCustomAuto:
 				// Put custom auto code here
@@ -93,8 +99,11 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		
+		
 		systems.inAuto = false;
 		systems.update();
+		System.out.println(systems.getNavXAngle());
+		System.out.println(systems.getNavXDriveAngle()+"\n");
 	}
 
 	/**
