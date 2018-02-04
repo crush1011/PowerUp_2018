@@ -414,4 +414,16 @@ public class Systems{
 		}
 	}
 	
+	/*
+	 * instantiate
+	 * Author: Finlay Parsons
+	 * Collaborators: Nitesh Puri, Ethan Yes, Jeremiah Hanson
+	 * -------------------------------------------------------
+	 * Purpose: Gives an instance of systems to every class in here
+	 * Returns: nothing
+	 */
+	public void instantiate(){
+		driveTrain.getSystems();
+	}
+	
 }

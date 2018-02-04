@@ -74,6 +74,20 @@ public class DriveTrain implements Subsystem{
 		
 	}
 	
+	
+	/*
+	 * getSystems
+	 * Author: Finlay Parsons
+	 * Collaborators: Nitesh Puri, Ethan Yes, Jeremiah Hanson
+	 * -------------------------------------------------------
+	 * Purpose: Gets an instance of Systems
+	 * Returns: nothing
+	 */
+	public void getSystems(){
+		systems = Systems.getInstance();
+	}
+	
+	
 	/*
 	 * drive
 	 * Author: Finlay Parsons
@@ -89,15 +103,41 @@ public class DriveTrain implements Subsystem{
 		drive.arcadeDrive(x, z, true);
 	}
 	
+	/*
+	 * driveDistance
+	 * Author: Finlay Parsons
+	 * Collaborators: Nitesh Puri, Ethan Yes, Jeremiah Hanson
+	 * --------------------------------------------------------
+	 * Purpose: Drive a distance at a speed
+	 * Parameters:
+	 * 	distance: how far to drive (in inches)
+	 * 	speed: how fast to drive
+	 * Returns: nothing
+	 */
 	public void driveDistance(double distance, double speed){
-		if(systems.getEncoderDistance(SysObj.Sensors.RIGHT_ENCODER)<distance){
+		while(systems.getEncoderDistance(SysObj.Sensors.RIGHT_ENCODER)<distance){
+			systems.getRobotEncoder(SysObj.Sensors.LEFT_ENCODER).update();
+			systems.getRobotEncoder(SysObj.Sensors.RIGHT_ENCODER).update();
+			systems.getNavX().update();
 			drive.arcadeDrive(speed, -2*systems.getNavXDriveAngle());
+			systems.printEncoderInfo(true, false, true, SysObj.Sensors.RIGHT_ENCODER);
 		}
-		else {
-			drive.arcadeDrive(0,0);
-			systems.resetEncoders();
-		}
+		 
+		drive.arcadeDrive(0,0);
+		systems.resetEncoders();
+		
 	
+	}
+	
+	public void turnTo(double angle, double speed) {
+		while(systems.getNavXAngle() >= angle+1 || systems.getNavXAngle() <= angle-1) {
+			systems.getNavX().update();
+			if(Math.abs(angle-systems.getNavXAngle())>180){
+				speed = -speed;
+			}
+			drive.arcadeDrive(0, speed);
+		}
+		systems.resetEncoders();
 	}
 
 }

@@ -70,6 +70,20 @@ public class Robot extends IterativeRobot {
 		System.out.println("Auto selected: " + m_autoSelected);
 		leftSideLeftScore = new LeftSideLeftScore();
 		
+		systems.instantiate();
+		
+		switch (m_autoSelected) {
+		case kCustomAuto:
+			// Put custom auto code here
+			break;
+		case kDefaultAuto:
+			leftSideLeftScore.run();
+			break;
+		default:
+			leftSideLeftScore.run();
+			break;
+	}
+		
 	}
 
 	/**
@@ -78,19 +92,9 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousPeriodic() {
 		
-		systems.update();
+		//systems.update();
 		
-		switch (m_autoSelected) {
-			case kCustomAuto:
-				// Put custom auto code here
-				break;
-			case kDefaultAuto:
-				leftSideLeftScore.update();
-				break;
-			default:
-				leftSideLeftScore.update();
-				break;
-		}
+		
 	}
 
 	/**
