@@ -22,6 +22,7 @@ public class DriveTrain implements Subsystem{
 	private static Systems systems;
 	private DifferentialDrive drive;
 	private double driveConstant;
+	private double robotWidth;	//Distance between wheels
 	
 	/*
 	 * Constructor
@@ -53,6 +54,8 @@ public class DriveTrain implements Subsystem{
 		
 		driveConstant = 0.75;
 		drive = new DifferentialDrive(ltMain, rtMain);
+		
+		robotWidth=27.5;
 	}
 
 	@Override
@@ -104,6 +107,19 @@ public class DriveTrain implements Subsystem{
 	}
 	
 	/*
+	 * tankDrive
+	 * Author: Finlay Parsons
+	 * -------------------------
+	 * Sets each wheel speed individually. Used for circleTurn-ing in auto
+	 * Parameters:
+	 * 	double leftSpeed- left wheels speed
+	 * 	double rightSpeed- right wheels speed
+	 */
+	public void tankDrive(double leftSpeed, double rightSpeed){
+		drive.tankDrive(leftSpeed, rightSpeed);
+	}
+	
+	/*
 	 * driveDistance
 	 * Author: Finlay Parsons
 	 * Collaborators: Nitesh Puri, Ethan Yes, Jeremiah Hanson
@@ -130,13 +146,55 @@ public class DriveTrain implements Subsystem{
 	}
 	
 	public void turnTo(double angle, double speed) {
+		if(Math.abs(angle-systems.getNavXAngle())>180){
+			speed = -speed;
+		}
 		while(systems.getNavXAngle() >= angle+1 || systems.getNavXAngle() <= angle-1) {
 			systems.getNavX().update();
-			if(Math.abs(angle-systems.getNavXAngle())>180){
-				speed = -speed;
-			}
 			drive.arcadeDrive(0, speed);
+			System.out.println(systems.getNavXAngle());
 		}
+		systems.resetEncoders();
+	}
+	
+	/*
+	 * circleTurn
+	 * Author: Finlay Parsons
+	 * ------------------------
+	 * Robot moves along a circle with a specified radius to a specified angle
+	 */
+	public void circleTurn(double radius, double angle, double speed, boolean right, boolean forwards){
+		double v1=1, v2;
+		if(!forwards) speed *= -1;
+		v2=v1/((robotWidth+radius)/radius);
+		double initialAngle = systems.getNavXAngle();
+		
+		while(systems.getNavXAngle() >= angle+2 || systems.getNavXAngle() <= angle-2) {
+			systems.getNavX().update();
+			
+			if((right && angle < systems.getNavXAngle()) || (!right && angle > systems.getNavXAngle())){
+				if(360-Math.abs(angle - systems.getNavXAngle()) < 30){
+					speed = speed*(Math.abs(angle-systems.getNavXAngle())/30);
+				}
+			}
+			else{
+				if(Math.abs(angle-systems.getNavXAngle()) < 30) {
+					speed = speed*(Math.abs(angle-systems.getNavXAngle())/30);
+				}
+			}
+			if(right){
+				drive.tankDrive(speed*v1, speed*v2);
+			}
+			else {
+				drive.tankDrive(speed*v2, speed*v1);
+			}
+			
+			
+			System.out.print("v1: " + v1 + "   ");
+			System.out.print("v2: " + v2);
+			System.out.println("    Angle:" + systems.getNavXAngle());
+		}
+		drive.arcadeDrive(0, 0);
 		systems.resetEncoders();
 	}
 

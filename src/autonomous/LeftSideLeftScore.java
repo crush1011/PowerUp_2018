@@ -32,9 +32,9 @@ public class LeftSideLeftScore implements Runnable{
 	@Override
 	public void run() {
 		
-		driveTrain.driveDistance(60, 0.5);
-		driveTrain.turnTo(180, 0.5);
-		
+	//	driveTrain.driveDistance(60, 0.5);
+	//	driveTrain.turnTo(180, 0.5);
+		driveTrain.circleTurn(40, 300, 0.8, true, false);
 	}
 	
 	

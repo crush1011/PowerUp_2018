@@ -63,6 +63,7 @@ public class Robot extends IterativeRobot {
 		System.out.println(gameData);
 		
 		systems.resetEncoders();
+		systems.resetNavXAngle();
 		
 		m_autoSelected = m_chooser.getSelected();
 		// autoSelected = SmartDashboard.getString("Auto Selector",
