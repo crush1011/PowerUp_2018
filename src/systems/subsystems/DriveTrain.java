@@ -10,6 +10,7 @@ package systems.subsystems;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import systems.Subsystem;
 import systems.SysObj;
@@ -131,12 +132,14 @@ public class DriveTrain implements Subsystem{
 	 * Returns: nothing
 	 */
 	public void driveDistance(double distance, double speed){
-		while(systems.getEncoderDistance(SysObj.Sensors.RIGHT_ENCODER)<distance){
+		double desiredDriveAngle = systems.getNavXAngle();
+		while(DriverStation.getInstance().isAutonomous() && (systems.getEncoderDistance(SysObj.Sensors.RIGHT_ENCODER)<distance)){
 			systems.getRobotEncoder(SysObj.Sensors.LEFT_ENCODER).update();
 			systems.getRobotEncoder(SysObj.Sensors.RIGHT_ENCODER).update();
 			systems.getNavX().update();
-			drive.arcadeDrive(speed, -2*systems.getNavXDriveAngle());
-			systems.printEncoderInfo(true, false, true, SysObj.Sensors.RIGHT_ENCODER);
+			if(systems.getNavXAngle()>180) desiredDriveAngle = (systems.getNavXAngle() - 360)/360;
+			else desiredDriveAngle = systems.getNavXAngle()/360;
+			drive.arcadeDrive(speed, -(speed/(Math.abs(speed)))*desiredDriveAngle);
 		}
 		 
 		drive.arcadeDrive(0,0);
@@ -144,15 +147,16 @@ public class DriveTrain implements Subsystem{
 		
 	
 	}
-	
-	public void turnTo(double angle, double speed) {
-		if(Math.abs(angle-systems.getNavXAngle())>180){
+	/*
+	 * FIN DO THE COMMENT
+	 */
+	public void turnTo(double angle, double speed, boolean right) {
+		if(!right){
 			speed = -speed;
 		}
-		while(systems.getNavXAngle() >= angle+1 || systems.getNavXAngle() <= angle-1) {
+		while(DriverStation.getInstance().isAutonomous() && (systems.getNavXAngle() >= angle+2 || systems.getNavXAngle() <= angle-2)) {
 			systems.getNavX().update();
 			drive.arcadeDrive(0, speed);
-			System.out.println(systems.getNavXAngle());
 		}
 		systems.resetEncoders();
 	}
@@ -162,24 +166,31 @@ public class DriveTrain implements Subsystem{
 	 * Author: Finlay Parsons
 	 * ------------------------
 	 * Robot moves along a circle with a specified radius to a specified angle
+	 * FIN DO THE PARAMETERS
 	 */
 	public void circleTurn(double radius, double angle, double speed, boolean right, boolean forwards){
 		double v1=1, v2;
+		int counter = 0;
+		double prevEncoder = 0;
+		
 		if(!forwards) speed *= -1;
 		v2=v1/((robotWidth+radius)/radius);
 		double initialAngle = systems.getNavXAngle();
 		
-		while(systems.getNavXAngle() >= angle+2 || systems.getNavXAngle() <= angle-2) {
+		while(DriverStation.getInstance().isAutonomous() && (systems.getNavXAngle() >= angle+2 || systems.getNavXAngle() <= angle-2)) {
 			systems.getNavX().update();
+			systems.update();
 			
 			if((right && angle < systems.getNavXAngle()) || (!right && angle > systems.getNavXAngle())){
 				if(360-Math.abs(angle - systems.getNavXAngle()) < 30){
-					speed = speed*(Math.abs(angle-systems.getNavXAngle())/30);
+					//speed = speed*(Math.abs(angle-systems.getNavXAngle())/30);
+					speed=0.6;
 				}
 			}
 			else{
 				if(Math.abs(angle-systems.getNavXAngle()) < 30) {
-					speed = speed*(Math.abs(angle-systems.getNavXAngle())/30);
+				//	speed = speed*(Math.abs(angle-systems.getNavXAngle())/30);
+					speed=0.6;
 				}
 			}
 			if(right){
@@ -190,10 +201,20 @@ public class DriveTrain implements Subsystem{
 			}
 			
 			
-			System.out.print("v1: " + v1 + "   ");
-			System.out.print("v2: " + v2);
-			System.out.println("    Angle:" + systems.getNavXAngle());
+			if(systems.getEncoderDistance(SysObj.Sensors.RIGHT_ENCODER)==prevEncoder){
+				counter++;
+			}
+			else{
+				counter=0;
+			}
+			prevEncoder = systems.getEncoderDistance(SysObj.Sensors.RIGHT_ENCODER);
+			
+			if(counter>600) break;
+			
 		}
+		System.out.print("v1: " + v1 + "   ");
+		System.out.print("v2: " + v2);
+		System.out.println("    Angle:" + systems.getNavXAngle());
 		drive.arcadeDrive(0, 0);
 		systems.resetEncoders();
 	}

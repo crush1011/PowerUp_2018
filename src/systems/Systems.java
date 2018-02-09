@@ -426,4 +426,17 @@ public class Systems{
 		driveTrain.getSystems();
 	}
 	
+	
+	/*
+	 * resetAutoSystems
+	 * Author: Finlay Parsons
+	 * Collaborators: Nitesh Puri
+	 * ------------------------------------------------------
+	 * Purpose: Reset all of the subsystems auto uses
+	 * Returns nothing
+	 */
+	public void resetAutoSystems(){
+		resetNavXAngle();
+		resetEncoders();
+	}
 }
