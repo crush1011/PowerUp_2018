@@ -63,7 +63,7 @@ public class PIDManual {
 		i = 0; //SmartDashboard.getNumber("DB/ Silder 1", 0);
 		d = 0; //SmartDashboard.getNumber("DB/ Silder 2", 0);
 		
-		System.out.println(p +" - "+ i + " - " + d);
+		//System.out.println(p +" - "+ i + " - " + d);
 		
 		error = resources.getAngleError(dAngle, systems.getNavXAngle());
 		this.integral += error * refreshTime;
