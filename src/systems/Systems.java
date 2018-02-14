@@ -27,8 +27,8 @@ import systems.subsystems.Collector;
 import systems.subsystems.Controls;
 import systems.subsystems.Controls.Axis;
 import systems.subsystems.DriveTrain;
-import systems.subsystems.EthanDrive;
 import systems.subsystems.NavX;
+import systems.subsystems.PIDManual;
 import systems.subsystems.RobotEncoder;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
@@ -39,10 +39,10 @@ public class Systems{
 	
 	private static Controls controls;
 	private static DriveTrain driveTrain;
-	private static EthanDrive ethanDrive;
 	private static Collector collector;
 	private static NavX navX;
 	private static RobotEncoder lEncoder, rEncoder, armEncoder;
+	private static PIDManual pidManual;
 	
 	public boolean inAuto;
 	
@@ -81,13 +81,6 @@ public class Systems{
 									(WPI_TalonSRX) sysObjects.get(SysObj.MotorController.RIGHT_1), 
 									(WPI_TalonSRX) sysObjects.get(SysObj.MotorController.RIGHT_2), 
 									(WPI_TalonSRX) sysObjects.get(SysObj.MotorController.RIGHT_3));
-		
-		ethanDrive = new EthanDrive((WPI_TalonSRX) sysObjects.get(SysObj.MotorController.LEFT_1), 
-				(WPI_TalonSRX) sysObjects.get(SysObj.MotorController.LEFT_2), 
-				(WPI_TalonSRX) sysObjects.get(SysObj.MotorController.LEFT_3), 
-				(WPI_TalonSRX) sysObjects.get(SysObj.MotorController.RIGHT_1), 
-				(WPI_TalonSRX) sysObjects.get(SysObj.MotorController.RIGHT_2), 
-				(WPI_TalonSRX) sysObjects.get(SysObj.MotorController.RIGHT_3));
 		
 		// Arm Motor Controllers
 		sysObjects.put(SysObj.MotorController.COLLECTOR_ARM, new WPI_TalonSRX(0));
@@ -135,6 +128,10 @@ public class Systems{
 		sysObjects.put(SysObj.Sensors.NAVX, new AHRS(SPI.Port.kMXP));
 		navX = new NavX((AHRS) sysObjects.get(SysObj.Sensors.NAVX));
 		
+		System.out.println("Other stuff too!");
+		
+		pidManual = new PIDManual();
+		
 	}
 	
 	/*
@@ -169,7 +166,6 @@ public class Systems{
 		if(controls.getButton(Controls.Button.BACK, SysObj.Sensors.DRIVER_STICK)){
 			navX.zeroAngler();
 		}
-		//ethanDrive.update();
 	}
 	
 	/*
@@ -237,10 +233,6 @@ public class Systems{
 	 */
 	public static DriveTrain getDriveTrain(){
 		return driveTrain;
-	}
-	
-	public static EthanDrive getEthanDrive(){
-		return ethanDrive;
 	}
 	
 	/*
@@ -430,7 +422,7 @@ public class Systems{
 	/*
 	 * resetAutoSystems
 	 * Author: Finlay Parsons
-	 * Collaborators: Nitesh Puri
+	 * Collaborators: Nitesh Puri, Argeo Leyva 
 	 * ------------------------------------------------------
 	 * Purpose: Reset all of the subsystems auto uses
 	 * Returns nothing
@@ -438,5 +430,16 @@ public class Systems{
 	public void resetAutoSystems(){
 		resetNavXAngle();
 		resetEncoders();
+	}
+	
+	/*
+	 * getPIDOutput
+	 * Author: Finlay Parsons
+	 * Collaborator: Jason Hyunh
+	 * -----------------------------------
+	 * Purpose: Returns output of the PID
+	 */
+	public double getPIDOutput(){
+		return pidManual.getTurnOutput();
 	}
 }

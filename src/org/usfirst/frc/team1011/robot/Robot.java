@@ -104,11 +104,9 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		
-		
 		systems.inAuto = false;
 		systems.update();
-		System.out.println(systems.getNavXAngle());
-		System.out.println(systems.getNavXDriveAngle()+"\n");
+		
 	}
 
 	/**

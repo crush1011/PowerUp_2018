@@ -21,7 +21,7 @@ public class RobotEncoder implements Subsystem{
 	
 	/*
 	 * Constructor
-	 * Author: Ethan Ngo
+	 * Author: Ethan Yes
 	 * ------------------------------------------------
 	 * Constructor
 	 * Parameters: Encoder
@@ -29,12 +29,12 @@ public class RobotEncoder implements Subsystem{
 	public RobotEncoder(Encoder e){
 		this.e=e;
 		startPos=e.getDistance();
-		e.setDistancePerPulse(0.047);
+		e.setDistancePerPulse(0.05875);
 	}
 	
 	/*
 	 * getValue()
-	 * Author: Ethan Ngo
+	 * Author: Ethan Yes
 	 * -------------------------------------
 	 * Purpose: Return currentPos value
 	 * returns type double

@@ -53,10 +53,10 @@ public class DriveTrain implements Subsystem{
 		rtSlave1.setNeutralMode(NeutralMode.Brake);
 		rtSlave2.setNeutralMode(NeutralMode.Brake);
 		
-		driveConstant = 0.75;
+		driveConstant = 1.0;
 		drive = new DifferentialDrive(ltMain, rtMain);
 		
-		robotWidth=27.5;
+		robotWidth=21;
 	}
 
 	@Override
@@ -133,22 +133,33 @@ public class DriveTrain implements Subsystem{
 	 */
 	public void driveDistance(double distance, double speed){
 		double desiredDriveAngle = systems.getNavXAngle();
+		double rotateConstant = 0;
+		
+	//	pidManual.setDAngle(0);
+		
 		while(DriverStation.getInstance().isAutonomous() && (systems.getEncoderDistance(SysObj.Sensors.RIGHT_ENCODER)<distance)){
-			systems.getRobotEncoder(SysObj.Sensors.LEFT_ENCODER).update();
+			/*systems.getRobotEncoder(SysObj.Sensors.LEFT_ENCODER).update();
 			systems.getRobotEncoder(SysObj.Sensors.RIGHT_ENCODER).update();
 			systems.getNavX().update();
 			if(systems.getNavXAngle()>180) desiredDriveAngle = (systems.getNavXAngle() - 360)/360;
 			else desiredDriveAngle = systems.getNavXAngle()/360;
-			drive.arcadeDrive(speed, -(speed/(Math.abs(speed)))*desiredDriveAngle);
+			
+			if(desiredDriveAngle>0) rotateConstant = 0.2;
+			if(desiredDriveAngle<0) rotateConstant = 0.2;
+			drive.arcadeDrive(speed, rotateConstant);*/
+
+
+			//System.out.println("output: " + systems.getPIDOutput());
+			drive.arcadeDrive(speed, systems.getPIDOutput());
 		}
-		 
 		drive.arcadeDrive(0,0);
-		systems.resetEncoders();
-		
-	
 	}
 	/*
-	 * FIN DO THE COMMENT
+	 * turnTo
+	 * Author: Finlay Parsons
+	 * Collaborators: Nitesh Puri
+	 * --------------------------------
+	 * Purpose: Turns the robot to a certain angle relative to its current angle.
 	 */
 	public void turnTo(double angle, double speed, boolean right) {
 		if(!right){
@@ -158,7 +169,7 @@ public class DriveTrain implements Subsystem{
 			systems.getNavX().update();
 			drive.arcadeDrive(0, speed);
 		}
-		systems.resetEncoders();
+		systems.resetAutoSystems();
 	}
 	
 	/*
@@ -215,8 +226,8 @@ public class DriveTrain implements Subsystem{
 		System.out.print("v1: " + v1 + "   ");
 		System.out.print("v2: " + v2);
 		System.out.println("    Angle:" + systems.getNavXAngle());
+		systems.resetAutoSystems();
 		drive.arcadeDrive(0, 0);
-		systems.resetEncoders();
 	}
 
 }

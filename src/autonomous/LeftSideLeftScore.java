@@ -14,7 +14,6 @@ import systems.SysObj;
 import systems.Systems;
 import systems.subsystems.Collector;
 import systems.subsystems.DriveTrain;
-import systems.subsystems.EthanDrive;
 import systems.subsystems.NavX;
 import systems.subsystems.RobotEncoder;
 
@@ -32,28 +31,28 @@ public class LeftSideLeftScore implements Runnable{
 	@Override
 	public void run() {
 		
-		driveTrain.driveDistance(110, 0.7); //Drives forward to the switch fence
+		driveTrain.driveDistance(50, 0.4);
+		
+		/*driveTrain.driveDistance(110, 0.7); //Drives forward to the switch fence
 		
 		driveTrain.circleTurn(45, 90, 0.7, true, true); //Turns into the switch fence
 		
 		//TODO: Eject the cube
 		
-		driveTrain.circleTurn(50, 180, 0.6, false, false); //Turns out of the switch fence finishing backwards
+		driveTrain.circleTurn(50, 0, 0.6, false, false); //Turns out of the switch fence finishing backwards
 		
-		driveTrain.driveDistance(30, -0.5);
+		driveTrain.driveDistance(30, -0.5); 
 		
-		driveTrain.turnTo(90, 0.5, false); //Turns towards fence cubes
+		driveTrain.turnTo(270, 0.5, false); //Turns towards fence cubes
 		
-		driveTrain.driveDistance(100, 0.6); //Drives towards the fence cubes
+		driveTrain.driveDistance(120, 0.6); //Drives towards the fence cubes
 		
 		//TODO: Pick up cube
 		
-		driveTrain.circleTurn(20, 180, 0.6, false, false);
-		
-		systems.resetNavXAngle();
+		driveTrain.circleTurn(30, 90, 0.6, false, false);
 		
 		driveTrain.driveDistance(40, 0.6);
-		
+		*/
 		//TODO: Eject the cube
 	}
 	
