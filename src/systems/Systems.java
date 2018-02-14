@@ -313,7 +313,7 @@ public class Systems{
 	 * Contrubitors: Jeremiah Hanson
 	 * -------------------------------------
 	 * Purpose: prints encoder info to system.out
-	 * Parameters:
+	 * Parameters:db
 	 * 	a: print distance
 	 * 	b: print rate
 	 *  c: print pulse
@@ -442,4 +442,19 @@ public class Systems{
 	public double getPIDOutput(){
 		return pidManual.getTurnOutput();
 	}
+	
+	/*
+	 * setPID
+	 * Author: Finlay Parsons
+	 * ------------------------
+	 * Purpose: Sets P I and D
+	 * Paramters:
+	 * 	dP: Desired P
+	 * 	dI: Desired I
+	 * 	dD: Desired D
+	 */
+	public void setPID(double dP, double dI, double dD){
+		pidManual.setPID(dP, dI, dD);
+	}
 }
+

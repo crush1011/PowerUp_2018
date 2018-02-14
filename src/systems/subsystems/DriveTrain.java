@@ -137,6 +137,8 @@ public class DriveTrain implements Subsystem{
 		double rotateConstant = 0;
 		
 	//	pidManual.setDAngle(0);
+		systems.setPID(SmartDashboard.getNumber("DB/Slider 0", 0), SmartDashboard.getNumber("DB/Slider 1", 0), SmartDashboard.getNumber("DB/Slider 2", 0));
+
 		
 		while(DriverStation.getInstance().isAutonomous() && (systems.getEncoderDistance(SysObj.Sensors.LEFT_ENCODER)<distance)){
 			/*systems.getRobotEncoder(SysObj.Sensors.LEFT_ENCODER).update();
@@ -150,7 +152,7 @@ public class DriveTrain implements Subsystem{
 			drive.arcadeDrive(speed, rotateConstant);*/
 
 
-			drive.arcadeDrive(speed, systems.getPIDOutput());
+			drive.arcadeDrive(speed, -(systems.getPIDOutput()/90));
 			
 		}
 		drive.arcadeDrive(0,0);

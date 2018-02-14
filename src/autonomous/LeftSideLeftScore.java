@@ -31,7 +31,7 @@ public class LeftSideLeftScore implements Runnable{
 	@Override
 	public void run() {
 		
-		driveTrain.driveDistance(150, 0.4);
+		driveTrain.driveDistance(48, 0.4);
 		
 		/*driveTrain.driveDistance(110, 0.7); //Drives forward to the switch fence
 		

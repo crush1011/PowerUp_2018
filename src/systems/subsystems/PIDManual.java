@@ -19,7 +19,7 @@ public class PIDManual implements Subsystem{
 	private Systems systems;
 	private Resources resources;
 	
-	private double integral, derivative, prevError, error, dAngle;
+	private double integral, derivative, prevError, error, dValue;
 	private double output;
 	private final double REFRESH_TIME = (1/14500); //Cycle time for program
 	
@@ -27,12 +27,13 @@ public class PIDManual implements Subsystem{
 	private double i;
 	private double d;
 	
+	
 	int counter;
 	
 	public PIDManual(){
 		resources = new Resources();
-		this.dAngle = 0;
-		p = 1;
+		this.dValue = 0;
+		p = 0;
 		i = 0;
 		d = 0;
 		error = 0;
@@ -42,13 +43,30 @@ public class PIDManual implements Subsystem{
 	}
 	
 	/*
-	 * setDAngle
+	 * setPID
+	 * Author: Finlay Parsons
+	 * -------------------------
+	 * Purpose: Sets the values of P, I, and D for whatever you're doing.
+	 * Parameters:
+	 * 	dP: Desired P
+	 * 	dI: Desired I
+	 * 	dD: Desired D
+	 * Returns void
+	 */
+	public void setPID(double dP, double dI, double dD){
+		p = dP;
+		i = dI;
+		d = dD;
+	}
+	
+	/*
+	 * setdValue
 	 * Author: Finlay Parsons
 	 * --------------------------
-	 * Purpose: Sets the current angle we want the robot to be driving at
+	 * Purpose: Sets the value to approach
 	 */
-	public void setDAngle(double Angle){
-		this.dAngle = Angle;
+	public void setDValue(double Angle){
+		this.dValue = Angle;
 	}
 	
 	/*
@@ -64,15 +82,12 @@ public class PIDManual implements Subsystem{
 			systems = Systems.getInstance();
 		}
 		
-		p = SmartDashboard.getNumber("DB/Slider 0", 0);
-		i = SmartDashboard.getNumber("DB/Slider 1", 0);
-		d = SmartDashboard.getNumber("DB/Slider 2", 0);
 		
 		//System.out.println(p +" - "+ i + " - " + d);
 		
 		systems.update();
 		
-		error = resources.getAngleError(dAngle, systems.getNavXAngle());
+		error = resources.getAngleError(dValue, systems.getNavXAngle()); 
 		this.integral += error * REFRESH_TIME;
 	//	derivative = (error - this.prevError) / REFRESH_TIME;
 		this.output = p * error + i * this.integral + d;
@@ -80,11 +95,9 @@ public class PIDManual implements Subsystem{
 		prevError = error;
 	
 		if (counter % 2000 == 0) {
-			//System.out.println("Error: " + error);
 			this.toSmartDashboard();
 		}
 		counter++;
-		//this.toSmartDashboard();
 	}
 	
 	/*
@@ -96,17 +109,17 @@ public class PIDManual implements Subsystem{
 	 */
 	public double getTurnOutput(){		
 		update();
-		return(-(output/180));
+		return output;
 	}
 
 	@Override
 	public void toSmartDashboard() {
 		// TODO Auto-generated method stub
-		SmartDashboard.putString("DB/String 1", "Error: " + error);
-		SmartDashboard.putString("DB/String 0", "PIDOutput:" + output);
+		SmartDashboard.putString("DB/String 1", "Error: " + resources.roundDouble(error, -1));
+		SmartDashboard.putString("DB/String 9", "PIDOutput:" + resources.roundDouble(output, -1));
 		SmartDashboard.putString("DB/String 2", "Derivative:" + derivative);
 		SmartDashboard.putString("DB/String 3", "Integral:" + integral);
-		SmartDashboard.putString("DB/String 4", "Angle:" + systems.getNavXAngle());
+		SmartDashboard.putString("DB/String 4", "Angle:" + resources.roundDouble(systems.getNavXAngle(), -1));
 		SmartDashboard.putString("DB/String 5", "Counter:" + counter);
 		SmartDashboard.putString("DB/String 6", "P:" + p);
 		SmartDashboard.putString("DB/String 7", "I:" + i);

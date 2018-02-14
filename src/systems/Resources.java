@@ -27,13 +27,44 @@ public class Resources {
 		}
 	}
 	
+	/*
+	 * returnGreater
+	 * Author: Finlay Parsons
+	 * ------------------------
+	 * Takes in two doubles and returns the greater
+	 */
 	public double returnGreater(double a, double b){
 		if(a>b) return a;
 		else return b;
 	}
 	
+	/*
+	 * returnLesser
+	 * Author: Finlay Parsons
+	 * -----------------------
+	 * Takes in two doubles and returns the lesser
+	 */
 	public double returnLesser(double a, double b){
 		if(a<b) return a;
 		else return b;
 	}
+	
+	/*
+	 * roundDouble
+	 * Author: Finlay Parsons
+	 * ------------------------
+	 * Rounds a given double to given power of 10
+	 * Parameters:
+	 * 	n: Double to round
+	 * 	p: Rounds to the nearest 10^p
+	 */
+	public double roundDouble(double n, double p){
+		if(n!=0) {
+		return n - (Math.abs((n)/n) * (n % (Math.pow(10, p))));
+		}
+		else {
+			return 0;
+		}
+	}
+	
 }
