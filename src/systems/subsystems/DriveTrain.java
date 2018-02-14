@@ -12,6 +12,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import systems.Subsystem;
 import systems.SysObj;
 import systems.Systems;
@@ -137,7 +138,7 @@ public class DriveTrain implements Subsystem{
 		
 	//	pidManual.setDAngle(0);
 		
-		while(DriverStation.getInstance().isAutonomous() && (systems.getEncoderDistance(SysObj.Sensors.RIGHT_ENCODER)<distance)){
+		while(DriverStation.getInstance().isAutonomous() && (systems.getEncoderDistance(SysObj.Sensors.LEFT_ENCODER)<distance)){
 			/*systems.getRobotEncoder(SysObj.Sensors.LEFT_ENCODER).update();
 			systems.getRobotEncoder(SysObj.Sensors.RIGHT_ENCODER).update();
 			systems.getNavX().update();
@@ -149,10 +150,11 @@ public class DriveTrain implements Subsystem{
 			drive.arcadeDrive(speed, rotateConstant);*/
 
 
-			//System.out.println("output: " + systems.getPIDOutput());
 			drive.arcadeDrive(speed, systems.getPIDOutput());
+			
 		}
 		drive.arcadeDrive(0,0);
+		systems.resetEncoders();
 	}
 	/*
 	 * turnTo

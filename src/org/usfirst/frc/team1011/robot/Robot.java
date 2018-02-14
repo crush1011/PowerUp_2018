@@ -62,8 +62,7 @@ public class Robot extends IterativeRobot {
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
 		System.out.println(gameData);
 		
-		systems.resetEncoders();
-		systems.resetNavXAngle();
+		systems.resetAutoSystems();
 		
 		m_autoSelected = m_chooser.getSelected();
 		// autoSelected = SmartDashboard.getString("Auto Selector",
@@ -83,8 +82,8 @@ public class Robot extends IterativeRobot {
 		default:
 			leftSideLeftScore.run();
 			break;
-	}
-		
+		}
+		System.out.println("" + systems.getPIDOutput());
 	}
 
 	/**
@@ -93,7 +92,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousPeriodic() {
 		
-		//systems.update();
+		System.out.print("" + systems.getPIDOutput());
 		
 		
 	}

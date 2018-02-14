@@ -20,7 +20,7 @@ public class Resources {
 	 */
 	public double getAngleError(double dAngle, double cAngle){
 		if(Math.abs(dAngle-cAngle) > 180){
-			return 360 - returnGreater(dAngle, cAngle) + returnLesser(dAngle, cAngle);
+			return (360 - returnGreater(dAngle, cAngle)) + returnLesser(dAngle, cAngle);
 		}
 		else {
 			return cAngle - dAngle;
