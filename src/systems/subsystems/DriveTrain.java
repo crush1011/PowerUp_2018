@@ -23,8 +23,9 @@ public class DriveTrain implements Subsystem{
 	private WPI_TalonSRX rtMain, rtSlave1, rtSlave2;
 	private static Systems systems;
 	private DifferentialDrive drive;
+	private PIDManual driveStraightPID;
 	private double driveConstant;
-	private double robotWidth;	//Distance between wheels
+	private final double ROBOT_WIDTH;	//Distance between wheels
 	
 	/*
 	 * Constructor
@@ -54,10 +55,12 @@ public class DriveTrain implements Subsystem{
 		rtSlave1.setNeutralMode(NeutralMode.Brake);
 		rtSlave2.setNeutralMode(NeutralMode.Brake);
 		
+		driveStraightPID = new PIDManual(1, 0 , 0);
+		
 		driveConstant = 1.0;
 		drive = new DifferentialDrive(ltMain, rtMain);
 		
-		robotWidth=21;
+		ROBOT_WIDTH=21;
 	}
 
 	@Override
@@ -137,7 +140,7 @@ public class DriveTrain implements Subsystem{
 		double rotateConstant = 0;
 		
 	//	pidManual.setDAngle(0);
-		systems.setPID(SmartDashboard.getNumber("DB/Slider 0", 0), SmartDashboard.getNumber("DB/Slider 1", 0), SmartDashboard.getNumber("DB/Slider 2", 0));
+		driveStraightPID.setPID(SmartDashboard.getNumber("DB/Slider 0", 0), SmartDashboard.getNumber("DB/Slider 1", 0), SmartDashboard.getNumber("DB/Slider 2", 0));
 
 		
 		while(DriverStation.getInstance().isAutonomous() && (systems.getEncoderDistance(SysObj.Sensors.LEFT_ENCODER)<distance)){
@@ -152,7 +155,7 @@ public class DriveTrain implements Subsystem{
 			drive.arcadeDrive(speed, rotateConstant);*/
 
 
-			drive.arcadeDrive(speed, -(systems.getPIDOutput()/90));
+			drive.arcadeDrive(speed, -(driveStraightPID.getOutput()/90));
 			
 		}
 		drive.arcadeDrive(0,0);
@@ -189,7 +192,7 @@ public class DriveTrain implements Subsystem{
 		double prevEncoder = 0;
 		
 		if(!forwards) speed *= -1;
-		v2=v1/((robotWidth+radius)/radius);
+		v2=v1/((ROBOT_WIDTH+radius)/radius);
 		double initialAngle = systems.getNavXAngle();
 		
 		while(DriverStation.getInstance().isAutonomous() && (systems.getNavXAngle() >= angle+2 || systems.getNavXAngle() <= angle-2)) {

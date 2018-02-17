@@ -19,7 +19,7 @@ public interface SysObj {
 		
 		LEFT_1("left1"), LEFT_2("left2"), LEFT_3("left3"),
 		RIGHT_1("right1"), RIGHT_2("right2"), RIGHT_3("right3"),
-		COLLECTOR_ARM("collectorMotor"),
+		COLLECTOR_ARM_1("collectorMotor1"), COLLECTOR_ARM_2("collectorMotor2"),
 		INTAKE_LEFT("intakeLeft"), INTAKE_RIGHT("intakeRight"),
 		CLIMBER("climber");
 		
@@ -36,7 +36,7 @@ public interface SysObj {
 		
 		DRIVER_STICK("DriverJoystick"), OPERATOR_STICK("OpertatorJoystick"),
 		NAVX("NavX"), PDP("PowerDistributionPanel"),
-		ARM_ENCODER("ArmEncoder"), CLIMB_ENCODER("ClimbEncoder"), 
+		ARM_ENCODER_1("ArmEncoder1"), ARM_ENCODER_2("ArmEncoder2"), CLIMB_ENCODER("ClimbEncoder"), 
 		LEFT_ENCODER("LeftEncoder"), RIGHT_ENCODER("RightEncoder"),
 		VISION("Vision");
 		

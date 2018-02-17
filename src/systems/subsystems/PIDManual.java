@@ -19,9 +19,9 @@ public class PIDManual implements Subsystem{
 	private Systems systems;
 	private Resources resources;
 	
-	private double integral, derivative, prevError, error, dValue;
+	private double integral, derivative, prevError, error, dValue, cValue;
 	private double output;
-	private final double REFRESH_TIME = (1/14500); //Cycle time for program
+	private final double REFRESH_TIME = (0.02); //Cycle time for program
 	
 	private double p;
 	private double i;
@@ -30,15 +30,16 @@ public class PIDManual implements Subsystem{
 	
 	int counter;
 	
-	public PIDManual(){
+	public PIDManual(double p, double i, double d){
 		resources = new Resources();
 		this.dValue = 0;
-		p = 0;
-		i = 0;
-		d = 0;
+		this.p = p;
+		this.i = i;
+		this.d = d;
 		error = 0;
 		
 		counter = 0;
+		prevError = 0;
 		
 	}
 	
@@ -60,13 +61,23 @@ public class PIDManual implements Subsystem{
 	}
 	
 	/*
+	 * setCValue
+	 * Author: Finlay Parsons
+	 * --------------------------
+	 * Purpose: Sets the current value
+	 */
+	public void setCValue(double value){
+		this.cValue = value;
+	}
+	
+	/*
 	 * setdValue
 	 * Author: Finlay Parsons
 	 * --------------------------
 	 * Purpose: Sets the value to approach
 	 */
-	public void setDValue(double Angle){
-		this.dValue = Angle;
+	public void setDValue(double value){
+		this.dValue = value;
 	}
 	
 	/*
@@ -77,19 +88,15 @@ public class PIDManual implements Subsystem{
 	 * Note- Needs to be constantly updated while driving
 	 */
 	public void update(){
-		
 		if (systems == null){
 			systems = Systems.getInstance();
 		}
-		
-		
-		//System.out.println(p +" - "+ i + " - " + d);
-		
+				
 		systems.update();
 		
-		error = resources.getAngleError(dValue, systems.getNavXAngle()); 
+		error = resources.getAngleError(dValue, cValue); 
 		this.integral += error * REFRESH_TIME;
-	//	derivative = (error - this.prevError) / REFRESH_TIME;
+		derivative = (error - this.prevError) / REFRESH_TIME;
 		this.output = p * error + i * this.integral + d;
 		
 		prevError = error;
@@ -101,13 +108,13 @@ public class PIDManual implements Subsystem{
 	}
 	
 	/*
-	 * getTurnOutput
+	 * getOutput
 	 * Author: Finlay Parsons
 	 * ------------------------
-	 * Purpose: Outputs the value of z in arcade drive
-	 * Returns: A value between -1 and 1
+	 * Purpose: Outputs the value that PID is telling you to give
+	 * Returns: A double
 	 */
-	public double getTurnOutput(){		
+	public double getOutput(){		
 		update();
 		return output;
 	}

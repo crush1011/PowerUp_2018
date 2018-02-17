@@ -16,6 +16,7 @@ package systems;
 import java.util.HashMap;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.Encoder;
@@ -23,6 +24,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.Victor;
 import systems.subsystems.Collector;
 import systems.subsystems.Controls;
 import systems.subsystems.Controls.Axis;
@@ -41,7 +43,7 @@ public class Systems{
 	private static DriveTrain driveTrain;
 	private static Collector collector;
 	private static NavX navX;
-	private static RobotEncoder lEncoder, rEncoder, armEncoder;
+	private static RobotEncoder lEncoder, rEncoder, armEncoder1, armEncoder2;
 	private static PIDManual pidManual;
 	
 	public boolean inAuto;
@@ -83,14 +85,18 @@ public class Systems{
 									(WPI_TalonSRX) sysObjects.get(SysObj.MotorController.RIGHT_3));
 		
 		// Arm Motor Controllers
-		sysObjects.put(SysObj.MotorController.COLLECTOR_ARM, new WPI_TalonSRX(0));
-		sysObjects.put(SysObj.MotorController.INTAKE_LEFT, new Spark(6));
-		sysObjects.put(SysObj.MotorController.INTAKE_RIGHT, new Spark(5));
+		sysObjects.put(SysObj.MotorController.COLLECTOR_ARM_1, new WPI_TalonSRX(7));
+		sysObjects.put(SysObj.MotorController.COLLECTOR_ARM_2, new WPI_TalonSRX(8));
+		sysObjects.put(SysObj.MotorController.INTAKE_LEFT, new WPI_VictorSPX(9));
+		sysObjects.put(SysObj.MotorController.INTAKE_RIGHT, new WPI_VictorSPX(10));
 		
 		// Create the Collector
-		collector = new Collector((WPI_TalonSRX) sysObjects.get(SysObj.MotorController.COLLECTOR_ARM),
-								  (Spark) sysObjects.get(SysObj.MotorController.INTAKE_LEFT), 
-								  (Spark) sysObjects.get(SysObj.MotorController.INTAKE_RIGHT));
+		collector = new Collector((WPI_TalonSRX) sysObjects.get(SysObj.MotorController.COLLECTOR_ARM_1),
+								  (WPI_TalonSRX) sysObjects.get(SysObj.MotorController.COLLECTOR_ARM_2),
+								  (WPI_VictorSPX) sysObjects.get(SysObj.MotorController.INTAKE_LEFT), 
+								  (WPI_VictorSPX) sysObjects.get(SysObj.MotorController.INTAKE_RIGHT),
+								  (RobotEncoder) sysObjects.get(armEncoder1),
+								  (RobotEncoder) sysObjects.get(armEncoder2));
 		
 		// Climber Motor Controller(s)
 		sysObjects.put(SysObj.MotorController.CLIMBER, new WPI_TalonSRX(9));
@@ -103,13 +109,15 @@ public class Systems{
 		
 		// Encoders
 		sysObjects.put(SysObj.Sensors.CLIMB_ENCODER, new Encoder(8,9));
-		sysObjects.put(SysObj.Sensors.ARM_ENCODER, new Encoder(4,5));
+		sysObjects.put(SysObj.Sensors.ARM_ENCODER_1, new Encoder(4,5));
+		sysObjects.put(SysObj.Sensors.ARM_ENCODER_2, new Encoder(6,7));
 		sysObjects.put(SysObj.Sensors.LEFT_ENCODER, new Encoder(2,3, true, Encoder.EncodingType.k4X));
 		sysObjects.put(SysObj.Sensors.RIGHT_ENCODER, new Encoder(1,0, true, Encoder.EncodingType.k4X));
 		//((Encoder) sysObjects.get(SysObj.Sensors.LEFT_ENCODER)).setDistancePerPulse(Math.PI);
 		lEncoder = new RobotEncoder((Encoder) sysObjects.get(SysObj.Sensors.LEFT_ENCODER));
 		rEncoder = new RobotEncoder((Encoder) sysObjects.get(SysObj.Sensors.RIGHT_ENCODER));
-		armEncoder = new RobotEncoder((Encoder) sysObjects.get(SysObj.Sensors.ARM_ENCODER));
+		armEncoder1 = new RobotEncoder((Encoder) sysObjects.get(SysObj.Sensors.ARM_ENCODER_1));
+		
 		
 		System.out.println("Don't forget controls");
 		
@@ -129,8 +137,6 @@ public class Systems{
 		navX = new NavX((AHRS) sysObjects.get(SysObj.Sensors.NAVX));
 		
 		System.out.println("Other stuff too!");
-		
-		pidManual = new PIDManual();
 		
 	}
 	
@@ -162,7 +168,8 @@ public class Systems{
 		navX.update();
 		lEncoder.update();
 		rEncoder.update();
-		armEncoder.update();
+		armEncoder1.update();
+		armEncoder2.update();
 		if(controls.getButton(Controls.Button.BACK, SysObj.Sensors.DRIVER_STICK)){
 			navX.zeroAngler();
 		}
@@ -273,8 +280,10 @@ public class Systems{
 			return lEncoder;
 		case RIGHT_ENCODER:
 			return rEncoder;
-		case ARM_ENCODER:
-			return armEncoder;
+		case ARM_ENCODER_1:
+			return armEncoder1;
+		case ARM_ENCODER_2:
+			return armEncoder2;
 		default:
 			return null;
 		
@@ -292,7 +301,8 @@ public class Systems{
 	public void resetEncoders(){
 		lEncoder.reset();
 		rEncoder.reset();
-		armEncoder.reset();
+		armEncoder1.reset();
+		armEncoder2.reset();
 	}
 	
 	/*
@@ -332,10 +342,15 @@ public class Systems{
 				if(b) System.out.print("    Right Rate: " + rEncoder.getRate());
 				if(c) System.out.print("    Right Pulse: " + rEncoder.getPulse());
 				break;
-			case ARM_ENCODER:
-				if(a) System.out.print("Arm Distance: "+ armEncoder.getValue());
-				if(b) System.out.print("    Arm Rate: " + armEncoder.getRate());
-				if(c) System.out.print("    Arm Pulse: " + armEncoder.getPulse());
+			case ARM_ENCODER_1:
+				if(a) System.out.print("Arm 1 Distance: "+ armEncoder1.getValue());
+				if(b) System.out.print("    Arm 1 Rate: " + armEncoder1.getRate());
+				if(c) System.out.print("    Arm 1 Pulse: " + armEncoder1.getPulse());
+				break;
+			case ARM_ENCODER_2:
+				if(a) System.out.print("Arm 2 Distance: "+ armEncoder2.getValue());
+				if(b) System.out.print("    Arm 2 Rate: " + armEncoder2.getRate());
+				if(c) System.out.print("    Arm 2 Pulse: " + armEncoder2.getPulse());
 				break;
 			default:
 				System.out.println("ERROR: no encoder selected!");
@@ -399,8 +414,10 @@ public class Systems{
 			return lEncoder.getValue();
 		case RIGHT_ENCODER:
 			return rEncoder.getValue();
-		case ARM_ENCODER:
-			return armEncoder.getValue();
+		case ARM_ENCODER_1:
+			return armEncoder1.getValue();
+		case ARM_ENCODER_2:
+			return armEncoder2.getValue();
 		default:
 			return 0;
 		}
@@ -432,29 +449,5 @@ public class Systems{
 		resetEncoders();
 	}
 	
-	/*
-	 * getPIDOutput
-	 * Author: Finlay Parsons
-	 * Collaborator: Jason Hyunh
-	 * -----------------------------------
-	 * Purpose: Returns output of the PID
-	 */
-	public double getPIDOutput(){
-		return pidManual.getTurnOutput();
-	}
-	
-	/*
-	 * setPID
-	 * Author: Finlay Parsons
-	 * ------------------------
-	 * Purpose: Sets P I and D
-	 * Paramters:
-	 * 	dP: Desired P
-	 * 	dI: Desired I
-	 * 	dD: Desired D
-	 */
-	public void setPID(double dP, double dI, double dD){
-		pidManual.setPID(dP, dI, dD);
-	}
 }
 

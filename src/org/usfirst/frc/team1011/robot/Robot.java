@@ -83,7 +83,6 @@ public class Robot extends IterativeRobot {
 			leftSideLeftScore.run();
 			break;
 		}
-		System.out.println("" + systems.getPIDOutput());
 	}
 
 	/**
@@ -92,7 +91,6 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousPeriodic() {
 		
-		System.out.print("" + systems.getPIDOutput());
 		
 		
 	}
@@ -105,6 +103,9 @@ public class Robot extends IterativeRobot {
 		
 		systems.inAuto = false;
 		systems.update();
+		systems.printEncoderInfo(false, false, true, SysObj.Sensors.ARM_ENCODER_1);
+		systems.printEncoderInfo(false, false, true, SysObj.Sensors.ARM_ENCODER_2);
+
 		
 	}
 
