@@ -87,8 +87,8 @@ public class Systems{
 		// Arm Motor Controllers
 		sysObjects.put(SysObj.MotorController.COLLECTOR_ARM_1, new WPI_TalonSRX(7));
 		sysObjects.put(SysObj.MotorController.COLLECTOR_ARM_2, new WPI_TalonSRX(8));
-		sysObjects.put(SysObj.MotorController.INTAKE_LEFT, new WPI_VictorSPX(9));
-		sysObjects.put(SysObj.MotorController.INTAKE_RIGHT, new WPI_VictorSPX(10));
+		sysObjects.put(SysObj.MotorController.INTAKE_LEFT, new WPI_VictorSPX(10));
+		sysObjects.put(SysObj.MotorController.INTAKE_RIGHT, new WPI_VictorSPX(9));
 		
 		// Create the Collector
 		collector = new Collector((WPI_TalonSRX) sysObjects.get(SysObj.MotorController.COLLECTOR_ARM_1),
@@ -99,7 +99,7 @@ public class Systems{
 								  (RobotEncoder) sysObjects.get(armEncoder2));
 		
 		// Climber Motor Controller(s)
-		sysObjects.put(SysObj.MotorController.CLIMBER, new WPI_TalonSRX(9));
+		sysObjects.put(SysObj.MotorController.CLIMBER, new Spark(11));
 
 //=======================================================================================
 // Sensors
@@ -109,15 +109,15 @@ public class Systems{
 		
 		// Encoders
 		sysObjects.put(SysObj.Sensors.CLIMB_ENCODER, new Encoder(8,9));
-		sysObjects.put(SysObj.Sensors.ARM_ENCODER_1, new Encoder(4,5));
-		sysObjects.put(SysObj.Sensors.ARM_ENCODER_2, new Encoder(6,7));
-		sysObjects.put(SysObj.Sensors.LEFT_ENCODER, new Encoder(2,3, true, Encoder.EncodingType.k4X));
-		sysObjects.put(SysObj.Sensors.RIGHT_ENCODER, new Encoder(1,0, true, Encoder.EncodingType.k4X));
+		sysObjects.put(SysObj.Sensors.ARM_ENCODER_1, new Encoder(0,1));
+		sysObjects.put(SysObj.Sensors.ARM_ENCODER_2, new Encoder(2,3));
+		sysObjects.put(SysObj.Sensors.LEFT_ENCODER, new Encoder(4,5, true, Encoder.EncodingType.k4X));
+		sysObjects.put(SysObj.Sensors.RIGHT_ENCODER, new Encoder(6,7, true, Encoder.EncodingType.k4X));
 		//((Encoder) sysObjects.get(SysObj.Sensors.LEFT_ENCODER)).setDistancePerPulse(Math.PI);
 		lEncoder = new RobotEncoder((Encoder) sysObjects.get(SysObj.Sensors.LEFT_ENCODER));
 		rEncoder = new RobotEncoder((Encoder) sysObjects.get(SysObj.Sensors.RIGHT_ENCODER));
 		armEncoder1 = new RobotEncoder((Encoder) sysObjects.get(SysObj.Sensors.ARM_ENCODER_1));
-		
+		armEncoder2 = new RobotEncoder((Encoder) sysObjects.get(SysObj.Sensors.ARM_ENCODER_2));          
 		
 		System.out.println("Don't forget controls");
 		
@@ -135,9 +135,7 @@ public class Systems{
 		sysObjects.put(SysObj.Sensors.PDP, new PowerDistributionPanel(0));
 		sysObjects.put(SysObj.Sensors.NAVX, new AHRS(SPI.Port.kMXP));
 		navX = new NavX((AHRS) sysObjects.get(SysObj.Sensors.NAVX));
-		
-		System.out.println("Other stuff too!");
-		
+				
 	}
 	
 	/*
@@ -164,7 +162,7 @@ public class Systems{
 	public void update() {
 		controls.update();
 		driveTrain.update();
-		collector.update();
+		//collector.update();
 		navX.update();
 		lEncoder.update();
 		rEncoder.update();

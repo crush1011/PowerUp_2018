@@ -89,7 +89,7 @@ public class Collector implements Subsystem {
 				intakeRight.set(0.0);
 			}
 			
-			averageArmEncoderPos = 0.5 * (armEncoder1.getValue() + armEncoder2.getValue());
+		//	averageArmEncoderPos = 0.5 * (armEncoder1.getValue() + armEncoder2.getValue());
 			
 			armPID.setCValue(averageArmEncoderPos);
 			
