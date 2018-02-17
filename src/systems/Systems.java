@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.Victor;
 import systems.subsystems.Collector;
 import systems.subsystems.Controls;
 import systems.subsystems.Controls.Axis;
+import systems.subsystems.Controls.Button;
 import systems.subsystems.DriveTrain;
 import systems.subsystems.NavX;
 import systems.subsystems.PIDManual;
@@ -226,6 +227,21 @@ public class Systems{
 	 */
 	public double getOperatorLJoystick(){
 		return controls.getOperatorAxes().get(Axis.LEFT_Y);
+	}
+	
+	/*
+	 * getButton
+	 * Author: Finlay Parsons
+	 * ------------------------
+	 * Purpose: Looks if the button is being pressed
+	 */
+	public boolean getButton(Button button, boolean driver) {
+		if(driver) {
+			return controls.getButton(button, SysObj.Sensors.DRIVER_STICK);
+		}
+		else {
+			return controls.getButton(button, SysObj.Sensors.OPERATOR_STICK);
+		}
 	}
 	
 	/*

@@ -23,7 +23,6 @@ public class Collector implements Subsystem {
 	private WPI_TalonSRX collectorArm1, collectorArm2; 
 	private WPI_VictorSPX intakeLeft, intakeRight;
 	private static Systems systems;
-	private static Controls controls;
 	private RobotEncoder armEncoder1;
 	private RobotEncoder armEncoder2;
 	private PIDManual armPID;
@@ -53,6 +52,7 @@ public class Collector implements Subsystem {
 		this.armEncoder1 = armEncoder1;
 		this.armEncoder2 = armEncoder2;
 		this.armPID = new PIDManual(0.015, 0, 0);
+		
 		//intakeLeft.setInverted(true);
 		collectorArm1.setNeutralMode(NeutralMode.Brake);
 		collectorArm2.setNeutralMode(NeutralMode.Brake);
@@ -94,19 +94,19 @@ public class Collector implements Subsystem {
 			armPID.setCValue(averageArmEncoderPos);
 			
 			//Controls for arm
-			if(controls.getButton(Controls.Button.LEFT_BUMPER, SysObj.Sensors.OPERATOR_STICK)){
+			if(systems.getButton(Controls.Button.LEFT_BUMPER, false)){
 				position = 1;
 				armPID.setDValue(angleConstant * 135);
 			}
-			if(controls.getButton(Controls.Button.B, SysObj.Sensors.OPERATOR_STICK)){
+			if(systems.getButton(Controls.Button.B, false)){
 				position = 2;
 				armPID.setDValue(angleConstant * 60);
 			}
-			if(controls.getButton(Controls.Button.A, SysObj.Sensors.OPERATOR_STICK)){
+			if(systems.getButton(Controls.Button.A, false)){
 				position = 3;
 				armPID.setDValue(angleConstant * 10);
 			}
-			if(controls.getButton(Controls.Button.RIGHT_BUMPER, SysObj.Sensors.OPERATOR_STICK)){
+			if(systems.getButton(Controls.Button.RIGHT_BUMPER, false)){
 				position = 4;
 				armPID.setDValue(angleConstant * 0);
 
