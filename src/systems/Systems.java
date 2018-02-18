@@ -163,7 +163,7 @@ public class Systems{
 	public void update() {
 		controls.update();
 		driveTrain.update();
-		//collector.update();
+		collector.update();
 		navX.update();
 		lEncoder.update();
 		rEncoder.update();

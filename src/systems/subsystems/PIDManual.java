@@ -92,7 +92,6 @@ public class PIDManual implements Subsystem{
 			systems = Systems.getInstance();
 		}
 				
-		systems.update();
 		
 		error = resources.getAngleError(dValue, cValue); 
 		this.integral += error * REFRESH_TIME;

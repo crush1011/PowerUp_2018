@@ -29,7 +29,10 @@ public class Collector implements Subsystem {
 	
 	private double averageArmEncoderPos;
 	private double encoderRange;
-	private double angleConstant;
+	private double angleConstant, armConstant;
+	private double idleTurnConstant;
+	
+	private boolean idleTurn;
 	
 	private int position;
 	
@@ -53,14 +56,21 @@ public class Collector implements Subsystem {
 		this.armEncoder2 = armEncoder2;
 		this.armPID = new PIDManual(0.015, 0, 0);
 		
-		//intakeLeft.setInverted(true);
+		intakeLeft.setInverted(true);
 		collectorArm1.setNeutralMode(NeutralMode.Brake);
 		collectorArm2.setNeutralMode(NeutralMode.Brake);
 		averageArmEncoderPos = 0;
 		
+		collectorArm1.setInverted(true);
+		
 		position = 0;
 		encoderRange = 0;
 		angleConstant = 1;
+		armPID.setDValue(0);
+		armConstant = 0.4;
+		idleTurnConstant = 0;
+		
+		idleTurn = false;
 	}
 	
 	/*
@@ -76,17 +86,17 @@ public class Collector implements Subsystem {
 		}
 		 if(!systems.inAuto) {
 			//Controls for intake
-			if(systems.getOperatorRtTrigger()>.2) {
-				intakeLeft.set(systems.getOperatorRtTrigger());
-				intakeRight.set(systems.getOperatorRtTrigger());
+			if(systems.getOperatorRtTrigger()>.1) {
+				intakeLeft.set(Math.pow(systems.getOperatorRtTrigger(), 2));
+				intakeRight.set(Math.pow(systems.getOperatorRtTrigger(), 2));
 			}
-			else if(systems.getOperatorLtTrigger()>.2) {
-				intakeLeft.set(-systems.getOperatorLtTrigger());
-				intakeRight.set(-systems.getOperatorLtTrigger());
+			else if(systems.getOperatorLtTrigger()>.1) {
+				intakeLeft.set(-Math.pow(systems.getOperatorLtTrigger(), 2));
+				intakeRight.set(-Math.pow(systems.getOperatorLtTrigger(), 2));
 			}
 			else {
-				intakeLeft.set(0.0);
-				intakeRight.set(0.0);
+				intakeLeft.set(idleTurnConstant);
+				intakeRight.set(idleTurnConstant);
 			}
 			
 			averageArmEncoderPos = 0.5 * (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1) + systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
@@ -112,42 +122,56 @@ public class Collector implements Subsystem {
 
 			}
 			
-			collectorArm1.set(armPID.getOutput());
-			collectorArm2.set(armPID.getOutput());
-			
-			/*if(position == 1 && averageArmEncoderPos != 0){
-				collectorArm1.set(0.5);
-				collectorArm2.set(0.5);
-			}
-			else if(position == 2 && (averageArmEncoderPos > angleConstant * 10 + encoderRange)){
-				collectorArm1.set(0.5);
-				collectorArm2.set(0.5);
-			}
-			else if(position == 2 && averageArmEncoderPos < angleConstant * 10 - encoderRange){
-				collectorArm1.set(-0.5);
-				collectorArm2.set(-0.5);
-			}
-			else if(position == 3 && (averageArmEncoderPos > angleConstant * 60 + encoderRange)){
-				collectorArm1.set(0.5);
-				collectorArm2.set(0.5);
-			}
-			else if(position == 3 && averageArmEncoderPos < angleConstant * 60 - encoderRange){
-				collectorArm1.set(-0.5);
-				collectorArm2.set(-0.5);
-			}
-			else if(position == 4 && (averageArmEncoderPos > angleConstant * 135 + encoderRange)){
-				collectorArm1.set(0.5);
-				collectorArm2.set(0.5);
-			}
-			else if(position == 4 && averageArmEncoderPos < angleConstant * 135 - encoderRange){
-				collectorArm1.set(-0.5);
-				collectorArm2.set(-0.5);
+			if(systems.getButton(Controls.Button.Y, false)){
+				idleTurnConstant = 0.2 ;
 			}
 			else {
-				collectorArm1.set(0.25);
-				collectorArm2.set(0.25);
+				idleTurnConstant = 0;
 			}
-			*/
+			
+			
+			//collectorArm1.set(armPID.getOutput());
+			//collectorArm2.set(armPID.getOutput());
+			
+			collectorArm1.set(armConstant * systems.getOperatorLJoystick());
+			collectorArm2.set(armConstant * systems.getOperatorLJoystick());
+			
+			//systems.printEncoderInfo(true, false, false, SysObj.Sensors.ARM_ENCODER_1);
+			//systems.printEncoderInfo(true, false, false, SysObj.Sensors.ARM_ENCODER_2);
+			
+			/*if(position == 1 && averageArmEncoderPos != 0){
+				collectorArm1.set(0.4);
+				collectorArm2.set(0.4);
+			}
+			else if(position == 2 && (averageArmEncoderPos > angleConstant * 10 + encoderRange)){
+				collectorArm1.set(0.4);
+				collectorArm2.set(0.4);
+			}
+			else if(position == 2 && averageArmEncoderPos < angleConstant * 10 - encoderRange){
+				collectorArm1.set(-0.4);
+				collectorArm2.set(-0.4);
+			}
+			else if(position == 3 && (averageArmEncoderPos > angleConstant * 60 + encoderRange)){
+				collectorArm1.set(0.4);
+				collectorArm2.set(0.4);
+			}
+			else if(position == 3 && averageArmEncoderPos < angleConstant * 60 - encoderRange){
+				collectorArm1.set(-0.4);
+				collectorArm2.set(-0.4);
+			}
+			else if(position == 4 && (averageArmEncoderPos > angleConstant * 135 + encoderRange)){
+				collectorArm1.set(0.4);
+				collectorArm2.set(0.4);
+			}
+			else if(position == 4 && averageArmEncoderPos < angleConstant * 135 - encoderRange){
+				collectorArm1.set(-0.4);
+				collectorArm2.set(-0.4);
+			}
+			else {
+				collectorArm1.set(0);
+				collectorArm2.set(0);
+			}*/
+			
 }
 	}
 

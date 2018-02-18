@@ -39,7 +39,6 @@ public class RobotEncoder implements Subsystem{
 	 * Purpose: Return currentPos value
 	 * returns type double
 	 */
-	
 	public double getValue(){
 		update();
 		return currentPos;
@@ -58,6 +57,10 @@ public class RobotEncoder implements Subsystem{
 		startPos = e.getDistance();
 	}
 
+	public void setDistancePerPulse(double x){
+		e.setDistancePerPulse(x);
+	}
+	
 	@Override
 	public void update() {
 		// TODO Auto-generated method stub
