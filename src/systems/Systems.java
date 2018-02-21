@@ -46,6 +46,7 @@ public class Systems{
 	private static NavX navX;
 	private static RobotEncoder lEncoder, rEncoder, armEncoder1, armEncoder2;
 	private static PIDManual pidManual;
+	private static PowerDistributionPanel pdp;
 	
 	public boolean inAuto;
 	
@@ -134,6 +135,7 @@ public class Systems{
 		
 		// Other Sensors
 		sysObjects.put(SysObj.Sensors.PDP, new PowerDistributionPanel(0));
+		pdp = new PowerDistributionPanel();
 		sysObjects.put(SysObj.Sensors.NAVX, new AHRS(SPI.Port.kMXP));
 		navX = new NavX((AHRS) sysObjects.get(SysObj.Sensors.NAVX));
 				
@@ -461,6 +463,17 @@ public class Systems{
 	public void resetAutoSystems(){
 		resetNavXAngle();
 		resetEncoders();
+	}
+	
+	/*
+	 * getMotorCurrent
+	 * Author: Nitesh Puri
+	 * ------------------------------------------------------
+	 * Purpose: Gets the motor current in amps
+	 * Returns: Double
+	 */
+	public double getMotorCurrent(int channel){
+		return pdp.getCurrent(channel);
 	}
 	
 }

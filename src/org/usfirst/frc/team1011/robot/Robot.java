@@ -8,6 +8,7 @@
 package org.usfirst.frc.team1011.robot;
 
 import autonomous.LeftSideLeftScore;
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -42,6 +43,8 @@ public class Robot extends IterativeRobot {
 		m_chooser.addDefault("Default Auto", kDefaultAuto);
 		m_chooser.addObject("My Auto", kCustomAuto);
 		SmartDashboard.putData("Auto choices", m_chooser);
+		CameraServer cameraServer = CameraServer.getInstance();
+		cameraServer.startAutomaticCapture();
 	}
 	
 	/**
@@ -103,9 +106,14 @@ public class Robot extends IterativeRobot {
 		
 		systems.inAuto = false;
 		systems.update();
-		systems.printEncoderInfo(false, false, true, SysObj.Sensors.ARM_ENCODER_1);
-		systems.printEncoderInfo(false, false, true, SysObj.Sensors.ARM_ENCODER_2);
-
+		//systems.printEncoderInfo(false, false, true, SysObj.Sensors.ARM_ENCODER_1);
+		//systems.printEncoderInfo(false, false, true, SysObj.Sensors.ARM_ENCODER_2);
+		/*System.out.print("Left Intake: ");
+		systems.getMotorCurrent(10);
+		System.out.print("    ");
+		System.out.print("Right Intake: ");
+		systems.getMotorCurrent(11);
+		System.out.println("");*/
 		
 	}
 

@@ -14,6 +14,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj.Victor;
+import systems.Resources;
 import systems.Subsystem;
 import systems.SysObj;
 import systems.Systems;
@@ -26,6 +27,7 @@ public class Collector implements Subsystem {
 	private RobotEncoder armEncoder1;
 	private RobotEncoder armEncoder2;
 	private PIDManual armPID;
+	private Resources resources;
 	
 	private double averageArmEncoderPos;
 	private double encoderRange;
@@ -55,8 +57,10 @@ public class Collector implements Subsystem {
 		this.armEncoder1 = armEncoder1;
 		this.armEncoder2 = armEncoder2;
 		this.armPID = new PIDManual(0.015, 0, 0);
+		resources = new Resources();
 		
-		intakeLeft.setInverted(true);
+		intakeRight.setInverted(true);  
+		
 		collectorArm1.setNeutralMode(NeutralMode.Brake);
 		collectorArm2.setNeutralMode(NeutralMode.Brake);
 		averageArmEncoderPos = 0;
@@ -86,19 +90,25 @@ public class Collector implements Subsystem {
 		}
 		 if(!systems.inAuto) {
 			//Controls for intake
+			 
+			 if(systems.getMotorCurrent(10) < 75 && systems.getMotorCurrent(11) < 75) {
 			if(systems.getOperatorRtTrigger()>.1) {
-				intakeLeft.set(Math.pow(systems.getOperatorRtTrigger(), 2));
-				intakeRight.set(Math.pow(systems.getOperatorRtTrigger(), 2));
+				intakeLeft.set(-Math.pow(systems.getOperatorRtTrigger(), 2));
+				intakeRight.set(-Math.pow(systems.getOperatorRtTrigger(), 2));
 			}
 			else if(systems.getOperatorLtTrigger()>.1) {
-				intakeLeft.set(-Math.pow(systems.getOperatorLtTrigger(), 2));
-				intakeRight.set(-Math.pow(systems.getOperatorLtTrigger(), 2));
+				intakeLeft.set(Math.pow(systems.getOperatorLtTrigger(), 2));
+				intakeRight.set(Math.pow(systems.getOperatorLtTrigger(), 2));
 			}
 			else {
 				intakeLeft.set(idleTurnConstant);
 				intakeRight.set(idleTurnConstant);
 			}
-			
+			 }
+			 else{
+				 intakeLeft.set(0);
+				 intakeRight.set(0);
+			 }
 			averageArmEncoderPos = 0.5 * (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1) + systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
 			
 			armPID.setCValue(averageArmEncoderPos);
@@ -170,11 +180,36 @@ public class Collector implements Subsystem {
 			else {
 				collectorArm1.set(0);
 				collectorArm2.set(0);
-			}*/
-			
+			}*/		
 }
 	}
-
+	
+	/*
+	 * moveArm
+	 * Author: Finlay Parsons
+	 * -------------------------
+	 * Purpose: Moves the arm to specified angle - all the way back is 0, all the way down is 135
+	 * Parameters:
+	 * 	angle: Desired angle of arm
+	 */
+	public void moveArm(double angle){
+		armPID.setDValue(angle);
+		while(Math.abs(resources.getAngleError(angle, averageArmEncoderPos)) < 5){
+			systems.getRobotEncoder(SysObj.Sensors.ARM_ENCODER_1).update();
+			systems.getRobotEncoder(SysObj.Sensors.ARM_ENCODER_2).update();
+			averageArmEncoderPos = 0.5 * (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1) + systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
+			armPID.setCValue(averageArmEncoderPos);
+			collectorArm1.set(armPID.getOutput());
+			collectorArm2.set(armPID.getOutput());
+		}
+		collectorArm1.set(0);
+		collectorArm2.set(0);
+		}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see systems.Subsystem#toSmartDashboard()
+	 */
 	@Override
 	public void toSmartDashboard() {
 		// TODO Auto-generated method stub
