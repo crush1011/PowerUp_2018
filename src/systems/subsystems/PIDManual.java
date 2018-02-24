@@ -36,8 +36,8 @@ public class PIDManual implements Subsystem{
 		this.p = p;
 		this.i = i;
 		this.d = d;
-		error = 0;
 		
+		error = 0;
 		counter = 0;
 		prevError = 0;
 		
@@ -92,7 +92,6 @@ public class PIDManual implements Subsystem{
 			systems = Systems.getInstance();
 		}
 				
-		
 		error = resources.getAngleError(dValue, cValue); 
 		this.integral += error * REFRESH_TIME;
 		derivative = (error - this.prevError) / REFRESH_TIME;
@@ -123,8 +122,8 @@ public class PIDManual implements Subsystem{
 		// TODO Auto-generated method stub
 		SmartDashboard.putString("DB/String 1", "Error: " + resources.roundDouble(error, -1));
 		SmartDashboard.putString("DB/String 9", "PIDOutput:" + resources.roundDouble(output, -1));
-		SmartDashboard.putString("DB/String 2", "Derivative:" + derivative);
-		SmartDashboard.putString("DB/String 3", "Integral:" + integral);
+		//SmartDashboard.putString("DB/String 2", "Derivative:" + derivative);
+		//SmartDashboard.putString("DB/String 3", "Integral:" + integral);
 		SmartDashboard.putString("DB/String 4", "Angle:" + resources.roundDouble(systems.getNavXAngle(), -1));
 		SmartDashboard.putString("DB/String 5", "Counter:" + counter);
 		SmartDashboard.putString("DB/String 6", "P:" + p);

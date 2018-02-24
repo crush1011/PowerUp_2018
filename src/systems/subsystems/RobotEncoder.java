@@ -74,7 +74,7 @@ public class RobotEncoder implements Subsystem{
 
 	@Override
 	public void toSmartDashboard() {
-		// TODO Auto-generated method stub
+		System.out.println("Encoder Distance: " + currentPos);
 		
 	}
 

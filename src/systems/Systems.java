@@ -166,7 +166,7 @@ public class Systems{
 		controls.update();
 		driveTrain.update();
 		collector.update();
-		navX.update();
+		//navX.update();
 		lEncoder.update();
 		rEncoder.update();
 		armEncoder1.update();
@@ -174,6 +174,8 @@ public class Systems{
 		if(controls.getButton(Controls.Button.BACK, SysObj.Sensors.DRIVER_STICK)){
 			navX.zeroAngler();
 		}
+		//armEncoder2.toSmartDashboard();
+		collector.toSmartDashboard();
 	}
 	
 	/*

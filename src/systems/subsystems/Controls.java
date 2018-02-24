@@ -62,8 +62,25 @@ public class Controls implements Subsystem{
 	}
 	
 	/*
+	 * POV
+	 * Author: Finlay P
+	 * -------------------------
+	 * Purpose: Enum for the POV or DPAD "buttons."
+	 */
+	public enum POV{
+		RIGHT,
+		RIGHTUP,
+		UP,
+		LEFTUP,
+		LEFT,
+		LEFTDOWN,
+		DOWN,
+		RIGHTDOWN;
+	}
+	
+	/*
 	 * Axis
-	 * Author: Rubin Castro
+	 * Author: Ruben Castro
 	 * -----------------------------------------------
 	 * This enum is designed to make handling the Axis
 	 * controls easier.

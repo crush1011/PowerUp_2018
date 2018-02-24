@@ -6,7 +6,6 @@
  * This class controls the motors on the collector
  */
 
-
 package systems.subsystems;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -14,42 +13,38 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import edu.wpi.first.wpilibj.Victor;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import systems.Resources;
 import systems.Subsystem;
 import systems.SysObj;
 import systems.Systems;
 
 public class Collector implements Subsystem {
-	
-	private WPI_TalonSRX collectorArm1, collectorArm2; 
+
+	private WPI_TalonSRX collectorArm1, collectorArm2;
 	private WPI_VictorSPX intakeLeft, intakeRight;
 	private static Systems systems;
 	private RobotEncoder armEncoder1;
 	private RobotEncoder armEncoder2;
 	private PIDManual armPID;
 	private Resources resources;
-	
+
 	private double averageArmEncoderPos;
 	private double encoderRange;
 	private double angleConstant, armConstant;
 	private double idleTurnConstant;
-	
-	private boolean idleTurn;
-	
-	private int position;
-	
+
+	private boolean idleTurn, manualMode;
+
+	private int position, counter;
+
 	/*
-	 * Constructor
-	 * Author: Nitesh Puri
-	 * ----------------------------------------
+	 * Constructor Author: Nitesh Puri ----------------------------------------
 	 * constructor
 	 */
-	
-	public Collector(WPI_TalonSRX collectorArm1, WPI_TalonSRX collectorArm2, 
-			WPI_VictorSPX intakeLeft, 
-			WPI_VictorSPX intakeRight,
-			RobotEncoder armEncoder1,
-			RobotEncoder armEncoder2) {
+
+	public Collector(WPI_TalonSRX collectorArm1, WPI_TalonSRX collectorArm2, WPI_VictorSPX intakeLeft,
+			WPI_VictorSPX intakeRight, RobotEncoder armEncoder1, RobotEncoder armEncoder2) {
 		this.collectorArm1 = collectorArm1;
 		this.collectorArm2 = collectorArm2;
 		this.intakeLeft = intakeLeft;
@@ -58,162 +53,162 @@ public class Collector implements Subsystem {
 		this.armEncoder2 = armEncoder2;
 		this.armPID = new PIDManual(0.015, 0, 0);
 		resources = new Resources();
-		
-		intakeRight.setInverted(true);  
-		
+
+		intakeRight.setInverted(true);
+
 		collectorArm1.setNeutralMode(NeutralMode.Brake);
 		collectorArm2.setNeutralMode(NeutralMode.Brake);
 		averageArmEncoderPos = 0;
-		
+
 		collectorArm1.setInverted(true);
-		
+
 		position = 0;
 		encoderRange = 0;
-		angleConstant = 1;
+		angleConstant = 0.74269; // pulses per degree
 		armPID.setDValue(0);
 		armConstant = 0.4;
 		idleTurnConstant = 0;
-		
+
 		idleTurn = false;
+		manualMode = false;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see systems.Subsystem#update()
 	 */
 	@Override
 	public void update() {
-		
-		
+
 		if (systems == null) {
 			systems = Systems.getInstance();
+
+			//System.out.println("Collector.update(): " + systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
 		}
-		 if(!systems.inAuto) {
-			//Controls for intake
-			 
-			 if(systems.getMotorCurrent(10) < 75 && systems.getMotorCurrent(11) < 75) {
-			if(systems.getOperatorRtTrigger()>.1) {
-				intakeLeft.set(-Math.pow(systems.getOperatorRtTrigger(), 2));
-				intakeRight.set(-Math.pow(systems.getOperatorRtTrigger(), 2));
+		averageArmEncoderPos = 0.5 * (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1)
+				+ systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
+		if (!systems.inAuto) {
+			// Controls for intake
+
+			if (systems.getMotorCurrent(10) < 75 && systems.getMotorCurrent(11) < 75) {
+				if (systems.getOperatorRtTrigger() > .1) {
+					intakeLeft.set(-Math.pow(systems.getOperatorRtTrigger(), 2));
+					intakeRight.set(-Math.pow(systems.getOperatorRtTrigger(), 2));
+				} else if (systems.getOperatorLtTrigger() > .1) {
+					intakeLeft.set(Math.pow(systems.getOperatorLtTrigger(), 2));
+					intakeRight.set(Math.pow(systems.getOperatorLtTrigger(), 2));
+				} else {
+					intakeLeft.set(idleTurnConstant);
+					intakeRight.set(idleTurnConstant);
+				}
+			} else {
+				intakeLeft.set(0);
+				intakeRight.set(0);
 			}
-			else if(systems.getOperatorLtTrigger()>.1) {
-				intakeLeft.set(Math.pow(systems.getOperatorLtTrigger(), 2));
-				intakeRight.set(Math.pow(systems.getOperatorLtTrigger(), 2));
-			}
-			else {
-				intakeLeft.set(idleTurnConstant);
-				intakeRight.set(idleTurnConstant);
-			}
-			 }
-			 else{
-				 intakeLeft.set(0);
-				 intakeRight.set(0);
-			 }
-			averageArmEncoderPos = 0.5 * (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1) + systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
-			
+
 			armPID.setCValue(averageArmEncoderPos);
-			
-			//Controls for arm
-			if(systems.getButton(Controls.Button.LEFT_BUMPER, false)){
+
+			// Controls for arm
+			if (systems.getButton(Controls.Button.LEFT_BUMPER, false)) {
 				position = 1;
 				armPID.setDValue(angleConstant * 135);
 			}
-			if(systems.getButton(Controls.Button.B, false)){
+			if (systems.getButton(Controls.Button.B, false)) {
 				position = 2;
 				armPID.setDValue(angleConstant * 60);
 			}
-			if(systems.getButton(Controls.Button.A, false)){
+			if (systems.getButton(Controls.Button.A, false)) {
 				position = 3;
 				armPID.setDValue(angleConstant * 10);
 			}
-			if(systems.getButton(Controls.Button.RIGHT_BUMPER, false)){
+			if (systems.getButton(Controls.Button.RIGHT_BUMPER, false)) {
 				position = 4;
 				armPID.setDValue(angleConstant * 0);
 
 			}
-			
-			if(systems.getButton(Controls.Button.Y, false)){
-				idleTurnConstant = 0.2 ;
-			}
-			else {
+
+			if (systems.getButton(Controls.Button.Y, false)) {
+				idleTurnConstant = 0.2;
+			} else {
 				idleTurnConstant = 0;
 			}
-			
-			
-			//collectorArm1.set(armPID.getOutput());
-			//collectorArm2.set(armPID.getOutput());
-			
-			collectorArm1.set(armConstant * systems.getOperatorLJoystick());
-			collectorArm2.set(armConstant * systems.getOperatorLJoystick());
-			
-			//systems.printEncoderInfo(true, false, false, SysObj.Sensors.ARM_ENCODER_1);
-			//systems.printEncoderInfo(true, false, false, SysObj.Sensors.ARM_ENCODER_2);
-			
-			/*if(position == 1 && averageArmEncoderPos != 0){
-				collectorArm1.set(0.4);
-				collectorArm2.set(0.4);
+
+			if (systems.getButton(Controls.Button.START, false)) {
+				if (!manualMode)
+					manualMode = true;
+				else if (manualMode)
+					manualMode = false;
 			}
-			else if(position == 2 && (averageArmEncoderPos > angleConstant * 10 + encoderRange)){
-				collectorArm1.set(0.4);
-				collectorArm2.set(0.4);
+			if (systems.getButton(Controls.Button.X, false)){
+				intakeLeft.set(SmartDashboard.getNumber("DB/Slider 0", 1));
+				intakeRight.set(SmartDashboard.getNumber("DB/Slider 1", 0.2));
 			}
-			else if(position == 2 && averageArmEncoderPos < angleConstant * 10 - encoderRange){
-				collectorArm1.set(-0.4);
-				collectorArm2.set(-0.4);
+
+			// Automatic operator controls
+			if (!manualMode) {
+				collectorArm1.set(armPID.getOutput());
+				collectorArm2.set(armPID.getOutput());
 			}
-			else if(position == 3 && (averageArmEncoderPos > angleConstant * 60 + encoderRange)){
-				collectorArm1.set(0.4);
-				collectorArm2.set(0.4);
+
+			// Manual operator controls
+			if (manualMode) {
+				collectorArm1.set(armConstant * systems.getOperatorLJoystick());
+				collectorArm2.set(armConstant * systems.getOperatorLJoystick());
 			}
-			else if(position == 3 && averageArmEncoderPos < angleConstant * 60 - encoderRange){
-				collectorArm1.set(-0.4);
-				collectorArm2.set(-0.4);
-			}
-			else if(position == 4 && (averageArmEncoderPos > angleConstant * 135 + encoderRange)){
-				collectorArm1.set(0.4);
-				collectorArm2.set(0.4);
-			}
-			else if(position == 4 && averageArmEncoderPos < angleConstant * 135 - encoderRange){
-				collectorArm1.set(-0.4);
-				collectorArm2.set(-0.4);
-			}
-			else {
-				collectorArm1.set(0);
-				collectorArm2.set(0);
-			}*/		
-}
+
+		}
+		
+		if (counter % 2000 == 0) {
+			this.toSmartDashboard();
+		}
+		counter++;
 	}
-	
+
 	/*
-	 * moveArm
-	 * Author: Finlay Parsons
-	 * -------------------------
-	 * Purpose: Moves the arm to specified angle - all the way back is 0, all the way down is 135
-	 * Parameters:
-	 * 	angle: Desired angle of arm
+	 * moveArm Author: Finlay Parsons ------------------------- Purpose: Moves
+	 * the arm to specified angle - all the way back is 0, all the way down is
+	 * 135 Parameters: angle: Desired angle of arm
 	 */
-	public void moveArm(double angle){
+	public void moveArm(double angle) {
 		armPID.setDValue(angle);
-		while(Math.abs(resources.getAngleError(angle, averageArmEncoderPos)) < 5){
+		while (Math.abs(resources.getAngleError(angle, averageArmEncoderPos)) < 5) {
 			systems.getRobotEncoder(SysObj.Sensors.ARM_ENCODER_1).update();
 			systems.getRobotEncoder(SysObj.Sensors.ARM_ENCODER_2).update();
-			averageArmEncoderPos = 0.5 * (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1) + systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
+			update();
+			averageArmEncoderPos = 0.5 * (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1)
+					+ systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
 			armPID.setCValue(averageArmEncoderPos);
 			collectorArm1.set(armPID.getOutput());
 			collectorArm2.set(armPID.getOutput());
 		}
 		collectorArm1.set(0);
 		collectorArm2.set(0);
+	}
+
+	/*
+	 * intakeCube Author: Finlay Parsons ------------------------ Purpose: Spins
+	 * the intake motors until the the cube is gained
+	 */
+	public void intakeCube() {
+		int counter = 0;
+		while (counter < 50) {
+			intakeLeft.set(1);
+			intakeRight.set(1);
+			counter++;
 		}
-	
+	}
+
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see systems.Subsystem#toSmartDashboard()
 	 */
 	@Override
 	public void toSmartDashboard() {
 		// TODO Auto-generated method stub
-		
+		SmartDashboard.putString("DB/String 3", "Encoder1: " + systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1));
+		SmartDashboard.putString("DB/String 2", "Encoder2: " + systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
 	}
 
 }

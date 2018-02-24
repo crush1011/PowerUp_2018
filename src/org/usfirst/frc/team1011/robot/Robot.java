@@ -43,8 +43,8 @@ public class Robot extends IterativeRobot {
 		m_chooser.addDefault("Default Auto", kDefaultAuto);
 		m_chooser.addObject("My Auto", kCustomAuto);
 		SmartDashboard.putData("Auto choices", m_chooser);
-		CameraServer cameraServer = CameraServer.getInstance();
-		cameraServer.startAutomaticCapture();
+		//CameraServer cameraServer = CameraServer.getInstance();
+		//cameraServer.startAutomaticCapture();
 	}
 	
 	/**

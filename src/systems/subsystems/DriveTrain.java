@@ -74,7 +74,7 @@ public class DriveTrain implements Subsystem{
 		}
 		
 		drive.arcadeDrive(driveConstant*systems.getDriverAxisLeftY(), driveConstant*systems.getDriverAxisRightX(), true);
-		System.out.println("" + systems.getPulse());
+		//System.out.println("" + systems.getPulse());
 	}
 	@Override
 	public void toSmartDashboard() {
@@ -123,6 +123,11 @@ public class DriveTrain implements Subsystem{
 	public void tankDrive(double leftSpeed, double rightSpeed){
 		drive.tankDrive(leftSpeed, rightSpeed);
 	}
+	
+	/*
+	 * align
+	 * 
+	 */
 	
 	/*
 	 * driveDistance
@@ -230,9 +235,9 @@ public class DriveTrain implements Subsystem{
 			if(counter>600) break;
 			
 		}
-		System.out.print("v1: " + v1 + "   ");
-		System.out.print("v2: " + v2);
-		System.out.println("    Angle:" + systems.getNavXAngle());
+		//System.out.print("v1: " + v1 + "   ");
+		//System.out.print("v2: " + v2);
+		//System.out.println("    Angle:" + systems.getNavXAngle());
 		systems.resetAutoSystems();
 		drive.arcadeDrive(0, 0);
 	}
