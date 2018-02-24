@@ -8,6 +8,8 @@
 
 package systems.subsystems;
 
+import java.text.DecimalFormat;
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
@@ -37,6 +39,8 @@ public class Collector implements Subsystem {
 	private boolean idleTurn, manualMode;
 
 	private int position, counter;
+	
+	DecimalFormat df;
 
 	/*
 	 * Constructor Author: Nitesh Puri ----------------------------------------
@@ -53,6 +57,8 @@ public class Collector implements Subsystem {
 		this.armEncoder2 = armEncoder2;
 		this.armPID = new PIDManual(0.015, 0, 0);
 		resources = new Resources();
+		
+		df = new DecimalFormat("#.##");
 
 		intakeRight.setInverted(true);
 
@@ -207,8 +213,8 @@ public class Collector implements Subsystem {
 	@Override
 	public void toSmartDashboard() {
 		// TODO Auto-generated method stub
-		SmartDashboard.putString("DB/String 3", "Encoder1: " + systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1));
-		SmartDashboard.putString("DB/String 2", "Encoder2: " + systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
+		SmartDashboard.putString("DB/String 3", "Encoder1: " + df.format(systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1)));
+		SmartDashboard.putString("DB/String 2", "Encoder2: " + df.format(systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2)));
 	}
 
 }
