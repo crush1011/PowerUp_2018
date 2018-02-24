@@ -103,17 +103,16 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		
 		systems.inAuto = false;
 		systems.update();
 		//systems.printEncoderInfo(false, false, true, SysObj.Sensors.ARM_ENCODER_1);
 		//systems.printEncoderInfo(false, false, true, SysObj.Sensors.ARM_ENCODER_2);
-		/*System.out.print("Left Intake: ");
-		systems.getMotorCurrent(10);
+		System.out.print("Left Intake: ");
+		System.out.print(systems.getMotorCurrent(10));
 		System.out.print("    ");
 		System.out.print("Right Intake: ");
-		systems.getMotorCurrent(11);
-		System.out.println("");*/
+		System.out.print(systems.getMotorCurrent(11));
+		System.out.println("");
 		
 	}
 
