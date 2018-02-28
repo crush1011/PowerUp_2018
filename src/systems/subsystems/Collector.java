@@ -170,7 +170,9 @@ public class Collector implements Subsystem {
 			}
 			if (systems.getButton(Controls.Button.X, false)) {
 				position = 5;
-				armPID.setDValue(110);
+				armPID.setDValue(45);
+				intakeLeft.set(1);
+				intakeRight.set(1);
 			}
 
 			if (systems.getButton(Controls.Button.Y, false)) {
