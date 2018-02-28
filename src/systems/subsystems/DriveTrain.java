@@ -67,7 +67,6 @@ public class DriveTrain implements Subsystem{
 		ROBOT_WIDTH=21;
 		
 		distancePerPulse = 1;
-		
 	}
 
 	@Override
@@ -169,27 +168,24 @@ public class DriveTrain implements Subsystem{
 		double desiredDriveAngle = systems.getNavXAngle();
 		double rotateConstant = 0;
 		
+		Systems.getRobotEncoder(SysObj.Sensors.LEFT_ENCODER).setDistancePerPulse(distancePerPulse);
+		Systems.getRobotEncoder(SysObj.Sensors.RIGHT_ENCODER).setDistancePerPulse(distancePerPulse);
+		
 		driveStraightPID.setDValue(desiredDriveAngle);
 		driveStraightPID.setPID(SmartDashboard.getNumber("DB/Slider 0", 0), SmartDashboard.getNumber("DB/Slider 1", 0), SmartDashboard.getNumber("DB/Slider 2", 0));
-
-		
 		
 		while(DriverStation.getInstance().isAutonomous() && (systems.getEncoderDistance(SysObj.Sensors.RIGHT_ENCODER)<distance)){
-			/*systems.getRobotEncoder(SysObj.Sensors.LEFT_ENCODER).update();
-			systems.getRobotEncoder(SysObj.Sensors.RIGHT_ENCODER).update();
 			systems.getNavX().update();
-			if(systems.getNavXAngle()>180) desiredDriveAngle = (systems.getNavXAngle() - 360)/360;
-			else desiredDriveAngle = systems.getNavXAngle()/360;
-			
-			if(desiredDriveAngle>0) rotateConstant = 0.2;
-			if(desiredDriveAngle<0) rotateConstant = 0.2;
-			drive.arcadeDrive(speed, rotateConstant);*/
-
+			systems.getRobotEncoder(SysObj.Sensors.RIGHT_ENCODER).update();
+			systems.getRobotEncoder(SysObj.Sensors.LEFT_ENCODER).update();
+			driveStraightPID.setCValue(resources.getAngleError(desiredDriveAngle, systems.getNavXAngle()));
 			this.toSmartDashboard();
 			driveStraightPID.toSmartDashboard();
-			drive.arcadeDrive(speed, -(driveStraightPID.getOutput()));
-			
+			drive.arcadeDrive(SmartDashboard.getNumber("DB/Slider 3",  0), -driveStraightPID.getOutput());
 		}
+		SmartDashboard.putString("DB/String 1", "Left " + systems.getEncoderDistance(SysObj.Sensors.LEFT_ENCODER));
+		SmartDashboard.putString("DB/String 2", "Right" + systems.getEncoderDistance(SysObj.Sensors.RIGHT_ENCODER));
+
 		drive.arcadeDrive(0,0);
 		systems.resetEncoders();
 	}
