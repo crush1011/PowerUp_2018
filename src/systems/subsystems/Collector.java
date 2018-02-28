@@ -169,16 +169,7 @@ public class Collector implements Subsystem {
 				armPID.setDValue(3);
 
 			}
-			if (systems.getButton(Controls.Button.X, false)) {
-				position = 5;
-				armPID.setDValue(25);
-				fast = true;
-				if (averageArmEncoderPos < 48) {
-					intakeLeft.set(1);
-					intakeRight.set(1);
-				}
-			}
-	
+			
 			
 			if (systems.getButton(Controls.Button.Y, false)) {
 				idleTurnConstant = -0.2; // might be different for real robot
