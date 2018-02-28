@@ -36,10 +36,10 @@ public class Collector implements Subsystem {
 	private double angleConstant, armConstant;
 	private double idleTurnConstant;
 
-	private boolean idleTurn, manualMode;
+	private boolean idleTurn, manualMode, collecting;
 
 	private int position, counter;
-	
+
 	DecimalFormat df;
 
 	/*
@@ -57,7 +57,7 @@ public class Collector implements Subsystem {
 		this.armEncoder2 = armEncoder2;
 		this.armPID = new PIDManual(0.015, 0, 0);
 		resources = new Resources();
-		
+
 		df = new DecimalFormat("#.##");
 
 		intakeRight.setInverted(true);
@@ -70,13 +70,13 @@ public class Collector implements Subsystem {
 
 		position = 0;
 		encoderRange = 0;
-		angleConstant = 0.74269; // pulses per degree
 		armPID.setDValue(0);
 		armConstant = 0.4;
 		idleTurnConstant = 0;
 
 		idleTurn = false;
 		manualMode = false;
+		collecting = false;
 	}
 
 	/*
@@ -89,28 +89,63 @@ public class Collector implements Subsystem {
 
 		if (systems == null) {
 			systems = Systems.getInstance();
+			armEncoder1 = Systems.getRobotEncoder(SysObj.Sensors.ARM_ENCODER_1);
+			armEncoder2 = Systems.getRobotEncoder(SysObj.Sensors.ARM_ENCODER_2);
+			armEncoder1.setDistancePerPulse(0.42);
+			armEncoder2.setDistancePerPulse(0.42);
 
-			//System.out.println("Collector.update(): " + systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
+			// System.out.println("Collector.update(): " +
+			// systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
 		}
 		averageArmEncoderPos = 0.5 * (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1)
 				+ systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
 		if (!systems.inAuto) {
 			// Controls for intake
-
 			if (systems.getMotorCurrent(10) < 75 && systems.getMotorCurrent(11) < 75) {
 				if (systems.getOperatorRtTrigger() > .1) {
-					intakeLeft.set(-Math.pow(systems.getOperatorRtTrigger(), 2));
-					intakeRight.set(-Math.pow(systems.getOperatorRtTrigger(), 2));
+					intakeLeft.set(-Math.pow(0.9 * systems.getOperatorRtTrigger(), 2));
+					intakeRight.set(-Math.pow(0.9 * systems.getOperatorRtTrigger(), 2));
+					if (position == 3 && !collecting) {
+						armPID.setDValue(135);
+						collecting = true;
+					}
 				} else if (systems.getOperatorLtTrigger() > .1) {
 					intakeLeft.set(Math.pow(systems.getOperatorLtTrigger(), 2));
 					intakeRight.set(Math.pow(systems.getOperatorLtTrigger(), 2));
 				} else {
 					intakeLeft.set(idleTurnConstant);
 					intakeRight.set(idleTurnConstant);
+					if (collecting) {
+						armPID.setDValue(120);
+						SmartDashboard.putString("DB/String 2", "Hellu");
+						collecting = false;
+					}
 				}
 			} else {
+
 				intakeLeft.set(0);
 				intakeRight.set(0);
+			}
+
+			// Driver Test Controls
+			if (systems.getButton(Controls.Button.A, true)) {
+				intakeLeft.set(1);
+				intakeRight.set(0.2);
+			}
+
+			if (systems.getButton(Controls.Button.X, true)) {
+				intakeLeft.set(1);
+			}
+
+			if (systems.getButton(Controls.Button.B, true)) {
+				intakeRight.set(1);
+			}
+
+			if (systems.getDriverLtTrigger() > 0.1) {
+				intakeLeft.set(-systems.getDriverLtTrigger());
+			}
+			if (systems.getDriverRtTrigger() > 0.1) {
+				intakeRight.set(-systems.getDriverRtTrigger());
 			}
 
 			armPID.setCValue(averageArmEncoderPos);
@@ -118,24 +153,28 @@ public class Collector implements Subsystem {
 			// Controls for arm
 			if (systems.getButton(Controls.Button.LEFT_BUMPER, false)) {
 				position = 1;
-				armPID.setDValue(angleConstant * 135);
-			}
-			if (systems.getButton(Controls.Button.B, false)) {
-				position = 2;
-				armPID.setDValue(angleConstant * 60);
-			}
-			if (systems.getButton(Controls.Button.A, false)) {
-				position = 3;
-				armPID.setDValue(angleConstant * 10);
+				armPID.setDValue(135);
 			}
 			if (systems.getButton(Controls.Button.RIGHT_BUMPER, false)) {
+				position = 2;
+				armPID.setDValue(75);
+			}
+			if (systems.getButton(Controls.Button.B, false)) {
+				position = 3;
+				armPID.setDValue(120);
+			}
+			if (systems.getButton(Controls.Button.A, false)) {
 				position = 4;
-				armPID.setDValue(angleConstant * 0);
+				armPID.setDValue(3);
 
+			}
+			if (systems.getButton(Controls.Button.X, false)) {
+				position = 5;
+				armPID.setDValue(110);
 			}
 
 			if (systems.getButton(Controls.Button.Y, false)) {
-				idleTurnConstant = 0.2;
+				idleTurnConstant = -0.2; // might be different for real robot
 			} else {
 				idleTurnConstant = 0;
 			}
@@ -146,11 +185,17 @@ public class Collector implements Subsystem {
 				else if (manualMode)
 					manualMode = false;
 			}
-			if (systems.getButton(Controls.Button.X, false)){
-				intakeLeft.set(SmartDashboard.getNumber("DB/Slider 0", 1));
-				intakeRight.set(SmartDashboard.getNumber("DB/Slider 1", 0.2));
+			
+			/*if(systems.getDPadButton(Controls.POV.UP, false)){
+				double i = averageArmEncoderPos;
+				armPID.setDValue(i - 5);
 			}
-
+			
+			if(systems.getDPadButton(Controls.POV.DOWN, false)){
+				double i = averageArmEncoderPos;
+				armPID.setDValue(i + 5);
+			}*/
+			
 			// Automatic operator controls
 			if (!manualMode) {
 				collectorArm1.set(armPID.getOutput());
@@ -164,9 +209,9 @@ public class Collector implements Subsystem {
 			}
 
 		}
-		
+
 		if (counter % 2000 == 0) {
-			this.toSmartDashboard();
+			// this.toSmartDashboard();
 		}
 		counter++;
 	}
@@ -179,8 +224,8 @@ public class Collector implements Subsystem {
 	public void moveArm(double angle) {
 		armPID.setDValue(angle);
 		while (Math.abs(resources.getAngleError(angle, averageArmEncoderPos)) < 5) {
-			systems.getRobotEncoder(SysObj.Sensors.ARM_ENCODER_1).update();
-			systems.getRobotEncoder(SysObj.Sensors.ARM_ENCODER_2).update();
+			armEncoder1.update();
+			armEncoder1.update();
 			update();
 			averageArmEncoderPos = 0.5 * (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1)
 					+ systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
@@ -204,6 +249,24 @@ public class Collector implements Subsystem {
 			counter++;
 		}
 	}
+	
+	/*
+	 *outtakeCube
+	 *Author: Nitesh Puri
+	 *Collaborators: Ethan Ngo and Finlay Parsons
+	 *--------------------------------------------------
+	 *Parameters: None
+	 *Purpose: Outtakes the cube 
+	 */
+	
+	public void outtakeCube(){
+		int counter = 0;
+		while (counter < 50) {
+			intakeLeft.set(-1);
+			intakeRight.set(-1);
+			counter++;
+		}
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -213,8 +276,11 @@ public class Collector implements Subsystem {
 	@Override
 	public void toSmartDashboard() {
 		// TODO Auto-generated method stub
-		SmartDashboard.putString("DB/String 3", "Encoder1: " + df.format(systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1)));
-		SmartDashboard.putString("DB/String 2", "Encoder2: " + df.format(systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2)));
+		SmartDashboard.putString("DB/String 4",
+				"Encoder1: " + df.format(systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1)));
+		SmartDashboard.putString("DB/String 3",
+				"Encoder2: " + df.format(systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2)));
+		SmartDashboard.putString("DB/String 5", "Distance: " + df.format(averageArmEncoderPos));
 	}
 
 }

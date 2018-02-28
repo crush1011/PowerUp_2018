@@ -25,10 +25,12 @@ import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.Victor;
+import systems.SysObj.Sensors;
 import systems.subsystems.Collector;
 import systems.subsystems.Controls;
 import systems.subsystems.Controls.Axis;
 import systems.subsystems.Controls.Button;
+import systems.subsystems.Controls.POV;
 import systems.subsystems.DriveTrain;
 import systems.subsystems.NavX;
 import systems.subsystems.PIDManual;
@@ -174,8 +176,9 @@ public class Systems{
 		if(controls.getButton(Controls.Button.BACK, SysObj.Sensors.DRIVER_STICK)){
 			navX.zeroAngler();
 		}
-		//armEncoder2.toSmartDashboard();
+		lEncoder.toSmartDashboard();
 		collector.toSmartDashboard();
+		
 	}
 	
 	/*
@@ -198,6 +201,28 @@ public class Systems{
 	 */
 	public double getDriverAxisRightX() {
 		return controls.getDriverAxis().get(Axis.RIGHT_X);
+	}
+	
+	/*
+	 * getDriverLtTrigger
+	 * Author: Nitesh Puri
+	 * ---------------------------------------------
+	 * Purpose: gets the driver's current trigger value
+	 * Returns: Driver's Trigger Value As Double
+	 */
+	public double getDriverLtTrigger() {
+		return controls.getDriverAxis().get(Axis.LEFT_TRIGGER);
+	}
+	
+	/*
+	 * getDriverRtTrigger
+	 * Author: Nitesh Puri
+	 * ---------------------------------------------
+	 * Purpose: gets the driver's current trigger value
+	 * Returns: Driver's Trigger Value As Double
+	 */
+	public double getDriverRtTrigger() {
+		return controls.getDriverAxis().get(Axis.RIGHT_TRIGGER);
 	}
 	
 	/*
@@ -245,6 +270,22 @@ public class Systems{
 		}
 		else {
 			return controls.getButton(button, SysObj.Sensors.OPERATOR_STICK);
+		}
+	}
+	
+	/*
+	 * getDPadButton
+	 * Author: Ethan Yes
+	 * Collaborator: Nitesh Puri
+	 * ------------------------
+	 * Purpose: Looks if the POV is being pressed
+	 */
+	public boolean getDPadButton(POV pov, boolean driver) {
+		if(driver) {
+			return controls.getDPadButton(pov, SysObj.Sensors.DRIVER_STICK);
+		}
+		else {
+			return controls.getDPadButton(pov, SysObj.Sensors.OPERATOR_STICK);
 		}
 	}
 	
@@ -331,9 +372,9 @@ public class Systems{
 	 * Purpose: Gets the pulse
 	 * Return: Returns a double
 	 */
-	public double getPulse(){
-		return lEncoder.getPulse();
-	}
+	//public double getPulse(){
+		//return lEncoder.getPulse();
+	//}
 	
 	/*
 	 * printEncoderInfo
@@ -347,28 +388,28 @@ public class Systems{
 	 *  c: print pulse
 	 * returns nothing
 	 */
-	public void printEncoderInfo(boolean a, boolean b, boolean c, SysObj.Sensors sensor){
+	public void printEncoderInfo(boolean distance, boolean rate, boolean pulse, SysObj.Sensors sensor){
 		
 		switch(sensor){
 			case LEFT_ENCODER: 
-				if(a) System.out.print("Left Distance: "+ lEncoder.getValue());
-				if(b) System.out.print("    Left Rate: " + lEncoder.getRate());
-				if(c) System.out.print("    Left Pulse: " + lEncoder.getPulse());
+				if(distance) System.out.print("Left Distance: "+ lEncoder.getValue());
+				if(rate) System.out.print("    Left Rate: " + lEncoder.getRate());
+				if(pulse) System.out.print("    Left Pulse: " + lEncoder.getPulse());
 				break;
 			case RIGHT_ENCODER:
-				if(a) System.out.print("Right Distance: "+ rEncoder.getValue());
-				if(b) System.out.print("    Right Rate: " + rEncoder.getRate());
-				if(c) System.out.print("    Right Pulse: " + rEncoder.getPulse());
+				if(distance) System.out.print("Right Distance: "+ rEncoder.getValue());
+				if(rate) System.out.print("    Right Rate: " + rEncoder.getRate());
+				if(pulse) System.out.print("    Right Pulse: " + rEncoder.getPulse());
 				break;
 			case ARM_ENCODER_1:
-				if(a) System.out.print("Arm 1 Distance: "+ armEncoder1.getValue());
-				if(b) System.out.print("    Arm 1 Rate: " + armEncoder1.getRate());
-				if(c) System.out.print("    Arm 1 Pulse: " + armEncoder1.getPulse());
+				if(distance) System.out.print("Arm 1 Distance: "+ armEncoder1.getValue());
+				if(rate) System.out.print("    Arm 1 Rate: " + armEncoder1.getRate());
+				if(pulse) System.out.print("    Arm 1 Pulse: " + armEncoder1.getPulse());
 				break;
 			case ARM_ENCODER_2:
-				if(a) System.out.print("Arm 2 Distance: "+ armEncoder2.getValue());
-				if(b) System.out.print("    Arm 2 Rate: " + armEncoder2.getRate());
-				if(c) System.out.print("    Arm 2 Pulse: " + armEncoder2.getPulse());
+				if(distance) System.out.print("Arm 2 Distance: "+ armEncoder2.getValue());
+				if(rate) System.out.print("    Arm 2 Rate: " + armEncoder2.getRate());
+				if(pulse) System.out.print("    Arm 2 Pulse: " + armEncoder2.getPulse());
 				break;
 			default:
 				System.out.println("ERROR: no encoder selected!");
@@ -440,6 +481,16 @@ public class Systems{
 			return 0;
 		}
 	}
+	
+	/*
+	 * setDistancePerPulse
+	 * Author: Finlay Parsons
+	 * ----------------------
+	 * Sets distance per pulse of a specified encoder
+	 */
+	public void setDistancePerPulse(RobotEncoder encoder, double x){
+		encoder.setDistancePerPulse(x);
+	} 
 	
 	/*
 	 * instantiate

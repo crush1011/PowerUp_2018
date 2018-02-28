@@ -18,6 +18,8 @@ public class Controls implements Subsystem{
 	
 	private HashMap<Button, Boolean> driverButtons;
 	private HashMap<Button, Boolean> operatorButtons;
+	private HashMap<POV, Boolean> driverDPadButtons;
+	private HashMap<POV, Boolean> operatorDPadButtons;
 	private HashMap<Axis, Double> driverAxis;
 	private HashMap<Axis, Double> operatorAxis;
 	
@@ -65,17 +67,37 @@ public class Controls implements Subsystem{
 	 * POV
 	 * Author: Finlay P
 	 * -------------------------
-	 * Purpose: Enum for the POV or DPAD "buttons."
+	 * Purpose: Enum for the POV or DPad "buttons."
 	 */
 	public enum POV{
-		RIGHT,
-		RIGHTUP,
-		UP,
-		LEFTUP,
-		LEFT,
-		LEFTDOWN,
-		DOWN,
-		RIGHTDOWN;
+		UP(1),
+		RIGHT(2),
+		DOWN(3),
+		LEFT(4),
+		RIGHTUP(5),
+		RIGHTDOWN(6),
+		LEFTDOWN(7),
+		LEFTUP(8);
+		
+		int index;
+		
+		//Constructor
+		private POV(int index){
+			this.index = index;
+		}
+		
+		/*
+		 * getDPadIndex
+		 * Author: Ethan Yes
+		 * Collaborator: Nitesh Puri
+		 * --------------------------------------------
+		 * Purpose: This is a getter for the associated 
+		 * 	pov number
+		 * Returns: an int 
+		 */
+		public int getDPadIndex(){
+			return index;
+		}
 	}
 	
 	/*
@@ -119,8 +141,11 @@ public class Controls implements Subsystem{
 		
 		driverButtons = new HashMap<>();
 		driverAxis = new HashMap<>();
+		driverDPadButtons = new HashMap<>();
 		operatorButtons = new HashMap<>();
 		operatorAxis = new HashMap<>();
+		operatorDPadButtons = new HashMap<>();
+		
 	}
 	
 	/*
@@ -133,8 +158,10 @@ public class Controls implements Subsystem{
 	public void update(){
 		updateButtonHash(driverButtons, driverJoystick);
 		updateButtonHash(operatorButtons, operatorJoystick);
+		updatePOVHash(driverDPadButtons, driverJoystick);
+		updatePOVHash(operatorDPadButtons, operatorJoystick);
 		updateAxisHash(driverAxis, driverJoystick);
-		updateAxisHash(operatorAxis, operatorJoystick);	
+		updateAxisHash(operatorAxis, operatorJoystick);
 	}
 	
 	/*
@@ -154,6 +181,24 @@ public class Controls implements Subsystem{
 		hash.put(Button.RIGHT_BUMPER, stick.getRawButton(Button.RIGHT_BUMPER.getIndex()));
 		hash.put(Button.LEFTJOY, stick.getRawButton(Button.LEFTJOY.getIndex()));
 		hash.put(Button.RIGHTJOY, stick.getRawButton(Button.RIGHTJOY.getIndex()));
+	}
+	
+	/*
+	 * updatePOVHash
+	 * Author: Ethan Yes
+	 * Collaborator: Nitesh Puri
+	 * --------------------------------------
+	 * Purpose: updates just the pov hashmaps
+	 */
+	private static void updatePOVHash(HashMap<POV, Boolean> hash, Joystick stick){
+		hash.put(POV.RIGHT, stick.getRawButton(POV.RIGHT.getDPadIndex()));
+		hash.put(POV.RIGHTUP, stick.getRawButton(POV.RIGHTUP.getDPadIndex()));
+		hash.put(POV.RIGHTDOWN, stick.getRawButton(POV.RIGHTDOWN.getDPadIndex()));
+		hash.put(POV.LEFT, stick.getRawButton(POV.LEFT.getDPadIndex()));
+		hash.put(POV.LEFTUP, stick.getRawButton(POV.LEFTUP.getDPadIndex()));
+		hash.put(POV.LEFTDOWN, stick.getRawButton(POV.LEFTDOWN.getDPadIndex()));
+		hash.put(POV.UP, stick.getRawButton(POV.UP.getDPadIndex()));
+		hash.put(POV.DOWN, stick.getRawButton(POV.DOWN.getDPadIndex()));
 	}
 	
 	/*
@@ -215,6 +260,27 @@ public class Controls implements Subsystem{
 		}
 	}
 	
+	/*
+	 * getDPadButton
+	 * Author: Ethan Yes
+	 * Collaborators: Nitesh Puri
+	 * --------------------------------------------------------
+	 * Purpose: Gets current DPad button being pressed
+	 * Parameters: 
+	 * 	button: enum representing the button to get
+	 * Returns: boolean
+	 */
+	public boolean getDPadButton(POV pov, SysObj.Sensors controller){
+		if(controller == SysObj.Sensors.DRIVER_STICK) {
+			return driverDPadButtons.get(pov);
+		}
+		else if(controller == SysObj.Sensors.OPERATOR_STICK){
+			return operatorDPadButtons.get(pov);
+		}
+		else {
+			return false;
+		}
+	}
 	/*
 	 * (non-Javadoc)
 	 * @see systems.Subsystem#toSmartDashboard()

@@ -21,44 +21,42 @@ public class LeftSideLeftScore implements Runnable{
 	
 	private Systems systems;
 	private DriveTrain driveTrain;
+	private Collector collector;
 	
 	public LeftSideLeftScore(){
 		
 		systems = Systems.getInstance();
 		driveTrain = Systems.getDriveTrain();
+		collector = Systems.getCollector();
 	}
 
 	@Override
 	public void run() {
-		try {
-			Thread.sleep(15000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		//driveTrain.driveDistance(48, 0.4);
+		driveTrain.driveDistance(60, 0.5);
 		
-		/*driveTrain.driveDistance(110, 0.7); //Drives forward to the switch fence
+		/*driveTrain.driveDistance(110, -0.7); //Drives backwards to the switch fence
 		
-		driveTrain.circleTurn(45, 90, 0.7, true, true); //Turns into the switch fence
+		driveTrain.circleTurn(45, 90, 0.7, false, false); //Turns into the switch fence
 		
-		//TODO: Eject the cube
+		collector.outtakeCube(); //outtake
 		
-		driveTrain.circleTurn(50, 0, 0.6, false, false); //Turns out of the switch fence finishing backwards
+		driveTrain.circleTurn(40, 270, 0.6, true, true); //Turns out of the switch fence finishing forwards
 		
-		driveTrain.driveDistance(30, -0.5); 
+		driveTrain.circleTurn(40, 0, 0.6, true, true);
 		
-		driveTrain.turnTo(270, 0.5, false); //Turns towards fence cubes
+		collector.moveArm(135);
 		
-		driveTrain.driveDistance(120, 0.6); //Drives towards the fence cubes
+		driveTrain.driveDistance(40, 0.6); //Drives towards the fence cubes
 		
-		//TODO: Pick up cube
+		driveTrain.driveDistance(10, 0.4);
 		
-		driveTrain.circleTurn(30, 90, 0.6, false, false);
+		collector.intakeCube();
 		
-		driveTrain.driveDistance(40, 0.6);
-		*/
-		//TODO: Eject the cube
+		driveTrain.driveDistance(10, -0.6);
+		
+		collector.moveArm(75);
+		
+		collector.outtakeCube();*/
 	}
 	
 	

@@ -116,16 +116,25 @@ public class PIDManual implements Subsystem{
 		update();
 		return output;
 	}
+	
+	/*
+	 * getDValue
+	 * Author: Finny
+	 * ------------ 
+	 */
+	public double getDValue(){
+		return dValue;
+	}
 
 	@Override
 	public void toSmartDashboard() {
 		// TODO Auto-generated method stub
-		SmartDashboard.putString("DB/String 1", "Error: " + resources.roundDouble(error, -1));
-		SmartDashboard.putString("DB/String 9", "PIDOutput:" + resources.roundDouble(output, -1));
+		//SmartDashboard.putString("DB/String 1", "Error: " + resources.roundDouble(error, -1));
+		//SmartDashboard.putString("DB/String 9", "PIDOutput:" + resources.roundDouble(output, -1));
 		//SmartDashboard.putString("DB/String 2", "Derivative:" + derivative);
 		//SmartDashboard.putString("DB/String 3", "Integral:" + integral);
-		SmartDashboard.putString("DB/String 4", "Angle:" + resources.roundDouble(systems.getNavXAngle(), -1));
-		SmartDashboard.putString("DB/String 5", "Counter:" + counter);
+		//SmartDashboard.putString("DB/String 4", "Angle:" + resources.roundDouble(systems.getNavXAngle(), -1));
+		//SmartDashboard.putString("DB/String 5", "Counter:" + counter);
 		SmartDashboard.putString("DB/String 6", "P:" + p);
 		SmartDashboard.putString("DB/String 7", "I:" + i);
 		SmartDashboard.putString("DB/String 8", "D:" + d);

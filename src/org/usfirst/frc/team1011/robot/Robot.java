@@ -40,6 +40,17 @@ public class Robot extends IterativeRobot {
 		
 		systems = Systems.getInstance();
 		
+		systems.resetEncoders();
+		SmartDashboard.putString("DB/String 0", "");
+		SmartDashboard.putString("DB/String 1", "");
+		SmartDashboard.putString("DB/String 2", "");
+		SmartDashboard.putString("DB/String 3", "");
+		SmartDashboard.putString("DB/String 4", "");
+		SmartDashboard.putString("DB/String 5", "");
+		SmartDashboard.putString("DB/String 6", "");
+		SmartDashboard.putString("DB/String 7", "");
+		SmartDashboard.putString("DB/String 8", "");
+		SmartDashboard.putString("DB/String 9", "");
 		m_chooser.addDefault("Default Auto", kDefaultAuto);
 		m_chooser.addObject("My Auto", kCustomAuto);
 		SmartDashboard.putData("Auto choices", m_chooser);
@@ -107,12 +118,8 @@ public class Robot extends IterativeRobot {
 		systems.update();
 		//systems.printEncoderInfo(false, false, true, SysObj.Sensors.ARM_ENCODER_1);
 		//systems.printEncoderInfo(false, false, true, SysObj.Sensors.ARM_ENCODER_2);
-		System.out.print("Left Intake: ");
-		System.out.print(systems.getMotorCurrent(10));
-		System.out.print("    ");
-		System.out.print("Right Intake: ");
-		System.out.print(systems.getMotorCurrent(11));
-		System.out.println("");
+		systems.printEncoderInfo(true, false, false, SysObj.Sensors.LEFT_ENCODER);
+		systems.printEncoderInfo(true, false, false, SysObj.Sensors.RIGHT_ENCODER);
 		
 	}
 

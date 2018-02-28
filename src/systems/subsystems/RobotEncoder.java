@@ -74,8 +74,8 @@ public class RobotEncoder implements Subsystem{
 
 	@Override
 	public void toSmartDashboard() {
-		System.out.println("Encoder Distance: " + currentPos);
-		
+		SmartDashboard.putString("DB/String 0", "Distance: " + this.getValue() );
+		SmartDashboard.putString("DB/String 1", "Pulse1: " + this.getPulse());
 	}
 
 }

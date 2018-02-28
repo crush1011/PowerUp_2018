@@ -13,6 +13,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import systems.Resources;
 import systems.Subsystem;
 import systems.SysObj;
 import systems.Systems;
@@ -24,7 +25,8 @@ public class DriveTrain implements Subsystem{
 	private static Systems systems;
 	private DifferentialDrive drive;
 	private PIDManual driveStraightPID;
-	private double driveConstant;
+	public Resources resources;
+	private double driveConstant, distancePerPulse;
 	private final double ROBOT_WIDTH;	//Distance between wheels
 	
 	/*
@@ -55,22 +57,39 @@ public class DriveTrain implements Subsystem{
 		rtSlave1.setNeutralMode(NeutralMode.Brake);
 		rtSlave2.setNeutralMode(NeutralMode.Brake);
 		
-		driveStraightPID = new PIDManual(1, 0 , 0);
+		driveStraightPID = new PIDManual(0.05, 0 , 0);
+		
+		resources = new Resources();
 		
 		driveConstant = 1.0;
 		drive = new DifferentialDrive(ltMain, rtMain);
 		
 		ROBOT_WIDTH=21;
+		
+		distancePerPulse = 1;
+		
 	}
 
 	@Override
 	public void update() {
 		if (systems == null) {
 			systems = Systems.getInstance();
+			systems.setDistancePerPulse(Systems.getRobotEncoder(SysObj.Sensors.LEFT_ENCODER), distancePerPulse);
+			systems.setDistancePerPulse(Systems.getRobotEncoder(SysObj.Sensors.RIGHT_ENCODER), distancePerPulse);
 		}
 		
 		if (systems.inAuto){
 			return;
+		}
+		
+		if(systems.getButton(Controls.Button.LEFT_BUMPER, true)){
+			driveConstant = 0.6;
+		}
+		else if(systems.getButton(Controls.Button.RIGHT_BUMPER, true)){
+			driveConstant = 0.8;
+		}
+		else {
+			driveConstant = 1;
 		}
 		
 		drive.arcadeDrive(driveConstant*systems.getDriverAxisLeftY(), driveConstant*systems.getDriverAxisRightX(), true);
@@ -78,8 +97,7 @@ public class DriveTrain implements Subsystem{
 	}
 	@Override
 	public void toSmartDashboard() {
-		// TODO Auto-generated method stub
-		
+		SmartDashboard.putString("DB/String 0", "Distance: " + systems.getEncoderDistance(SysObj.Sensors.LEFT_ENCODER));
 	}
 	
 	
@@ -126,8 +144,15 @@ public class DriveTrain implements Subsystem{
 	
 	/*
 	 * align
-	 * 
+	 * Author: Finlay Parsons
+	 * ---------------------------
+	 * Purpose: Aligns robot to a multiple of 90 degrees
 	 */
+	public void align(int direction) {
+		driveStraightPID.setDValue(direction);
+		
+	}
+	
 	
 	/*
 	 * driveDistance
@@ -144,11 +169,12 @@ public class DriveTrain implements Subsystem{
 		double desiredDriveAngle = systems.getNavXAngle();
 		double rotateConstant = 0;
 		
-	//	pidManual.setDAngle(0);
+		driveStraightPID.setDValue(desiredDriveAngle);
 		driveStraightPID.setPID(SmartDashboard.getNumber("DB/Slider 0", 0), SmartDashboard.getNumber("DB/Slider 1", 0), SmartDashboard.getNumber("DB/Slider 2", 0));
 
 		
-		while(DriverStation.getInstance().isAutonomous() && (systems.getEncoderDistance(SysObj.Sensors.LEFT_ENCODER)<distance)){
+		
+		while(DriverStation.getInstance().isAutonomous() && (systems.getEncoderDistance(SysObj.Sensors.RIGHT_ENCODER)<distance)){
 			/*systems.getRobotEncoder(SysObj.Sensors.LEFT_ENCODER).update();
 			systems.getRobotEncoder(SysObj.Sensors.RIGHT_ENCODER).update();
 			systems.getNavX().update();
@@ -159,8 +185,9 @@ public class DriveTrain implements Subsystem{
 			if(desiredDriveAngle<0) rotateConstant = 0.2;
 			drive.arcadeDrive(speed, rotateConstant);*/
 
-
-			drive.arcadeDrive(speed, -(driveStraightPID.getOutput()/90));
+			this.toSmartDashboard();
+			driveStraightPID.toSmartDashboard();
+			drive.arcadeDrive(speed, -(driveStraightPID.getOutput()));
 			
 		}
 		drive.arcadeDrive(0,0);
