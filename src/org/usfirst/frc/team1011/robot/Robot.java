@@ -9,6 +9,7 @@ package org.usfirst.frc.team1011.robot;
 
 import autonomous.LeftSideLeftScore;
 import autonomous.MidSideLeftScore;
+import autonomous.MidSideRightScore;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -31,8 +32,6 @@ public class Robot extends IterativeRobot {
 	private String m_autoSelected;
 	private SendableChooser<String> m_chooser = new SendableChooser<>();
 	private static Systems systems;
-	private LeftSideLeftScore leftSideLeftScore;
-	private MidSideLeftScore midSideLeftScore;
 	private static Collector collector;
 	private static Thread auton;
 	
@@ -88,8 +87,6 @@ public class Robot extends IterativeRobot {
 		// autoSelected = SmartDashboard.getString("Auto Selector",
 		// defaultAuto);
 		System.out.println("Auto selected: " + m_autoSelected);
-		leftSideLeftScore = new LeftSideLeftScore();
-		midSideLeftScore = new MidSideLeftScore();
 		
 		systems.instantiate();
 		systems.update();
@@ -101,17 +98,15 @@ public class Robot extends IterativeRobot {
 		
 		switch (m_autoSelected) {
 		case kCustomAuto:
-			midSideLeftScore.run();
 			break;
 		case kDefaultAuto:
-			midSideLeftScore.run();
 			break;
 		default:
 			if (gameData.charAt(0) == 'L') 
-				auton = new Thread(midSideLeftScore);
+				auton = new Thread(new MidSideLeftScore());
 			else 
-				//auton = new Thread(midSideRightScore);
-			System.out.println("No autonomous selected.");
+				auton = new Thread(new MidSideRightScore());
+			//System.out.println("No autonomous selected.");
 			break;
 		}
 		auton.start();

@@ -41,6 +41,8 @@ public class Collector implements Subsystem {
 	private int position, counter;
 
 	DecimalFormat df;
+	
+	private static Thread cubeThrowThread;
 
 	/*
 	 * Constructor Author: Nitesh Puri ----------------------------------------
@@ -78,6 +80,43 @@ public class Collector implements Subsystem {
 		manualMode = false;
 		collecting = false;
 		fast = false;
+		
+		cubeThrowThread = new Thread(new CubeThrow());
+	}
+	
+	/*
+	 * CubeThrow
+	 * Author: Nitesh Puri
+	 * Collaborators: Jeremiah Hanson
+	 * --------------------------------------
+	 * Runnable Class
+	 * Purpose: Throw the cube.
+	 */
+	
+	private class CubeThrow implements Runnable {
+
+		@Override
+		public void run() {
+			
+			armPID.setDValue(45);
+			
+			while(true) {
+				boolean stop = false;
+				averageArmEncoderPos = 0.5 * (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1)
+						+ systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
+				collectorArm1.set(armPID.getOutput());
+				collectorArm2.set(armPID.getOutput());
+				
+				if (averageArmEncoderPos <= 50) {
+					outtakeCube(.6);
+					stop = true;
+				}
+				if (stop) 
+					break;
+			}
+			
+		}
+		
 	}
 
 	/*
@@ -98,6 +137,11 @@ public class Collector implements Subsystem {
 			// System.out.println("Collector.update(): " +
 			// systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
 		}
+		
+		if (cubeThrowThread.isAlive()) {
+			return;
+		}
+		
 		averageArmEncoderPos = 0.5 * (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1)
 				+ systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
 		if (!systems.inAuto) {
@@ -150,7 +194,7 @@ public class Collector implements Subsystem {
 			}
 			if (systems.getButton(Controls.Button.X, false)){
 				position = 5;
-				armPID.setDValue(60);
+				cubeThrowThread.start();
 			}
 
 			if (systems.getButton(Controls.Button.Y, false)) {
