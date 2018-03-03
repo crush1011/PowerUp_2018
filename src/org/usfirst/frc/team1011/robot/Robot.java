@@ -8,6 +8,7 @@
 package org.usfirst.frc.team1011.robot;
 
 import autonomous.LeftSideLeftScore;
+import autonomous.MidSideLeftScore;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -15,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import systems.SysObj;
 import systems.Systems;
+import systems.subsystems.Collector;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -30,6 +32,8 @@ public class Robot extends IterativeRobot {
 	private SendableChooser<String> m_chooser = new SendableChooser<>();
 	private static Systems systems;
 	private LeftSideLeftScore leftSideLeftScore;
+	private MidSideLeftScore midSideLeftScore;
+	private static Collector collector;
 	
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -41,7 +45,8 @@ public class Robot extends IterativeRobot {
 		systems = Systems.getInstance();
 		
 		systems.resetEncoders();
-		SmartDashboard.putString("DB/String 0", "");
+		systems.update();
+		/*SmartDashboard.putString("DB/String 0", "");
 		SmartDashboard.putString("DB/String 1", "");
 		SmartDashboard.putString("DB/String 2", "");
 		SmartDashboard.putString("DB/String 3", "");
@@ -50,7 +55,7 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putString("DB/String 6", "");
 		SmartDashboard.putString("DB/String 7", "");
 		SmartDashboard.putString("DB/String 8", "");
-		SmartDashboard.putString("DB/String 9", "");
+		SmartDashboard.putString("DB/String 9", "");*/
 		m_chooser.addDefault("Default Auto", kDefaultAuto);
 		m_chooser.addObject("My Auto", kCustomAuto);
 		SmartDashboard.putData("Auto choices", m_chooser);
@@ -83,18 +88,20 @@ public class Robot extends IterativeRobot {
 		// defaultAuto);
 		System.out.println("Auto selected: " + m_autoSelected);
 		leftSideLeftScore = new LeftSideLeftScore();
+		midSideLeftScore = new MidSideLeftScore();
 		
 		systems.instantiate();
+		systems.update();
 		
 		switch (m_autoSelected) {
 		case kCustomAuto:
-			// Put custom auto code here
+			midSideLeftScore.run();
 			break;
 		case kDefaultAuto:
-			leftSideLeftScore.run();
+			midSideLeftScore.run();
 			break;
 		default:
-			leftSideLeftScore.run();
+			System.out.println("No autonomous selected.");
 			break;
 		}
 	}
@@ -105,7 +112,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousPeriodic() {
 		
-		
+		System.out.println("Angle: " + systems.getNavXAngle());
 		
 	}
 
@@ -118,8 +125,10 @@ public class Robot extends IterativeRobot {
 		systems.update();
 		//systems.printEncoderInfo(false, false, true, SysObj.Sensors.ARM_ENCODER_1);
 		//systems.printEncoderInfo(false, false, true, SysObj.Sensors.ARM_ENCODER_2);
-		systems.printEncoderInfo(true, false, false, SysObj.Sensors.LEFT_ENCODER);
-		systems.printEncoderInfo(true, false, false, SysObj.Sensors.RIGHT_ENCODER);
+		//systems.printEncoderInfo(true, false, false, SysObj.Sensors.LEFT_ENCODER);
+		//systems.printEncoderInfo(true, false, false, SysObj.Sensors.RIGHT_ENCODER);
+		System.out.println("Left Motor: " + systems.getMotorCurrent(10));
+		System.out.println("Right Motor: " + systems.getMotorCurrent(11));
 		
 	}
 

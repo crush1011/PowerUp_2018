@@ -104,8 +104,8 @@ public class Collector implements Subsystem {
 			// Controls for intake
 			if (systems.getMotorCurrent(10) < 75 && systems.getMotorCurrent(11) < 75) {
 				if (systems.getOperatorRtTrigger() > .1) {
-					intakeLeft.set(-Math.pow(0.9 * systems.getOperatorRtTrigger(), 2));
-					intakeRight.set(-Math.pow(0.9 * systems.getOperatorRtTrigger(), 2));
+					intakeLeft.set(-Math.pow(0.87 * systems.getOperatorRtTrigger(), 2));
+					intakeRight.set(-Math.pow(0.87 * systems.getOperatorRtTrigger(), 2));
 					if (position == 3 && !collecting) {
 						armPID.setDValue(135);
 						collecting = true;
@@ -128,26 +128,6 @@ public class Collector implements Subsystem {
 				intakeRight.set(0);
 			}
 
-			// Driver Test Controls
-			if (systems.getButton(Controls.Button.A, true)) {
-				intakeLeft.set(1);
-				intakeRight.set(0.2);
-			}
-
-			if (systems.getButton(Controls.Button.X, true)) {
-				intakeLeft.set(1);
-			}
-
-			if (systems.getButton(Controls.Button.B, true)) {
-				intakeRight.set(1);
-			}
-
-			if (systems.getDriverLtTrigger() > 0.1) {
-				intakeLeft.set(-systems.getDriverLtTrigger());
-			}
-			if (systems.getDriverRtTrigger() > 0.1) {
-				intakeRight.set(-systems.getDriverRtTrigger());
-			}
 
 			armPID.setCValue(averageArmEncoderPos);
 
@@ -162,15 +142,17 @@ public class Collector implements Subsystem {
 			}
 			if (systems.getButton(Controls.Button.B, false)) {
 				position = 3;
-				armPID.setDValue(120);
+				armPID.setDValue(125);
 			}
 			if (systems.getButton(Controls.Button.A, false)) {
 				position = 4;
-				armPID.setDValue(3);
-
+				armPID.setDValue(15);
 			}
-			
-			
+			if (systems.getButton(Controls.Button.X, false)){
+				position = 5;
+				armPID.setDValue(60);
+			}
+
 			if (systems.getButton(Controls.Button.Y, false)) {
 				idleTurnConstant = -0.2; // might be different for real robot
 			} else {
@@ -194,11 +176,10 @@ public class Collector implements Subsystem {
 
 			// Automatic operator controls
 			if (!manualMode) {
-				if(fast) {
+				if (fast) {
 					collectorArm1.set(0.75);
 					collectorArm2.set(0.75);
-				}
-				else {
+				} else {
 					collectorArm1.set(armPID.getOutput());
 					collectorArm2.set(armPID.getOutput());
 				}
@@ -219,9 +200,9 @@ public class Collector implements Subsystem {
 	}
 
 	/*
-	 * moveArm Author: Finlay Parsons ------------------------- Purpose: Moves the
-	 * arm to specified angle - all the way back is 0, all the way down is 135
-	 * Parameters: angle: Desired angle of arm
+	 * moveArm Author: Finlay Parsons ------------------------- Purpose: Moves
+	 * the arm to specified angle - all the way back is 0, all the way down is
+	 * 135 Parameters: angle: Desired angle of arm
 	 */
 	public void moveArm(double angle) {
 		armPID.setDValue(angle);
@@ -240,33 +221,36 @@ public class Collector implements Subsystem {
 	}
 
 	/*
-	 * intakeCube Author: Finlay Parsons ------------------------ Purpose: Spins the
-	 * intake motors until the the cube is gained
+	 * intakeCube Author: Finlay Parsons ------------------------ Purpose: Spins
+	 * the intake motors until the the cube is gained
 	 */
-	public void intakeCube() {
+	public void intakeCube(double speed) {
 		int counter = 0;
-		while (counter < 50) {
-			intakeLeft.set(1);
-			intakeRight.set(1);
+		while ((counter < 50) && (systems.getMotorCurrent(10) < 60) && (systems.getMotorCurrent(11) < 60)) {
+			intakeLeft.set(-speed);
+			intakeRight.set(-speed);
 			counter++;
 		}
 	}
 
 	/*
-	 * outtakeCube Author: Nitesh Puri Collaborators: Ethan Ngo and Finlay Parsons
-	 * -------------------------------------------------- Parameters: None Purpose:
-	 * Outtakes the cube
+	 * outtakeCube Author: Nitesh Puri Collaborators: Ethan Ngo and Finlay
+	 * Parsons -------------------------------------------------- Parameters:
+	 * None Purpose: Outtakes the cube
 	 */
-
-	public void outtakeCube() {
-		int counter = 0;
-		while (counter < 50) {
-			intakeLeft.set(-1);
-			intakeRight.set(-1);
-			counter++;
+	public void outtakeCube(double speed) {
+		intakeLeft.set(speed);
+		intakeRight.set(speed);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		intakeLeft.set(0);
+		intakeRight.set(0);
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -275,11 +259,16 @@ public class Collector implements Subsystem {
 	@Override
 	public void toSmartDashboard() {
 		// TODO Auto-generated method stub
-		SmartDashboard.putString("DB/String 4",
-				"Encoder1: " + df.format(systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1)));
-		SmartDashboard.putString("DB/String 3",
-				"Encoder2: " + df.format(systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2)));
-		SmartDashboard.putString("DB/String 5", "Distance: " + df.format(averageArmEncoderPos));
+		/*
+		 * SmartDashboard.putString("DB/String 4", "Encoder1: " +
+		 * df.format(systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1)));
+		 * SmartDashboard.putString("DB/String 3", "Encoder2: " +
+		 * df.format(systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2)));
+		 * SmartDashboard.putString("DB/String 5", "Distance: " +
+		 * df.format(averageArmEncoderPos));
+		 */
+		// SmartDashboard.putString("DB/Slider 4", "I hate this.");
+
 	}
 
 }

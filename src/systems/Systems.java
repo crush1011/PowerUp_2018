@@ -49,6 +49,7 @@ public class Systems{
 	private static RobotEncoder lEncoder, rEncoder, armEncoder1, armEncoder2;
 	private static PIDManual pidManual;
 	private static PowerDistributionPanel pdp;
+	private Resources resources;
 	
 	public boolean inAuto;
 	
@@ -140,7 +141,7 @@ public class Systems{
 		pdp = new PowerDistributionPanel();
 		sysObjects.put(SysObj.Sensors.NAVX, new AHRS(SPI.Port.kMXP));
 		navX = new NavX((AHRS) sysObjects.get(SysObj.Sensors.NAVX));
-				
+		resources = new Resources();
 	}
 	
 	/*
@@ -529,5 +530,45 @@ public class Systems{
 		return pdp.getCurrent(channel);
 	}
 	
+	/*
+	 * getAverageDriveEncoderDistance
+	 * Author: Finlay Parsons
+	 * Collaborators: Ethan Yes, Nitesh Puri
+	 * -------------------------------------------
+	 * Purpose: getAverageDriveEncoderDistance with failsafe if one goes wrong
+	 */
+	public double getAverageDriveEncoderDistance(){
+		if(Math.abs(lEncoder.getValue() - rEncoder.getValue()) <
+		0.1 * resources.returnGreater(lEncoder.getValue(), rEncoder.getValue())){
+			return 0.5 * (lEncoder.getValue() + rEncoder.getValue());
+		}
+		else{
+			return resources.returnGreater(lEncoder.getValue(), rEncoder.getValue());
+		}
+			
+	}
+	
+	/*
+	 * intake
+	 * Author: Finlay Parsons
+	 * Collaborators: Nitesh Puri, Ethan Yes
+	 * ---------------------------------------
+	 * Purpose: Set intake motors
+	 */
+	public void intake(double speed){
+		collector.intakeCube(speed);
+	}
+	
+	/*
+	 * eject
+	 * Author: Finlay Parsons
+	 * ------------------------
+	 * Purpose: Shoots out the cube
+	 */
+	public void eject(double speed){
+		
+			collector.outtakeCube(speed);
+		
+	}
 }
 

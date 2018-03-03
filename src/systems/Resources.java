@@ -67,4 +67,21 @@ public class Resources {
 		}
 	}
 	
+	/*
+	 * limit
+	 * Author: Finlay Parsons
+	 * Collaborators: Ruben Castro, 520-461-0733
+	 * --------------------------------------
+	 * Limits a value between values
+	 */
+	public double limit(double numberIn, double lower, double upper){
+		if(Math.abs(numberIn - lower) < Math.abs(numberIn - upper)){
+			return lower;
+		}
+		if(Math.abs(numberIn - lower) > Math.abs(numberIn - upper)){
+			return upper;
+		}else{
+			return numberIn;
+		}
+	}
 }

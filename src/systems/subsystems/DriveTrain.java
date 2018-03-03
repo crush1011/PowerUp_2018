@@ -26,7 +26,7 @@ public class DriveTrain implements Subsystem{
 	private DifferentialDrive drive;
 	private PIDManual driveStraightPID;
 	public Resources resources;
-	private double driveConstant, distancePerPulse;
+	private double driveConstant, distancePerPulse, turnConstant;
 	private final double ROBOT_WIDTH;	//Distance between wheels
 	
 	/*
@@ -57,7 +57,7 @@ public class DriveTrain implements Subsystem{
 		rtSlave1.setNeutralMode(NeutralMode.Brake);
 		rtSlave2.setNeutralMode(NeutralMode.Brake);
 		
-		driveStraightPID = new PIDManual(0.05, 0 , 0);
+		driveStraightPID = new PIDManual(0.11, 0 , 0);
 		
 		resources = new Resources();
 		
@@ -66,7 +66,9 @@ public class DriveTrain implements Subsystem{
 		
 		ROBOT_WIDTH=21;
 		
-		distancePerPulse = 1;
+		distancePerPulse = 0.064;
+		
+		turnConstant = 0.1;
 	}
 
 	@Override
@@ -85,13 +87,13 @@ public class DriveTrain implements Subsystem{
 			driveConstant = 0.6;
 		}
 		else if(systems.getButton(Controls.Button.RIGHT_BUMPER, true)){
-			driveConstant = 0.8;
+			driveConstant = 0.7;
 		}
 		else {
-			driveConstant = 1;
+			driveConstant = 0.8;
 		}
 		
-		drive.arcadeDrive(driveConstant*systems.getDriverAxisLeftY(), driveConstant*systems.getDriverAxisRightX(), true);
+		drive.arcadeDrive(driveConstant*systems.getDriverAxisLeftY(), (driveConstant + turnConstant) *systems.getDriverAxisRightX(), true);
 		//System.out.println("" + systems.getPulse());
 	}
 	@Override
@@ -165,6 +167,9 @@ public class DriveTrain implements Subsystem{
 	 * Returns: nothing
 	 */
 	public void driveDistance(double distance, double speed){
+		SmartDashboard.putString("DB/String 6", "lol");
+		System.out.println(systems.getEncoderDistance(SysObj.Sensors.LEFT_ENCODER));
+		System.out.println(systems.getEncoderDistance(SysObj.Sensors.RIGHT_ENCODER));
 		double desiredDriveAngle = systems.getNavXAngle();
 		double rotateConstant = 0;
 		
@@ -172,8 +177,10 @@ public class DriveTrain implements Subsystem{
 		Systems.getRobotEncoder(SysObj.Sensors.RIGHT_ENCODER).setDistancePerPulse(distancePerPulse);
 		
 		driveStraightPID.setDValue(desiredDriveAngle);
-		driveStraightPID.setPID(SmartDashboard.getNumber("DB/Slider 0", 0), SmartDashboard.getNumber("DB/Slider 1", 0), SmartDashboard.getNumber("DB/Slider 2", 0));
-		
+		/*while(DriverStation.getInstance().isAutonomous()){
+			SmartDashboard.putString("DB/String 6", "lol");
+			drive.arcadeDrive(0.5, 0);
+		}*/
 		while(DriverStation.getInstance().isAutonomous() && (systems.getEncoderDistance(SysObj.Sensors.RIGHT_ENCODER)<distance)){
 			systems.getNavX().update();
 			systems.getRobotEncoder(SysObj.Sensors.RIGHT_ENCODER).update();
@@ -181,14 +188,33 @@ public class DriveTrain implements Subsystem{
 			driveStraightPID.setCValue(resources.getAngleError(desiredDriveAngle, systems.getNavXAngle()));
 			this.toSmartDashboard();
 			driveStraightPID.toSmartDashboard();
-			drive.arcadeDrive(SmartDashboard.getNumber("DB/Slider 3",  0), -driveStraightPID.getOutput());
+		//	drive.arcadeDrive(0.5, 0);
+			drive.arcadeDrive(speed, -(speed/(Math.abs(speed))*driveStraightPID.getOutput()));
 		}
-		SmartDashboard.putString("DB/String 1", "Left " + systems.getEncoderDistance(SysObj.Sensors.LEFT_ENCODER));
-		SmartDashboard.putString("DB/String 2", "Right" + systems.getEncoderDistance(SysObj.Sensors.RIGHT_ENCODER));
+		System.out.print(systems.getEncoderDistance(SysObj.Sensors.LEFT_ENCODER));
+		System.out.println(systems.getEncoderDistance(SysObj.Sensors.RIGHT_ENCODER));
 
 		drive.arcadeDrive(0,0);
 		systems.resetEncoders();
+		
 	}
+	
+	/*
+	 * driveIntake
+	 * Author: Finlay Parsons
+	 * Collaborators: Nitesh Puri, Ethan Yes
+	 * -----------------------------------------
+	 * Purpose: Drive while intaking
+	 */
+	public void driveIntake(double speed, double intakeSpeed, double maxDistance){
+		while(systems.getMotorCurrent(10)<50 && (systems.getAverageDriveEncoderDistance()) < maxDistance){
+			drive.arcadeDrive(speed, -(speed/(Math.abs(speed))*driveStraightPID.getOutput()));
+			systems.intake(intakeSpeed);
+		}
+		drive.arcadeDrive(0, 0);
+		systems.intake(0);
+	}
+	
 	/*
 	 * turnTo
 	 * Author: Finlay Parsons
@@ -197,6 +223,7 @@ public class DriveTrain implements Subsystem{
 	 * Purpose: Turns the robot to a certain angle relative to its current angle.
 	 */
 	public void turnTo(double angle, double speed, boolean right) {
+		double initialAngle = systems.getNavXAngle();
 		if(!right){
 			speed = -speed;
 		}
@@ -204,7 +231,7 @@ public class DriveTrain implements Subsystem{
 			systems.getNavX().update();
 			drive.arcadeDrive(0, speed);
 		}
-		systems.resetAutoSystems();
+		drive.arcadeDrive(0, 0);
 	}
 	
 	/*
@@ -261,7 +288,6 @@ public class DriveTrain implements Subsystem{
 		//System.out.print("v1: " + v1 + "   ");
 		//System.out.print("v2: " + v2);
 		//System.out.println("    Angle:" + systems.getNavXAngle());
-		systems.resetAutoSystems();
 		drive.arcadeDrive(0, 0);
 	}
 
