@@ -29,6 +29,8 @@ public class DriveTrain implements Subsystem{
 	private double driveConstant, distancePerPulse, turnConstant;
 	private final double ROBOT_WIDTH;	//Distance between wheels
 	
+	private static Thread leftAlign, rightAlign;
+	
 	/*
 	 * Constructor
 	 * Author: Jeremiah Hanson
@@ -69,6 +71,58 @@ public class DriveTrain implements Subsystem{
 		distancePerPulse = 0.064;
 		
 		turnConstant = 0.1;
+		
+		leftAlign = new Thread(new LeftAlign());
+		rightAlign = new Thread(new RightAlign());
+
+	}
+	
+	/*
+	 * LeftAlign
+	 * Author: Finny
+	 * Collaborators: Nitesh Puri, Ethan Yes, Jeremiah Hanson
+	 * ---------------------------------------------------------
+	 * Purpose: Aligns the robot to the multiple of 90 degrees to the left of the robot's
+	 * current direction
+	 */
+	private class LeftAlign implements Runnable{
+		
+		@Override
+		public void run() {
+			double dAngle = 0;
+			double cAngle = systems.getNavXAngle();
+			if(cAngle < 90 && cAngle > 0) dAngle = 0;
+			else if(cAngle < 180 && cAngle > 90) dAngle = 90;
+			else if(cAngle < 270 && cAngle > 180) dAngle = 180;
+			else dAngle = 270;
+			
+			turnTo(dAngle, 1, false);
+		}
+		
+	}
+	
+	/*
+	 * RightAlign
+	 * Author: Finny
+	 * Collaborators: Nitesh Puri, Ethan Yes, Jeremiah Hanson
+	 * ---------------------------------------------------------
+	 * Purpose: Aligns the robot to the multiple of 90 degrees to the right of the robot's
+	 * current direction
+	 */
+	private class RightAlign implements Runnable{
+
+		@Override
+		public void run() {
+			double dAngle = 0;
+			double cAngle = systems.getNavXAngle();
+			if(cAngle < 90 && cAngle > 0) dAngle = 90;
+			else if(cAngle < 180 && cAngle > 90) dAngle = 180;
+			else if(cAngle < 270 && cAngle > 180) dAngle = 270;
+			else dAngle = 0;
+			
+			turnTo(dAngle, 1, true);
+		}
+		
 	}
 
 	@Override
@@ -77,6 +131,10 @@ public class DriveTrain implements Subsystem{
 			systems = Systems.getInstance();
 			systems.setDistancePerPulse(Systems.getRobotEncoder(SysObj.Sensors.LEFT_ENCODER), distancePerPulse);
 			systems.setDistancePerPulse(Systems.getRobotEncoder(SysObj.Sensors.RIGHT_ENCODER), distancePerPulse);
+		}
+		
+		if(leftAlign.isAlive() || rightAlign.isAlive()) {
+			return;
 		}
 		
 		if (systems.inAuto){
@@ -91,6 +149,13 @@ public class DriveTrain implements Subsystem{
 		}
 		else {
 			driveConstant = 0.8;
+		}
+		
+		if(systems.getDriverLtTrigger() > 0.5) {
+			leftAlign.start();
+		}
+		else if(systems.getDriverRtTrigger() > 0.5) {
+			rightAlign.start();
 		}
 		
 		drive.arcadeDrive(driveConstant*systems.getDriverAxisLeftY(), (driveConstant + turnConstant) *systems.getDriverAxisRightX(), true);
@@ -227,7 +292,7 @@ public class DriveTrain implements Subsystem{
 		if(!right){
 			speed = -speed;
 		}
-		while(DriverStation.getInstance().isAutonomous() && (systems.getNavXAngle() >= angle+2 || systems.getNavXAngle() <= angle-2)) {
+		while((systems.getNavXAngle() >= angle+2 || systems.getNavXAngle() <= angle-2)) {
 			systems.getNavX().update();
 			driveStraightPID.setCValue(systems.getNavXAngle());
 			drive.arcadeDrive(0, speed * driveStraightPID.getOutput());
