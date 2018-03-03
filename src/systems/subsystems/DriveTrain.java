@@ -220,16 +220,17 @@ public class DriveTrain implements Subsystem{
 	 * Author: Finlay Parsons
 	 * Collaborators: Nitesh Puri
 	 * --------------------------------
-	 * Purpose: Turns the robot to a certain angle relative to its current angle.
+	 * Purpose: Turns the robot to a certain angle.
 	 */
 	public void turnTo(double angle, double speed, boolean right) {
-		double initialAngle = systems.getNavXAngle();
+		driveStraightPID.setDValue(angle);
 		if(!right){
 			speed = -speed;
 		}
 		while(DriverStation.getInstance().isAutonomous() && (systems.getNavXAngle() >= angle+2 || systems.getNavXAngle() <= angle-2)) {
 			systems.getNavX().update();
-			drive.arcadeDrive(0, speed);
+			driveStraightPID.setCValue(systems.getNavXAngle());
+			drive.arcadeDrive(0, speed * driveStraightPID.getOutput());
 		}
 		drive.arcadeDrive(0, 0);
 	}

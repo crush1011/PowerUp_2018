@@ -28,7 +28,9 @@ public class PIDManual implements Subsystem{
 	private double d;
 	
 	
-	int counter;
+	private int counter;
+	private boolean angle;
+	
 	
 	public PIDManual(double p, double i, double d){
 		resources = new Resources();
@@ -40,6 +42,7 @@ public class PIDManual implements Subsystem{
 		error = 0;
 		counter = 0;
 		prevError = 0;
+		angle = false;
 		
 	}
 	
@@ -91,8 +94,13 @@ public class PIDManual implements Subsystem{
 		if (systems == null){
 			systems = Systems.getInstance();
 		}
-				
+			
+		if(angle) {
 		error = resources.getAngleError(dValue, cValue); 
+		}
+		else {
+			error = cValue - dValue;
+		}
 		this.integral += error * REFRESH_TIME;
 		derivative = (error - this.prevError) / REFRESH_TIME;
 		this.output = p * error + i * this.integral + d;
@@ -124,6 +132,17 @@ public class PIDManual implements Subsystem{
 	 */
 	public double getDValue(){
 		return dValue;
+	}
+	
+	/*
+	 * setAngle
+	 * Author: Finlay Parsons
+	 * Collaborators: Ethan Yes
+	 * ----------------------------
+	 * Purpose: Changes it to be working in degrees
+	 */
+	public void setAngle(boolean angle) {
+		this.angle = angle;
 	}
 
 	@Override

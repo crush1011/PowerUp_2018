@@ -34,6 +34,7 @@ public class Robot extends IterativeRobot {
 	private LeftSideLeftScore leftSideLeftScore;
 	private MidSideLeftScore midSideLeftScore;
 	private static Collector collector;
+	private static Thread auton;
 	
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -46,7 +47,7 @@ public class Robot extends IterativeRobot {
 		
 		systems.resetEncoders();
 		systems.update();
-		/*SmartDashboard.putString("DB/String 0", "");
+		SmartDashboard.putString("DB/String 0", "");
 		SmartDashboard.putString("DB/String 1", "");
 		SmartDashboard.putString("DB/String 2", "");
 		SmartDashboard.putString("DB/String 3", "");
@@ -55,7 +56,7 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putString("DB/String 6", "");
 		SmartDashboard.putString("DB/String 7", "");
 		SmartDashboard.putString("DB/String 8", "");
-		SmartDashboard.putString("DB/String 9", "");*/
+		SmartDashboard.putString("DB/String 9", "");
 		m_chooser.addDefault("Default Auto", kDefaultAuto);
 		m_chooser.addObject("My Auto", kCustomAuto);
 		SmartDashboard.putData("Auto choices", m_chooser);
@@ -93,6 +94,11 @@ public class Robot extends IterativeRobot {
 		systems.instantiate();
 		systems.update();
 		
+		/*
+		while (gameData == null) {
+			gameData = DriverStation.getInstance().getGameSpecificMessage();
+		}*/
+		
 		switch (m_autoSelected) {
 		case kCustomAuto:
 			midSideLeftScore.run();
@@ -101,9 +107,14 @@ public class Robot extends IterativeRobot {
 			midSideLeftScore.run();
 			break;
 		default:
+			if (gameData.charAt(0) == 'L') 
+				auton = new Thread(midSideLeftScore);
+			else 
+				//auton = new Thread(midSideRightScore);
 			System.out.println("No autonomous selected.");
 			break;
 		}
+		auton.start();
 	}
 
 	/**
@@ -112,7 +123,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousPeriodic() {
 		
-		System.out.println("Angle: " + systems.getNavXAngle());
+		//System.out.println("Angle: " + systems.getNavXAngle());
 		
 	}
 
