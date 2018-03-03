@@ -169,7 +169,7 @@ public class Systems{
 		controls.update();
 		driveTrain.update();
 		collector.update();
-		//navX.update();
+		navX.update();
 		lEncoder.update();
 		rEncoder.update();
 		armEncoder1.update();

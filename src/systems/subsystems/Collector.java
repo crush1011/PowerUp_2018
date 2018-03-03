@@ -57,7 +57,7 @@ public class Collector implements Subsystem {
 		this.intakeRight = intakeRight;
 		this.armEncoder1 = armEncoder1;
 		this.armEncoder2 = armEncoder2;
-		this.armPID = new PIDManual(SmartDashboard.getNumber("DB/Slider 0", 0), SmartDashboard.getNumber("DB/Slider 1", 0), SmartDashboard.getNumber("DB/Slider 2", 0)); //0.015, 0, 0
+		this.armPID = new PIDManual(0.015, 0, 0); //0.015, 0, 0
 		resources = new Resources();
 
 		df = new DecimalFormat("#.##");
