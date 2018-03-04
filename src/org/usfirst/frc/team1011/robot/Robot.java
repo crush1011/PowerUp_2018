@@ -7,6 +7,7 @@
 
 package org.usfirst.frc.team1011.robot;
 
+import autonomous.AutonLine;
 import autonomous.LeftSideLeftScore;
 import autonomous.MidSideLeftScore;
 import autonomous.MidSideRightScore;
@@ -76,6 +77,7 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousInit() {
+		
 		systems.inAuto = true;
 		String gameData;
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
@@ -109,7 +111,11 @@ public class Robot extends IterativeRobot {
 			//System.out.println("No autonomous selected.");
 			break;
 		}
-		auton.start();
+		
+		//auton.start();
+		
+		//systems.getDriveTrain().turnTo(90, 0.95, 5500);
+		new AutonLine(systems.getDriveTrain(), systems.getNavX(), 50,80, 0).run();
 	}
 
 	/**
@@ -135,7 +141,8 @@ public class Robot extends IterativeRobot {
 		//systems.printEncoderInfo(true, false, false, SysObj.Sensors.RIGHT_ENCODER);
 		/*System.out.println("Left Motor: " + systems.getMotorCurrent(10));
 		System.out.println("Right Motor: " + systems.getMotorCurrent(11));*/
-		collector.toSmartDashboard();
+		System.out.println("Encoder1: " + (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1)));
+		System.out.println("Encoder2: " + (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2)));
 		
 	}
 

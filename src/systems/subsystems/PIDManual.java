@@ -103,7 +103,7 @@ public class PIDManual implements Subsystem{
 		}
 		this.integral += error * REFRESH_TIME;
 		derivative = (error - this.prevError) / REFRESH_TIME;
-		this.output = p * error + i * this.integral + d;
+		this.output = p * error + i * this.integral + d * derivative;
 		
 		prevError = error;
 	
@@ -159,6 +159,10 @@ public class PIDManual implements Subsystem{
 		SmartDashboard.putString("DB/String 8", "D:" + d);
 
 		
+	}
+	
+	public double getSetpoint(){
+		return dValue;
 	}
 	
 }

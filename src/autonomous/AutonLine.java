@@ -8,26 +8,23 @@ import edu.wpi.first.wpilibj.command.PIDSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import systems.Systems;
 import systems.subsystems.DriveTrain;
+import systems.subsystems.NavX;
 
-public class AutonLine extends PIDSubsystem implements Runnable{
+public class AutonLine  implements Runnable{
 	
 	double angle, topSpeed, distance;
 	double rotateOutput;
 	double loopCount, pastCount;
 	
-	final double acceleration = 1.7;
+	final double acceleration = 140;
 	DriveTrain drive;
 	
-	AHRS navx;
+	NavX navx;
 	
-	public AutonLine(DriveTrain driveTrain, AHRS navx, double distance,double topSpeed,double angle){
-		super(2.0,0,0);
-		this.setAbsoluteTolerance(2);
-		this.getPIDController().setContinuous(true);
-		this.setInputRange(0, 360);
-		this.setOutputRange(-180, 180);
-		this.setSetpoint(angle);
-		this.enable();
+	private static final double P = 0.03;
+	
+	public AutonLine(DriveTrain driveTrain, NavX navx, double distance,double topSpeed,double angle){
+
 		
 		this.angle=angle;
 		this.topSpeed=topSpeed;
@@ -76,16 +73,18 @@ public class AutonLine extends PIDSubsystem implements Runnable{
 			System.out.println("currentV:" + currentVelocity);
 			System.out.println(deAccelerate);
 			System.out.println(backwards);
-			if(loopCount!=pastCount){
-				if(rotateOutput>=0){
-					rotateOutput+=0.02;
-				}else{
-					rotateOutput-=0.02;
-				}
-			}
+			
+			double currentError = angle - navx.getCurrentAngle();
+            if(Math.abs(currentError) > (360 - 0)/2){
+                currentError  = currentError>0? currentError-360+0 : currentError+360-0;
+            }
+			
+			double rotateOutput  = currentError * P;
+
+			
 			pastCount=loopCount;
-			double actualVelocity = currentVelocity / 180;
-			drive.drive(actualVelocity, rotateOutput);
+			double actualVelocity = currentVelocity / 140;
+			drive.drive(actualVelocity, 0);
 			if(backwards){
 				if(currentVelocity>=0 && lastVelocity<0){
 					stop=true;
@@ -105,30 +104,7 @@ public class AutonLine extends PIDSubsystem implements Runnable{
 		}
 		drive.drive(0, 0);
 		
-		
-		
-		
-		
 
-	}
-	
-	@Override
-	protected double returnPIDInput() {
-		SmartDashboard.putString("DB/String 1", "" +navx.getFusedHeading());
-		return navx.getFusedHeading();
-	}
-
-	@Override
-	protected void usePIDOutput(double output) {
-		rotateOutput = output / 140; //180? p140
-		loopCount++;
-		//SmartDashboard.putString("DB/String 0",""+rotateOutput);;
-		
-	}
-
-	@Override
-	protected void initDefaultCommand() {
-		// TODO Auto-generated method stub
 
 	}
 

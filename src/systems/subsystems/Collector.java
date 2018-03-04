@@ -98,7 +98,7 @@ public class Collector implements Subsystem {
 		@Override
 		public void run() {
 			
-			armPID.setDValue(45);
+			armPID.setDValue(35);
 			
 			while(true) {
 				boolean stop = false;
@@ -308,8 +308,6 @@ public class Collector implements Subsystem {
 	@Override
 	public void toSmartDashboard() {
 		// TODO Auto-generated method stub
-		System.out.println("Encoder1: " + (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1)));
-		System.out.println("Encoder2: " + (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2)));
 		/*
 		 * SmartDashboard.putString("DB/String 4", "Encoder1: " +
 		 * df.format(systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1)));

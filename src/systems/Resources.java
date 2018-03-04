@@ -18,13 +18,14 @@ public class Resources {
 	 * 	cAngle - The current angle
 	 * Returns: A doubleS
 	 */
-	public double getAngleError(double dAngle, double cAngle){
-		if(Math.abs(dAngle-cAngle) > 180){
-			return (360 - returnGreater(dAngle, cAngle)) + returnLesser(dAngle, cAngle);
-		}
-		else {
-			return cAngle - dAngle;
-		}
+	
+	public static double getAngleError(double dAngle, double cAngle){
+
+		double currentError = dAngle- cAngle;
+        if(Math.abs(currentError) > (360 - 0)/2){
+            currentError  = currentError>0? currentError-360+0 : currentError+360-0;
+        }
+        return currentError;
 	}
 	
 	/*
@@ -33,7 +34,7 @@ public class Resources {
 	 * ------------------------
 	 * Takes in two doubles and returns the greater
 	 */
-	public double returnGreater(double a, double b){
+	public static double returnGreater(double a, double b){
 		if(a>b) return a;
 		else return b;
 	}
@@ -44,7 +45,7 @@ public class Resources {
 	 * -----------------------
 	 * Takes in two doubles and returns the lesser
 	 */
-	public double returnLesser(double a, double b){
+	public static double returnLesser(double a, double b){
 		if(a<b) return a;
 		else return b;
 	}
@@ -58,7 +59,7 @@ public class Resources {
 	 * 	n: Double to round
 	 * 	p: Rounds to the nearest 10^p
 	 */
-	public double roundDouble(double n, double p){
+	public static double roundDouble(double n, double p){
 		if(n!=0) {
 		return n - (Math.abs((n)/n) * (n % (Math.pow(10, p))));
 		}
@@ -74,14 +75,7 @@ public class Resources {
 	 * --------------------------------------
 	 * Limits a value between values
 	 */
-	public double limit(double numberIn, double lower, double upper){
-		if(Math.abs(numberIn - lower) < Math.abs(numberIn - upper)){
-			return lower;
-		}
-		if(Math.abs(numberIn - lower) > Math.abs(numberIn - upper)){
-			return upper;
-		}else{
-			return numberIn;
-		}
+	public static double limit(double numberIn, double lower, double upper){
+		return Math.min(Math.max(lower, numberIn), upper);
 	}
 }

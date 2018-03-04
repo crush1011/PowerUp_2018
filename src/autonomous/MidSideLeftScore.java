@@ -39,13 +39,13 @@ public class MidSideLeftScore implements Runnable{
 		
 		collector.outtakeCube(0.5);
 		
-		driveTrain.turnTo(290, 0.7, false);
+		driveTrain.turnTo(290, 0.7, 1500);
 		
 		//collector.moveArm(135);
 		
 		driveTrain.driveIntake(0.6, 0.8, 18);
 		
-		driveTrain.turnTo(0, 0.8, false);
+		driveTrain.turnTo(0, 0.8, 1500);
 		
 		//collector.moveArm(0);
 		
