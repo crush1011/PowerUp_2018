@@ -133,8 +133,9 @@ public class Robot extends IterativeRobot {
 		//systems.printEncoderInfo(false, false, true, SysObj.Sensors.ARM_ENCODER_2);
 		//systems.printEncoderInfo(true, false, false, SysObj.Sensors.LEFT_ENCODER);
 		//systems.printEncoderInfo(true, false, false, SysObj.Sensors.RIGHT_ENCODER);
-		System.out.println("Left Motor: " + systems.getMotorCurrent(10));
-		System.out.println("Right Motor: " + systems.getMotorCurrent(11));
+		/*System.out.println("Left Motor: " + systems.getMotorCurrent(10));
+		System.out.println("Right Motor: " + systems.getMotorCurrent(11));*/
+		collector.toSmartDashboard();
 		
 	}
 
