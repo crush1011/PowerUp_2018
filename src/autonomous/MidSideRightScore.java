@@ -34,11 +34,41 @@ public class MidSideRightScore implements Runnable{
 	@Override
 	public void run() {
 		
-		driveTrain.driveDistance(103, -0.7);
+		driveTrain.driveDistance(96, -.7);
 		
 		collector.outtakeCube(0.5);
 		
-		//driveTrain.circleTurn(30, angle, speed, right, forwards);
+		driveTrain.driveDistance(15, 0.7);
+		
+		driveTrain.circleTurn(30, 180, 0.7, true, true);
+		
+		collector.moveArm(130);
+		
+		driveTrain.driveIntake(0.6, -0.5, 10);
+		
+		driveTrain.circleTurn(30, 0, 0.7, false, false);
+		
+		driveTrain.driveDistance(15, -0.7);
+		
+		collector.moveArm(10);
+		
+		collector.outtakeCube(0.5);
+		
+		driveTrain.driveDistance(10, 0.7);
+		
+		driveTrain.circleTurn(20, 180, 0.7, true, true);
+		
+		collector.moveArm(130);
+		
+		driveTrain.driveIntake(0.6, -0.5, 10);
+		
+		driveTrain.circleTurn(30, 0, 0.7, false, false);
+		
+		driveTrain.driveDistance(10, -0.7);
+		
+		collector.moveArm(10);
+		
+		collector.outtakeCube(0.5);
 		
 	}
 	

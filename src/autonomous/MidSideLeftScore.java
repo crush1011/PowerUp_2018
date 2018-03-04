@@ -33,23 +33,43 @@ public class MidSideLeftScore implements Runnable{
 	@Override
 	public void run() {
 		
-		//driveTrain.turnTo(220, 0.7, false);
+		driveTrain.circleTurn(50, 90, 0.7, false, false);
 		
-		driveTrain.driveDistance(103, -0.7); //120 - robot length for real
+		driveTrain.circleTurn(50, 0, 0.7, true, false);
 		
 		collector.outtakeCube(0.5);
 		
-		driveTrain.turnTo(290, 0.7, 1500);
+		driveTrain.driveDistance(15, 0.7);
 		
-		//collector.moveArm(135);
+		driveTrain.circleTurn(30, 180, 0.7, false, true);
 		
-		driveTrain.driveIntake(0.6, 0.8, 18);
+		collector.moveArm(130);
 		
-		driveTrain.turnTo(0, 0.8, 1500);
+		driveTrain.driveIntake(0.6, -0.5, 10);
 		
-		//collector.moveArm(0);
+		driveTrain.circleTurn(30, 0, 0.7, true, false);
 		
-		systems.eject(0.8);
+		driveTrain.driveDistance(15, -0.7);
+		
+		collector.moveArm(10);
+		
+		collector.outtakeCube(0.5);
+		
+		driveTrain.driveDistance(10, 0.7);
+		
+		driveTrain.circleTurn(20, 180, 0.7, false, true);
+		
+		collector.moveArm(130);
+		
+		driveTrain.driveIntake(0.6, -0.5, 10);
+		
+		driveTrain.circleTurn(30, 0, 0.7, true, false);
+		
+		driveTrain.driveDistance(10, -0.7);
+		
+		collector.moveArm(10);
+		
+		collector.outtakeCube(0.5);
 		
 	}
 	
