@@ -63,7 +63,7 @@ public class DriveTrain implements Subsystem {
 		ltMain.configOpenloopRamp(0.1, 0);
 		rtMain.configOpenloopRamp(0.1, 0);
 
-		driveStraightPID = new PIDManual(0.11, 0, 0);// 0.11,0,0
+		driveStraightPID = new PIDManual(0.11, 0, 0, 0.02);// 0.11,0,0
 		turnPID = new RPID(0.023, 0.083, 0.003, 0.02);
 
 		driveStraightPID.setAngle(true);

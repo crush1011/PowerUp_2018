@@ -21,6 +21,7 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Spark;
@@ -176,6 +177,9 @@ public class Systems{
 		armEncoder2.update();
 		if(controls.getButton(Controls.Button.BACK, SysObj.Sensors.DRIVER_STICK)){
 			navX.zeroAngler();
+		}
+		if(controls.getButton(Controls.Button.BACK, SysObj.Sensors.OPERATOR_STICK)){
+			System.out.println("Hi Ethan");
 		}
 		lEncoder.toSmartDashboard();
 		collector.toSmartDashboard();

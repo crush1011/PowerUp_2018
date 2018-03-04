@@ -14,6 +14,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
+import autonomous.RPID;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import systems.Resources;
@@ -29,6 +30,7 @@ public class Collector implements Subsystem {
 	private RobotEncoder armEncoder1;
 	private RobotEncoder armEncoder2;
 	private PIDManual armPID;
+	private RPID goodArmPID; //Just in case
 	private Resources resources;
 
 	private double averageArmEncoderPos;
@@ -57,7 +59,8 @@ public class Collector implements Subsystem {
 		this.intakeRight = intakeRight;
 		this.armEncoder1 = armEncoder1;
 		this.armEncoder2 = armEncoder2;
-		this.armPID = new PIDManual(0.015, 0, 0); //0.015, 0, 0
+		this.armPID = new PIDManual(0.02, 0, 0.005, 0.02); //0.015, 0, 0
+		this.goodArmPID = new RPID(0.035, 0, 0.005, 0.02); //0.015, 0, 0
 		resources = new Resources();
 
 		df = new DecimalFormat("#.##");
@@ -68,11 +71,11 @@ public class Collector implements Subsystem {
 		collectorArm2.setNeutralMode(NeutralMode.Brake);
 		averageArmEncoderPos = 0;
 
-		collectorArm1.setInverted(true);
+		collectorArm2.setInverted(true);
 
 		position = 0;
 		encoderRange = 0;
-		armPID.setDValue(0);
+		goodArmPID.setSetPoint(0);
 		armConstant = 1;
 		idleTurnConstant = 0;
 
@@ -98,15 +101,15 @@ public class Collector implements Subsystem {
 		@Override
 		public void run() {
 			
-			armPID.setDValue(35);
+			goodArmPID.setSetPoint(35);
 			
 			while(true) {
 				boolean stop = false;
 				averageArmEncoderPos = 0.5 * (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1)
 						+ systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
-				armPID.setCValue(averageArmEncoderPos);
-				collectorArm1.set(armPID.getOutput());
-				collectorArm2.set(armPID.getOutput());
+			//	goodArmPID.setCValue(averageArmEncoderPos);
+				collectorArm1.set(goodArmPID.crunch(averageArmEncoderPos));
+				collectorArm2.set(goodArmPID.crunch(averageArmEncoderPos));
 				
 				if (averageArmEncoderPos <= 50) {
 					outtakeCube(.6);
@@ -152,7 +155,7 @@ public class Collector implements Subsystem {
 					intakeLeft.set(-Math.pow(0.87 * systems.getOperatorRtTrigger(), 2));
 					intakeRight.set(-Math.pow(0.87 * systems.getOperatorRtTrigger(), 2));
 					if (position == 3 && !collecting) {
-						armPID.setDValue(135);
+						goodArmPID.setSetPoint(135);
 						collecting = true;
 					}
 				} else if (systems.getOperatorLtTrigger() > .1) {
@@ -162,7 +165,7 @@ public class Collector implements Subsystem {
 					intakeLeft.set(idleTurnConstant);
 					intakeRight.set(idleTurnConstant);
 					if (collecting) {
-						armPID.setDValue(120);
+						goodArmPID.setSetPoint(120);
 						SmartDashboard.putString("DB/String 2", "Hellu");
 						collecting = false;
 					}
@@ -174,27 +177,28 @@ public class Collector implements Subsystem {
 			}
 
 
-			armPID.setCValue(averageArmEncoderPos);
+		//	goodArmPID.setCValue(averageArmEncoderPos);
 
 			// Controls for arm
 			if (systems.getButton(Controls.Button.LEFT_BUMPER, false)) {
 				position = 1;
-				armPID.setDValue(135);
+				goodArmPID.setSetPoint(135);
 			}
 			if (systems.getButton(Controls.Button.RIGHT_BUMPER, false)) {
 				position = 2;
-				armPID.setDValue(75);
+				goodArmPID.setSetPoint(75);
 			}
 			if (systems.getButton(Controls.Button.B, false)) {
 				position = 3;
-				armPID.setDValue(125);
+				goodArmPID.setSetPoint(125);
 			}
 			if (systems.getButton(Controls.Button.A, false)) {
 				position = 4;
-				armPID.setDValue(15);
+				goodArmPID.setSetPoint(15);
 			}
 			if (systems.getButton(Controls.Button.X, false)){
 				position = 5;
+				cubeThrowThread = new Thread(new  CubeThrow());
 				cubeThrowThread.start();
 			}
 
@@ -213,10 +217,10 @@ public class Collector implements Subsystem {
 
 			/*
 			 * if(systems.getDPadButton(Controls.POV.UP, false)){ double i =
-			 * averageArmEncoderPos; armPID.setDValue(i - 5); }
+			 * averageArmEncoderPos; goodArmPID.setSetPoint(i - 5); }
 			 * 
 			 * if(systems.getDPadButton(Controls.POV.DOWN, false)){ double i =
-			 * averageArmEncoderPos; armPID.setDValue(i + 5); }
+			 * averageArmEncoderPos; goodArmPID.setSetPoint(i + 5); }
 			 */
 
 			// Automatic operator controls
@@ -225,8 +229,8 @@ public class Collector implements Subsystem {
 					collectorArm1.set(0.75);
 					collectorArm2.set(0.75);
 				} else {
-					collectorArm1.set(armPID.getOutput());
-					collectorArm2.set(armPID.getOutput());
+					collectorArm1.set(goodArmPID.crunch(averageArmEncoderPos));
+					collectorArm2.set(goodArmPID.crunch(averageArmEncoderPos));
 				}
 			}
 
@@ -250,16 +254,16 @@ public class Collector implements Subsystem {
 	 * 135 Parameters: angle: Desired angle of arm
 	 */
 	public void moveArm(double angle) {
-		armPID.setDValue(angle);
+		goodArmPID.setSetPoint(angle);
 		while (Math.abs(resources.getAngleError(angle, averageArmEncoderPos)) < 5) {
 			armEncoder1.update();
 			armEncoder1.update();
 			update();
 			averageArmEncoderPos = 0.5 * (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1)
 					+ systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
-			armPID.setCValue(averageArmEncoderPos);
-			collectorArm1.set(armPID.getOutput());
-			collectorArm2.set(armPID.getOutput());
+	//		goodArmPID.setCValue(averageArmEncoderPos);
+			collectorArm1.set(goodArmPID.crunch(averageArmEncoderPos));
+			collectorArm2.set(goodArmPID.crunch(averageArmEncoderPos));
 		}
 		collectorArm1.set(0);
 		collectorArm2.set(0);

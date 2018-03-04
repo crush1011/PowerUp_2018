@@ -21,8 +21,7 @@ public class PIDManual implements Subsystem{
 	
 	private double integral, derivative, prevError, error, dValue, cValue;
 	private double output;
-	private final double REFRESH_TIME = (0.02); //Cycle time for program
-	
+	private double refreshTime;
 	private double p;
 	private double i;
 	private double d;
@@ -32,12 +31,13 @@ public class PIDManual implements Subsystem{
 	private boolean angle;
 	
 	
-	public PIDManual(double p, double i, double d){
+	public PIDManual(double p, double i, double d, double dt){
 		resources = new Resources();
 		this.dValue = 0;
 		this.p = p;
 		this.i = i;
 		this.d = d;
+		refreshTime = dt;
 		
 		error = 0;
 		counter = 0;
@@ -101,9 +101,9 @@ public class PIDManual implements Subsystem{
 		else {
 			error = cValue - dValue;
 		}
-		this.integral += error * REFRESH_TIME;
-		derivative = (error - this.prevError) / REFRESH_TIME;
-		this.output = p * error + i * this.integral + d * derivative;
+		integral += error * refreshTime;
+		derivative = (error - prevError) / refreshTime;
+		output = p * error + i * integral + d * derivative;
 		
 		prevError = error;
 	
