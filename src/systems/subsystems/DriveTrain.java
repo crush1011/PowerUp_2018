@@ -61,6 +61,7 @@ public class DriveTrain implements Subsystem{
 		rtSlave2.setNeutralMode(NeutralMode.Brake);
 		
 		driveStraightPID = new PIDManual(0.11, 0 , 0);
+		driveStraightPID.setAngle(true);
 		
 		resources = new Resources();
 		

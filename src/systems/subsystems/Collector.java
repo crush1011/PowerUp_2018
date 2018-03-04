@@ -104,6 +104,7 @@ public class Collector implements Subsystem {
 				boolean stop = false;
 				averageArmEncoderPos = 0.5 * (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1)
 						+ systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
+				armPID.setCValue(averageArmEncoderPos);
 				collectorArm1.set(armPID.getOutput());
 				collectorArm2.set(armPID.getOutput());
 				
