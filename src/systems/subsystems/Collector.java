@@ -73,7 +73,7 @@ public class Collector implements Subsystem {
 		position = 0;
 		encoderRange = 0;
 		armPID.setDValue(0);
-		armConstant = 0.4;
+		armConstant = 1;
 		idleTurnConstant = 0;
 
 		idleTurn = false;
@@ -269,12 +269,16 @@ public class Collector implements Subsystem {
 	 * the intake motors until the the cube is gained
 	 */
 	public void intakeCube(double speed) {
-		int counter = 0;
-		while ((counter < 50) && (systems.getMotorCurrent(10) < 60) && (systems.getMotorCurrent(11) < 60)) {
-			intakeLeft.set(-speed);
-			intakeRight.set(-speed);
-			counter++;
+		intakeLeft.set(speed);
+		intakeRight.set(speed);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		intakeLeft.set(0);
+		intakeRight.set(0);
 	}
 
 	/*

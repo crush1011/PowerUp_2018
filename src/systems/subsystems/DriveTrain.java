@@ -20,6 +20,7 @@ import systems.Systems;
 
 public class DriveTrain implements Subsystem{
 	
+	
 	private WPI_TalonSRX ltMain, ltSlave1, ltSlave2;
 	private WPI_TalonSRX rtMain, rtSlave1, rtSlave2;
 	private static Systems systems;
@@ -246,6 +247,7 @@ public class DriveTrain implements Subsystem{
 			SmartDashboard.putString("DB/String 6", "lol");
 			drive.arcadeDrive(0.5, 0);
 		}*/
+		
 		while(DriverStation.getInstance().isAutonomous() && (systems.getEncoderDistance(SysObj.Sensors.RIGHT_ENCODER)<distance)){
 			systems.getNavX().update();
 			systems.getRobotEncoder(SysObj.Sensors.RIGHT_ENCODER).update();
