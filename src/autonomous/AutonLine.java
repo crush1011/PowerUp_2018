@@ -10,104 +10,132 @@ import systems.Systems;
 import systems.subsystems.DriveTrain;
 import systems.subsystems.NavX;
 
-public class AutonLine  implements Runnable{
-	
+public class AutonLine implements Runnable {
+
 	double angle, topSpeed, distance;
 	double rotateOutput;
 	double loopCount, pastCount;
-	
-	final double acceleration = 140;
-	DriveTrain drive;
-	
-	NavX navx;
-	
-	private static final double P = 0.03;
-	
-	public AutonLine(DriveTrain driveTrain, NavX navx, double distance,double topSpeed,double angle){
 
-		
-		this.angle=angle;
-		this.topSpeed=topSpeed;
-		this.distance=distance;
-		
+	final double acceleration = 300;
+	final double kA = (1 / acceleration) * 0;
+
+	DriveTrain drive;
+
+	NavX navx;
+
+	private static final double P = 0.03;
+
+	public AutonLine(DriveTrain driveTrain, NavX navx, double distance, double topSpeed, double angle) {
+
+		this.angle = angle;
+		this.topSpeed = topSpeed;
+		this.distance = distance;
+
 		this.drive = driveTrain;
 		this.navx = navx;
 	}
 
 	double delT = 50;
-	public void run(){
-		boolean stop = false;
-		//300 is accel
 
-		boolean deAccelerate = false;	
+	public void run() {
+		boolean stop = false;
+		// 300 is accel
+
+		int counter =0;
+		boolean deAccelerate = false;
+		boolean deAccelerateStarted = false;
 		double initialPos = Systems.getInstance().getAverageDriveEncoderDistance();
-		
-		double distanceTravelled =0;
-		
-		boolean backwards = distance<0;
-		
+
+		double distanceTravelled = 0;
+		double pastDistanceTravelled = 0;
+
+		boolean backwards = distance < 0;
+
 		double currentVelocity = 0;
-		double lastVelocity =0;
-		while(!stop && DriverStation.getInstance().isAutonomous() && DriverStation.getInstance().isEnabled()){
+		double lastVelocity = 0;
+
+		long startTimeLine = System.currentTimeMillis();
+		while (!stop && DriverStation.getInstance().isAutonomous() && DriverStation.getInstance().isEnabled()) {
 			long startTime = System.currentTimeMillis();
-			
-			double timeToStop = Math.abs(currentVelocity/acceleration);
-			
-			timeToStop = Math.abs(currentVelocity)/acceleration;
-			double distanceNeededToStop = (Math.abs(currentVelocity )) * timeToStop;
-			
-			distanceTravelled=Math.abs(Systems.getInstance().getAverageDriveEncoderDistance());
-			
-			
-			//remainingdistance
-			if(Math.abs(distance) - distanceTravelled<=distanceNeededToStop){
-				deAccelerate=true;
+
+			double timeToStop = Math.abs(currentVelocity / acceleration);
+
+			double distanceNeededToStop = (Math.abs(currentVelocity)) * timeToStop;
+
+			distanceTravelled = Math.abs(Systems.getInstance().getAverageDriveEncoderDistance() - initialPos);
+
+			// remainingdistance
+			if (Math.abs(distance) - distanceTravelled <= distanceNeededToStop) {
+				deAccelerate = true;
+				deAccelerateStarted=true;
+			} else if ((Math.abs(distance) > distanceTravelled)) {
+				//deAccelerate = false;
 			}
 
-			if(deAccelerate? !backwards:backwards){
-				currentVelocity-= (delT/1000) * acceleration;
-			}else{
-				currentVelocity += (delT/1000) * acceleration;
+			double currentAcceleration;
+			if (deAccelerate ? !backwards : backwards) {
+				currentVelocity -= (delT / 1000) * acceleration;
+				currentAcceleration = -acceleration;
+			} else {
+				currentVelocity += (delT / 1000) * acceleration;
+				currentAcceleration = acceleration;
+			}
+			if (Math.abs(currentVelocity) - topSpeed >= 0) {
+				currentAcceleration = 0;
 			}
 			currentVelocity = Math.max(Math.min(topSpeed, currentVelocity), -topSpeed);
-			System.out.println("currentV:" + currentVelocity);
-			System.out.println(deAccelerate);
-			System.out.println(backwards);
-			
-			double currentError = angle - navx.getCurrentAngle();
-            if(Math.abs(currentError) > (360 - 0)/2){
-                currentError  = currentError>0? currentError-360+0 : currentError+360-0;
-            }
-			
-			double rotateOutput  = currentError * P;
+			System.out.println(
+					"CurrentTime:" + (System.currentTimeMillis() - startTimeLine) + "    currentV:" + currentVelocity
+							+ "    CURRENTP" + distanceTravelled + "    DistanceToSTOP" + distanceNeededToStop);
+			System.out.println("DEACC" + deAccelerate);
 
-			
-			pastCount=loopCount;
-			double actualVelocity = currentVelocity / 140;
-			drive.drive(actualVelocity, 0);
-			if(backwards){
-				if(currentVelocity>=0 && lastVelocity<0){
-					stop=true;
+			double currentError = angle - navx.getCurrentAngle();
+			if (Math.abs(currentError) > (360 - 0) / 2) {
+				currentError = currentError > 0 ? currentError - 360 + 0 : currentError + 360 - 0;
+			}
+
+			double rotateOutput = currentError * P;
+
+			pastCount = loopCount;
+			double actualVelocity = currentVelocity / 150;
+			drive.drive(actualVelocity + (kA * currentAcceleration), 0, false);
+			if (backwards) {
+				if (currentVelocity >= 0 && lastVelocity < 0) {
+					stop = true;
 				}
-			}else{
-				if(currentVelocity<=0 && lastVelocity>0){
-					stop=true;
+			} else {
+				if (currentVelocity <= 0 && lastVelocity > 0) {
+					stop = true;
 				}
+			}
+			if(deAccelerateStarted && (Math.abs(distanceTravelled - pastDistanceTravelled) < 0.15 )){
+				counter++;
+			}
+			if(counter>4){
+				stop = true;
 			}
 			lastVelocity = currentVelocity;
 			try {
-				Thread.sleep(((long)delT + (System.currentTimeMillis() - startTime)));
+				long sleepTime = ((long) delT - (System.currentTimeMillis() - startTime));
+				System.out.println("SLEEP" + sleepTime);
+				Thread.sleep(sleepTime);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		long startTime = System.currentTimeMillis();
+		while (System.currentTimeMillis() - startTime < 300) {
+			drive.drive(backwards ? 0.5 : -0.5, 0);
+			try {
+				Thread.sleep(300);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		drive.drive(0, 0);
-		
-
 
 	}
 
-	
-	
 }
