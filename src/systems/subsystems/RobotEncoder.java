@@ -66,9 +66,7 @@ public class RobotEncoder implements Subsystem{
 		// TODO Auto-generated method stub
 		if(e!=null){
 			currentPos = e.getDistance()-startPos;
-			if(currentPos < 0) {
-				currentPos = currentPos * -1;
-		}
+
 		}
 	}
 

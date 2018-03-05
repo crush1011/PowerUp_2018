@@ -15,7 +15,8 @@ package systems;
 
 import java.util.HashMap;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.kauailabs.navx.frc.AHRS;
 
@@ -27,6 +28,7 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.Victor;
 import systems.SysObj.Sensors;
+import systems.subsystems.Collector;
 import systems.subsystems.Collector;
 import systems.subsystems.Controls;
 import systems.subsystems.Controls.Axis;
@@ -73,36 +75,30 @@ public class Systems{
 		System.out.println("Start with motors");
 		
 		// Left Motor Controllers
-		sysObjects.put(SysObj.MotorController.LEFT_1, new WPI_TalonSRX(2));
-		sysObjects.put(SysObj.MotorController.LEFT_2, new WPI_TalonSRX(4));
-		sysObjects.put(SysObj.MotorController.LEFT_3, new WPI_TalonSRX(6));
+		sysObjects.put(SysObj.MotorController.LEFT_1, new TalonSRX(2));
+		sysObjects.put(SysObj.MotorController.LEFT_2, new TalonSRX(4));
+		sysObjects.put(SysObj.MotorController.LEFT_3, new TalonSRX(6));
+
 		
 		// Right Motor Controllers
-		sysObjects.put(SysObj.MotorController.RIGHT_1, new WPI_TalonSRX(1));
-		sysObjects.put(SysObj.MotorController.RIGHT_2, new WPI_TalonSRX(3));
-		sysObjects.put(SysObj.MotorController.RIGHT_3, new WPI_TalonSRX(5));
+		sysObjects.put(SysObj.MotorController.RIGHT_1, new TalonSRX(1));
+		sysObjects.put(SysObj.MotorController.RIGHT_2, new TalonSRX(3));
+		sysObjects.put(SysObj.MotorController.RIGHT_3, new TalonSRX(5));
 		
 		// Create the driveTrain
-		driveTrain = new DriveTrain((WPI_TalonSRX) sysObjects.get(SysObj.MotorController.LEFT_1), 
-									(WPI_TalonSRX) sysObjects.get(SysObj.MotorController.LEFT_2), 
-									(WPI_TalonSRX) sysObjects.get(SysObj.MotorController.LEFT_3), 
-									(WPI_TalonSRX) sysObjects.get(SysObj.MotorController.RIGHT_1), 
-									(WPI_TalonSRX) sysObjects.get(SysObj.MotorController.RIGHT_2), 
-									(WPI_TalonSRX) sysObjects.get(SysObj.MotorController.RIGHT_3));
+		driveTrain = new DriveTrain((TalonSRX) sysObjects.get(SysObj.MotorController.LEFT_1), 
+									(TalonSRX) sysObjects.get(SysObj.MotorController.LEFT_2), 
+									(TalonSRX) sysObjects.get(SysObj.MotorController.LEFT_3), 
+									(TalonSRX) sysObjects.get(SysObj.MotorController.RIGHT_1), 
+									(TalonSRX) sysObjects.get(SysObj.MotorController.RIGHT_2), 
+									(TalonSRX) sysObjects.get(SysObj.MotorController.RIGHT_3));
 		
 		// Arm Motor Controllers
-		sysObjects.put(SysObj.MotorController.COLLECTOR_ARM_1, new WPI_TalonSRX(7));
-		sysObjects.put(SysObj.MotorController.COLLECTOR_ARM_2, new WPI_TalonSRX(8));
+		sysObjects.put(SysObj.MotorController.COLLECTOR_ARM_1, new TalonSRX(7));
+		sysObjects.put(SysObj.MotorController.COLLECTOR_ARM_2, new TalonSRX(8));
 		sysObjects.put(SysObj.MotorController.INTAKE_LEFT, new WPI_VictorSPX(10));
 		sysObjects.put(SysObj.MotorController.INTAKE_RIGHT, new WPI_VictorSPX(9));
 		
-		// Create the Collector
-		collector = new Collector((WPI_TalonSRX) sysObjects.get(SysObj.MotorController.COLLECTOR_ARM_1),
-								  (WPI_TalonSRX) sysObjects.get(SysObj.MotorController.COLLECTOR_ARM_2),
-								  (WPI_VictorSPX) sysObjects.get(SysObj.MotorController.INTAKE_LEFT), 
-								  (WPI_VictorSPX) sysObjects.get(SysObj.MotorController.INTAKE_RIGHT),
-								  (RobotEncoder) sysObjects.get(armEncoder1),
-								  (RobotEncoder) sysObjects.get(armEncoder2));
 		
 		// Climber Motor Controller(s)
 		sysObjects.put(SysObj.MotorController.CLIMBER, new Spark(11));
@@ -143,6 +139,15 @@ public class Systems{
 		sysObjects.put(SysObj.Sensors.NAVX, new AHRS(SPI.Port.kMXP));
 		navX = new NavX((AHRS) sysObjects.get(SysObj.Sensors.NAVX));
 		resources = new Resources();
+	
+		// Create the Collector
+			collector = new Collector((TalonSRX) sysObjects.get(SysObj.MotorController.COLLECTOR_ARM_1),
+										  (TalonSRX) sysObjects.get(SysObj.MotorController.COLLECTOR_ARM_2),
+										  (WPI_VictorSPX) sysObjects.get(SysObj.MotorController.INTAKE_LEFT), 
+										  (WPI_VictorSPX) sysObjects.get(SysObj.MotorController.INTAKE_RIGHT),
+										  (RobotEncoder) sysObjects.get(armEncoder1),
+										  (RobotEncoder) sysObjects.get(armEncoder2));
+				
 	}
 	
 	/*
@@ -169,7 +174,7 @@ public class Systems{
 	public void update() {
 		controls.update();
 		driveTrain.update();
-		collector.update();
+		//collector.update(); on its own thread now
 		navX.update();
 		lEncoder.update();
 		rEncoder.update();
@@ -542,14 +547,15 @@ public class Systems{
 	 * Purpose: getAverageDriveEncoderDistance with failsafe if one goes wrong
 	 */
 	public double getAverageDriveEncoderDistance(){
-		if(Math.abs(lEncoder.getValue() - rEncoder.getValue()) <
+		/*if(Math.abs(lEncoder.getValue() - rEncoder.getValue()) <
 		0.1 * resources.returnGreater(lEncoder.getValue(), rEncoder.getValue())){
 			return 0.5 * (lEncoder.getValue() + rEncoder.getValue());
 		}
 		else{
 			return resources.returnGreater(lEncoder.getValue(), rEncoder.getValue());
 		}
-			
+		*/
+		return rEncoder.getValue();	
 	}
 	
 	/*

@@ -8,6 +8,7 @@
 package org.usfirst.frc.team1011.robot;
 
 import autonomous.AutonLine;
+import autonomous.FourCubeRightAuto;
 import autonomous.LeftSideLeftScore;
 import autonomous.MidSideLeftScore;
 import autonomous.MidSideRightScore;
@@ -21,6 +22,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import systems.SysObj;
 import systems.Systems;
+import systems.subsystems.Collector;
+import systems.subsystems.DriveTrain;
 import systems.subsystems.Collector;
 
 /**
@@ -37,6 +40,7 @@ public class Robot extends IterativeRobot {
 	private SendableChooser<String> m_chooser = new SendableChooser<>();
 	private static Systems systems;
 	private static Collector collector;
+	private static DriveTrain driveTrain;
 	private static Thread auton;
 	private static UsbCamera visionCam;
 	private static MjpegServer camServer;
@@ -50,9 +54,13 @@ public class Robot extends IterativeRobot {
 	public void robotInit() {
 		
 		systems = Systems.getInstance();
+		collector = systems.getCollector();
+		driveTrain = systems.getDriveTrain();
+		collector.enable();
 		
 		systems.resetEncoders();
 		systems.update();
+		
 		SmartDashboard.putString("DB/String 0", "");
 		SmartDashboard.putString("DB/String 1", "");
 		SmartDashboard.putString("DB/String 2", "");
@@ -119,12 +127,16 @@ public class Robot extends IterativeRobot {
 				auton = new Thread(new MidSideRightScore());
 			//System.out.println("No autonomous selected.");
 			break;
+			
 		}
 		
 		//auton.start();
 		
 		//systems.getDriveTrain().turnTo(90, 0.95, 5500);
-		new AutonLine(systems.getDriveTrain(), systems.getNavX(), 50,80, 0).run();
+		//new AutonLine(systems.getDriveTrain(), systems.getNavX(), 150,140, 0).run();
+		new FourCubeRightAuto().run();
+		//driveTrain.turnToOneSide(70, 0.8, 5500, false);
+		//driveTrain.driveLine(-50, 0, 140);
 	}
 
 	/**
@@ -132,9 +144,9 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		
 		//System.out.println("Angle: " + systems.getNavXAngle());
-		
+		//System.out.println("LeftEncoder: " + systems.getEncoderDistance(SysObj.Sensors.LEFT_ENCODER));
+		System.out.println("RightEncoder: " + systems.getEncoderDistance(SysObj.Sensors.RIGHT_ENCODER));
 	}
 
 	/**
@@ -150,8 +162,8 @@ public class Robot extends IterativeRobot {
 		//systems.printEncoderInfo(true, false, false, SysObj.Sensors.RIGHT_ENCODER);
 		/*System.out.println("Left Motor: " + systems.getMotorCurrent(10));
 		System.out.println("Right Motor: " + systems.getMotorCurrent(11));*/
-		System.out.println("Encoder1: " + (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1)));
-		System.out.println("Encoder2: " + (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2)));
+		//System.out.println("Encoder1: " + (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1)));
+		//System.out.println("Encoder2: " + (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2)));
 		
 	}
 

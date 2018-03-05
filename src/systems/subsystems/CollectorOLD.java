@@ -10,15 +10,11 @@ package systems.subsystems;
 
 import java.text.DecimalFormat;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
-import autonomous.Loop;
 import autonomous.RPID;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import systems.Resources;
@@ -26,15 +22,15 @@ import systems.Subsystem;
 import systems.SysObj;
 import systems.Systems;
 
-public class Collector implements Subsystem {
+public class CollectorOLD implements Subsystem {
 
-	private TalonSRX collectorArm1, collectorArm2;
+	private WPI_TalonSRX collectorArm1, collectorArm2;
 	private WPI_VictorSPX intakeLeft, intakeRight;
 	private static Systems systems;
 	private RobotEncoder armEncoder1;
 	private RobotEncoder armEncoder2;
 	private PIDManual armPID;
-	private RPID goodArmPID; // Just in case
+	private RPID goodArmPID; //Just in case
 	private Resources resources;
 
 	private double averageArmEncoderPos;
@@ -47,45 +43,39 @@ public class Collector implements Subsystem {
 	private int position, counter;
 
 	DecimalFormat df;
-
+	
 	private static Thread cubeThrowThread;
-
-	private Runnable updateRunnable;
-	private Loop updateLoop;
 
 	/*
 	 * Constructor Author: Nitesh Puri ----------------------------------------
 	 * constructor
 	 */
 
-	public Collector(TalonSRX talonSRX, TalonSRX talonSRX2, WPI_VictorSPX intakeLeft, WPI_VictorSPX intakeRight,
-			RobotEncoder armEncoder1, RobotEncoder armEncoder2) {
-		this.collectorArm1 = talonSRX;
-		this.collectorArm2 = talonSRX2;
+	public CollectorOLD(WPI_TalonSRX collectorArm1, WPI_TalonSRX collectorArm2, WPI_VictorSPX intakeLeft,
+			WPI_VictorSPX intakeRight, RobotEncoder armEncoder1, RobotEncoder armEncoder2) {
+		this.collectorArm1 = collectorArm1;
+		this.collectorArm2 = collectorArm2;
 		this.intakeLeft = intakeLeft;
 		this.intakeRight = intakeRight;
 		this.armEncoder1 = armEncoder1;
 		this.armEncoder2 = armEncoder2;
-		this.armPID = new PIDManual(0.02, 0, 0.005, 0.02); // 0.015, 0, 0
-		this.goodArmPID = new RPID(0.02, 0.0, 0.0, 0.02); // 0.015, 0, 0
-		//0.03, 0.0, 0.00555														// 0.035, 0,
-																// 0.005, 0.02
+		this.armPID = new PIDManual(0.02, 0, 0.005, 0.02); //0.015, 0, 0
+		this.goodArmPID = new RPID(0.035, 0, 0.005, 0.02); //0.015, 0, 0    0.035, 0, 0.005, 0.02
 		resources = new Resources();
 
 		df = new DecimalFormat("#.##");
 
 		intakeRight.setInverted(true);
 
-		talonSRX.setNeutralMode(NeutralMode.Brake);
-		talonSRX2.setNeutralMode(NeutralMode.Brake);
+		collectorArm1.setNeutralMode(NeutralMode.Brake);
+		collectorArm2.setNeutralMode(NeutralMode.Brake);
 		averageArmEncoderPos = 0;
 
-		talonSRX2.setInverted(true);
+		collectorArm2.setInverted(true);
 
 		position = 0;
 		encoderRange = 0;
 		goodArmPID.setSetPoint(0);
-		goodArmPID.setOutputRange(-1, 1);
 		armConstant = 1;
 		idleTurnConstant = 0;
 
@@ -93,49 +83,44 @@ public class Collector implements Subsystem {
 		manualMode = false;
 		collecting = false;
 		fast = false;
-
-		updateRunnable = () -> {
-			if (DriverStation.getInstance().isEnabled())
-				update();
-		};
-
-		updateLoop = new Loop(updateRunnable, 50);
-
+		
 		cubeThrowThread = new Thread(new CubeThrow());
 	}
-
+	
 	/*
-	 * CubeThrow Author: Nitesh Puri Collaborators: Jeremiah Hanson
-	 * -------------------------------------- Runnable Class Purpose: Throw the
-	 * cube.
+	 * CubeThrow
+	 * Author: Nitesh Puri
+	 * Collaborators: Jeremiah Hanson
+	 * --------------------------------------
+	 * Runnable Class
+	 * Purpose: Throw the cube.
 	 */
-
+	
 	private class CubeThrow implements Runnable {
 
 		@Override
 		public void run() {
-
+			
 			goodArmPID.setSetPoint(35);
-
-			while (true) {
+			
+			while(true) {
 				boolean stop = false;
 				averageArmEncoderPos = 0.5 * (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1)
 						+ systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
-
-				// goodArmPID.setCValue(averageArmEncoderPos);
-				collectorArm1.set(ControlMode.PercentOutput, goodArmPID.crunch(averageArmEncoderPos));
-				collectorArm2.set(ControlMode.PercentOutput, goodArmPID.crunch(averageArmEncoderPos));
-
+			//	goodArmPID.setCValue(averageArmEncoderPos);
+				collectorArm1.set(goodArmPID.crunch(averageArmEncoderPos));
+				collectorArm2.set(goodArmPID.crunch(averageArmEncoderPos));
+				
 				if (averageArmEncoderPos <= 50) {
 					outtakeCube(.6);
 					stop = true;
 				}
-				if (stop)
+				if (stop) 
 					break;
 			}
-
+			
 		}
-
+		
 	}
 
 	/*
@@ -146,17 +131,24 @@ public class Collector implements Subsystem {
 	@Override
 	public void update() {
 
+		if (systems == null) {
+			systems = Systems.getInstance();
+			armEncoder1 = Systems.getRobotEncoder(SysObj.Sensors.ARM_ENCODER_1);
+			armEncoder2 = Systems.getRobotEncoder(SysObj.Sensors.ARM_ENCODER_2);
+			armEncoder1.setDistancePerPulse(0.42);
+			armEncoder2.setDistancePerPulse(0.42);
+
+			// System.out.println("Collector.update(): " +
+			// systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
+		}
+		
 		if (cubeThrowThread.isAlive()) {
 			return;
 		}
-
-		/*
-		 * averageArmEncoderPos = 0.5 *
-		 * (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1) +
-		 * systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
-		 */
-		averageArmEncoderPos = -systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1);
-		if (true) {
+		
+		averageArmEncoderPos = 0.5 * (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1)
+				+ systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
+		if (!systems.inAuto) {
 			// Controls for intake
 			if (systems.getMotorCurrent(10) < 75 && systems.getMotorCurrent(11) < 75) {
 				if (systems.getOperatorRtTrigger() > .1) {
@@ -170,10 +162,8 @@ public class Collector implements Subsystem {
 					intakeLeft.set(Math.pow(systems.getOperatorLtTrigger(), 2));
 					intakeRight.set(Math.pow(systems.getOperatorLtTrigger(), 2));
 				} else {
-					if (!systems.inAuto) {
-						intakeLeft.set(idleTurnConstant);
-						intakeRight.set(idleTurnConstant);
-					}
+					intakeLeft.set(idleTurnConstant);
+					intakeRight.set(idleTurnConstant);
 					if (collecting) {
 						goodArmPID.setSetPoint(120);
 						SmartDashboard.putString("DB/String 2", "Hellu");
@@ -186,7 +176,8 @@ public class Collector implements Subsystem {
 				intakeRight.set(0);
 			}
 
-			// goodArmPID.setCValue(averageArmEncoderPos);
+
+		//	goodArmPID.setCValue(averageArmEncoderPos);
 
 			// Controls for arm
 			if (systems.getButton(Controls.Button.LEFT_BUMPER, false)) {
@@ -199,15 +190,15 @@ public class Collector implements Subsystem {
 			}
 			if (systems.getButton(Controls.Button.B, false)) {
 				position = 3;
-				goodArmPID.setSetPoint(115);
+				goodArmPID.setSetPoint(125);
 			}
 			if (systems.getButton(Controls.Button.A, false)) {
 				position = 4;
-				goodArmPID.setSetPoint(15);
+				goodArmPID.setSetPoint(100);
 			}
-			if (systems.getButton(Controls.Button.X, false)) {
+			if (systems.getButton(Controls.Button.X, false)){
 				position = 5;
-				cubeThrowThread = new Thread(new CubeThrow());
+				cubeThrowThread = new Thread(new  CubeThrow());
 				cubeThrowThread.start();
 			}
 
@@ -235,24 +226,20 @@ public class Collector implements Subsystem {
 			// Automatic operator controls
 			if (!manualMode) {
 				if (fast) {
-					collectorArm1.set(ControlMode.PercentOutput, 0.75);
-					collectorArm2.set(ControlMode.PercentOutput, 0.75);
+					collectorArm1.set(0.75);
+					collectorArm2.set(0.75);
 				} else {
-					double angleFromTop = averageArmEncoderPos - 45.0;
-					double feedForward = Math.sin(Math.toRadians(angleFromTop)) * 0.1;
-					double motorValue = goodArmPID.crunch(averageArmEncoderPos) + feedForward;
-
-					System.out.println("motorVAlue :" + motorValue + "    SETPOINT:" + goodArmPID.getSetPoint()
-							+ "  CurrentValue:" + averageArmEncoderPos);
-					collectorArm1.set(ControlMode.PercentOutput, motorValue);
-					collectorArm2.set(ControlMode.PercentOutput, motorValue);
+					double motorValue = goodArmPID.crunch(averageArmEncoderPos);
+					System.out.println("motorVAlue :" + motorValue  + "    SETPOINT:" + goodArmPID.getSetPoint() + "  CurrentValue:" + averageArmEncoderPos);
+					collectorArm1.set(motorValue);
+					collectorArm2.set(motorValue);
 				}
 			}
 
 			// Manual operator controls
 			if (manualMode) {
-				collectorArm1.set(ControlMode.PercentOutput, armConstant * systems.getOperatorLJoystick());
-				collectorArm2.set(ControlMode.PercentOutput, armConstant * systems.getOperatorLJoystick());
+				collectorArm1.set(armConstant * systems.getOperatorLJoystick());
+				collectorArm2.set(armConstant * systems.getOperatorLJoystick());
 			}
 
 		}
@@ -269,9 +256,22 @@ public class Collector implements Subsystem {
 	 * 135 Parameters: angle: Desired angle of arm
 	 */
 	public void moveArm(double angle) {
-
+		
 		goodArmPID.setSetPoint(angle);
-
+		while (Math.abs(resources.getAngleError(angle, averageArmEncoderPos)) < 5) {
+			armEncoder1.update();
+			armEncoder1.update();
+			update();/*
+			averageArmEncoderPos = 0.5 * (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1)
+					+ systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));*/
+			averageArmEncoderPos = systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1);
+			
+	//		goodArmPID.setCValue(averageArmEncoderPos);
+			collectorArm1.set(goodArmPID.crunch(averageArmEncoderPos));
+			collectorArm2.set(goodArmPID.crunch(averageArmEncoderPos));
+		}
+		collectorArm1.set(0);
+		collectorArm2.set(0);
 	}
 
 	/*
@@ -291,49 +291,24 @@ public class Collector implements Subsystem {
 		intakeRight.set(0);
 	}
 
-	public void intakeCubeAuto(double speed, double delay, double time) {
-		Runnable intake = () -> {
-			try {
-				Thread.sleep((long) delay);
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			intakeLeft.set(-speed);
-			intakeRight.set(-speed);
-			try {
-				Thread.sleep((long) time);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			intakeLeft.set(0);
-			intakeRight.set(0);
-		};
-		new Thread(intake).start();
-	}
-
 	/*
 	 * outtakeCube Author: Nitesh Puri Collaborators: Ethan Ngo and Finlay
 	 * Parsons -------------------------------------------------- Parameters:
 	 * None Purpose: Outtakes the cube
 	 */
 	public void outtakeCube(double speed) {
-		long startTime = System.currentTimeMillis();
-		while (System.currentTimeMillis() - startTime < 500) {
-			intakeLeft.set(speed);
-			intakeRight.set(speed);
-			try {
-				Thread.sleep(300);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		intakeLeft.set(speed);
+		intakeRight.set(speed);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		intakeLeft.set(0);
 		intakeRight.set(0);
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -353,21 +328,10 @@ public class Collector implements Subsystem {
 		// SmartDashboard.putString("DB/Slider 4", "I hate this.");
 
 	}
-
-	public void enable() {
-
-		if (systems == null) {
-			systems = Systems.getInstance();
-			armEncoder1 = Systems.getRobotEncoder(SysObj.Sensors.ARM_ENCODER_1);
-			armEncoder2 = Systems.getRobotEncoder(SysObj.Sensors.ARM_ENCODER_2);
-			armEncoder1.setDistancePerPulse(0.42);
-			armEncoder2.setDistancePerPulse(0.42);
-
-			// System.out.println("Collector.update(): " +
-			// systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
-		}
-
-		updateLoop.start();
+	
+	public boolean PIDEnabled= false;
+	public void enable(){
+		PIDEnabled = true;
 	}
 
 }
