@@ -11,6 +11,9 @@ import autonomous.AutonLine;
 import autonomous.LeftSideLeftScore;
 import autonomous.MidSideLeftScore;
 import autonomous.MidSideRightScore;
+import edu.wpi.cscore.MjpegServer;
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.cscore.VideoMode.PixelFormat;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -35,6 +38,9 @@ public class Robot extends IterativeRobot {
 	private static Systems systems;
 	private static Collector collector;
 	private static Thread auton;
+	private static UsbCamera visionCam;
+	private static MjpegServer camServer;
+	private static final int MJPG_STREAM_PORT = 115200;
 	
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -60,8 +66,11 @@ public class Robot extends IterativeRobot {
 		m_chooser.addDefault("Default Auto", kDefaultAuto);
 		m_chooser.addObject("My Auto", kCustomAuto);
 		SmartDashboard.putData("Auto choices", m_chooser);
-		CameraServer cameraServer = CameraServer.getInstance();
-		cameraServer.startAutomaticCapture();
+		
+		visionCam = new UsbCamera("VisionProcCam", 0);
+		visionCam.setVideoMode(PixelFormat.kYUYV, 320, 240, 60);  // start ObjectDetect		
+		camServer = new MjpegServer("VisionCamServer", MJPG_STREAM_PORT);
+		camServer.setSource(visionCam);
 	}
 	
 	/**
