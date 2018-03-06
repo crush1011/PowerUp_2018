@@ -67,7 +67,7 @@ public class Collector implements Subsystem {
 		this.armEncoder1 = armEncoder1;
 		this.armEncoder2 = armEncoder2;
 		this.armPID = new PIDManual(0.02, 0, 0.005, 0.02); // 0.015, 0, 0
-		this.goodArmPID = new RPID(0.02, 0.0, 0.0, 0.02); // 0.015, 0, 0
+		this.goodArmPID = new RPID(0.015, 0.0, 0.0, 0.02); // 0.015, 0, 0
 		//0.03, 0.0, 0.00555														// 0.035, 0,
 																// 0.005, 0.02
 		resources = new Resources();
@@ -191,7 +191,7 @@ public class Collector implements Subsystem {
 			// Controls for arm
 			if (systems.getButton(Controls.Button.LEFT_BUMPER, false)) {
 				position = 1;
-				goodArmPID.setSetPoint(135);
+				goodArmPID.setSetPoint(127);
 			}
 			if (systems.getButton(Controls.Button.RIGHT_BUMPER, false)) {
 				position = 2;
@@ -234,6 +234,7 @@ public class Collector implements Subsystem {
 
 			// Automatic operator controls
 			if (!manualMode) {
+				systems.setRumbleOperator(0);
 				if (fast) {
 					collectorArm1.set(ControlMode.PercentOutput, 0.75);
 					collectorArm2.set(ControlMode.PercentOutput, 0.75);
@@ -251,8 +252,10 @@ public class Collector implements Subsystem {
 
 			// Manual operator controls
 			if (manualMode) {
+				systems.setRumbleOperator(0.1);
 				collectorArm1.set(ControlMode.PercentOutput, armConstant * systems.getOperatorLJoystick());
 				collectorArm2.set(ControlMode.PercentOutput, armConstant * systems.getOperatorLJoystick());
+			
 			}
 
 		}
@@ -363,7 +366,7 @@ public class Collector implements Subsystem {
 			armEncoder1.setDistancePerPulse(0.42);
 			armEncoder2.setDistancePerPulse(0.42);
 
-			// System.out.println("Collector.update(): " +
+		//	 System.out.println("Collector.update(): " +
 			// systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
 		}
 

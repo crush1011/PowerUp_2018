@@ -22,7 +22,7 @@ public class FourCubeRightAuto implements Runnable{
 		
 		collector.moveArm(75);
 		
-		driveTrain.turnToOneSide(20, 0.8, 600, false);
+		driveTrain.turnToOneSide(25, 0.8, 600, false);
 		
 		driveTrain.driveLine(110, 30, 140);
 		
@@ -37,9 +37,9 @@ public class FourCubeRightAuto implements Runnable{
 		driveTrain.turnTo(-45, 0.8, 600);
 		
 		collector.intakeCubeAuto(1.0, 200, 600);
-		driveTrain.driveLine(49, -45, 140);
+		driveTrain.driveLine(57, -45, 140);
 		
-		driveTrain.driveLine(-59, -45, 140);
+		driveTrain.driveLine(-67, -45, 140);
 		
 		collector.moveArm(75);
 		

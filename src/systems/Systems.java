@@ -213,6 +213,15 @@ public class Systems{
 		return controls.getDriverAxis().get(Axis.RIGHT_X);
 	}
 	
+	
+	public void setRumbleOperator(double val){
+		controls.setRumbleOperator(val);
+	}
+	
+	public void setRumbleDriver(double val){
+		controls.setRumbleDriver(val);
+	}
+	
 	/*
 	 * getDriverLtTrigger
 	 * Author: Nitesh Puri

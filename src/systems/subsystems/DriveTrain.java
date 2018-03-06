@@ -80,12 +80,11 @@ public class DriveTrain implements Subsystem {
 		resources = new Resources();
 
 		driveConstant = 1.0;
+		turnConstant = 0.9;
 
 		ROBOT_WIDTH = 21;
 
 		distancePerPulse = 0.064;
-
-		turnConstant = 0.1;
 
 		leftAlign = new Thread(new LeftAlign());
 		rightAlign = new Thread(new RightAlign());
@@ -175,7 +174,7 @@ public class DriveTrain implements Subsystem {
 			rightAlign.start();
 		}
 
-		arcadeDrive(driveConstant * systems.getDriverAxisLeftY(), driveConstant * systems.getDriverAxisRightX(),
+		arcadeDrive(driveConstant * systems.getDriverAxisLeftY(), turnConstant * systems.getDriverAxisRightX(),
 				true);
 		// System.out.println("" + systems.getPulse());
 	}

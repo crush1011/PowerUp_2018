@@ -10,6 +10,7 @@ package systems.subsystems;
 
 import java.util.HashMap;
 
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Joystick;
 import systems.Subsystem;
 import systems.SysObj;
@@ -290,5 +291,15 @@ public class Controls implements Subsystem{
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public void setRumbleOperator(double val){
+		operatorJoystick.setRumble(RumbleType.kLeftRumble, val);
+		operatorJoystick.setRumble(RumbleType.kRightRumble, val);
+	}
 
+	
+	public void setRumbleDriver(double val){
+		driverJoystick.setRumble(RumbleType.kLeftRumble, val);
+		driverJoystick.setRumble(RumbleType.kRightRumble, val);		
+	}
 }
