@@ -62,8 +62,8 @@ public class DriveTrain implements Subsystem {
 		rtSlave1.setNeutralMode(NeutralMode.Brake);
 		rtSlave2.setNeutralMode(NeutralMode.Brake);
 
-		ltMain.configOpenloopRamp(0.1, 0);
-		rtMain.configOpenloopRamp(0.1, 0);
+		ltMain.configOpenloopRamp(0.15, 0);
+		rtMain.configOpenloopRamp(0.15, 0);
 
 		driveStraightPID = new PIDManual(0.11, 0, 0, 0.02);// 0.11,0,0
 		turnPID = new RPID(0.023, 0.043, 0.003, 0.02);

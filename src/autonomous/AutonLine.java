@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import systems.Resources;
 import systems.Systems;
 import systems.subsystems.DriveTrain;
 import systems.subsystems.NavX;
@@ -23,7 +24,7 @@ public class AutonLine implements Runnable {
 
 	NavX navx;
 
-	private static final double P = 0.03;
+	private static final double P = 0.02;
 
 	public AutonLine(DriveTrain driveTrain, NavX navx, double distance, double topSpeed, double angle) {
 
@@ -89,16 +90,16 @@ public class AutonLine implements Runnable {
 							+ "    CURRENTP" + distanceTravelled + "    DistanceToSTOP" + distanceNeededToStop);
 			System.out.println("DEACC" + deAccelerate);
 
-			double currentError = angle - navx.getCurrentAngle();
-			if (Math.abs(currentError) > (360 - 0) / 2) {
-				currentError = currentError > 0 ? currentError - 360 + 0 : currentError + 360 - 0;
-			}
+			double currentError = Resources.getAngleError(angle, navx.getCurrentAngle());
+			
 
 			double rotateOutput = currentError * P;
-
+			
+			System.out.println("CurrentError: " + currentError  + "   rotateOutput: " + rotateOutput + "   Angle: " + navx.getCurrentAngle());
+			
 			pastCount = loopCount;
 			double actualVelocity = currentVelocity / 150;
-			drive.drive(actualVelocity + (kA * currentAcceleration), 0, false);
+			drive.drive(actualVelocity + (kA * currentAcceleration), rotateOutput, false);
 			if (backwards) {
 				if (currentVelocity >= 0 && lastVelocity < 0) {
 					stop = true;

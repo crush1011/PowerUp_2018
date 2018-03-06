@@ -59,8 +59,8 @@ public class NavX implements Subsystem {
 	 * Returns a double
 	 */
 	public double getCurrentAngle() {
-		//update();
-		return currentAngle;
+	//	update();
+		return navX.getFusedHeading();
 	}
 	
 	/*

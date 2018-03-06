@@ -8,6 +8,7 @@
 package org.usfirst.frc.team1011.robot;
 
 import autonomous.AutonLine;
+import autonomous.FourCubeLeftAuto;
 import autonomous.FourCubeRightAuto;
 import autonomous.LeftSideLeftScore;
 import autonomous.MidSideLeftScore;
@@ -118,27 +119,23 @@ public class Robot extends IterativeRobot {
 		}*/
 		
 		switch (m_autoSelected) {
-		case kCustomAuto:
-			break;
-		case kDefaultAuto:
-			break;
 		default:
 			if (gameData.charAt(0) == 'L') 
-				auton = new Thread(new MidSideLeftScore());
+				auton = new Thread(new FourCubeLeftAuto());
 			else 
-				auton = new Thread(new MidSideRightScore());
+				auton = new Thread(new FourCubeRightAuto());
 			//System.out.println("No autonomous selected.");
 			break;
 			
 		}
 		
-		//auton.start();
+		auton.start();
 		
 		//systems.getDriveTrain().turnTo(90, 0.95, 5500);
 		//new AutonLine(systems.getDriveTrain(), systems.getNavX(), 150,140, 0).run();
-		new FourCubeRightAuto().run();
+		//new FourCubeRightAuto().run();
 		//driveTrain.turnToOneSide(70, 0.8, 5500, false);
-		//driveTrain.driveLine(-50, 0, 140);
+		//driveTrain.driveLine(150, 10, 140);
 	}
 
 	/**
