@@ -67,7 +67,7 @@ public class Collector implements Subsystem {
 		this.armEncoder1 = armEncoder1;
 		this.armEncoder2 = armEncoder2;
 		this.armPID = new PIDManual(0.02, 0, 0.005, 0.02); // 0.015, 0, 0
-		this.goodArmPID = new RPID(0.015, 0.0, 0.0, 0.02); // 0.015, 0, 0
+		this.goodArmPID = new RPID(0.018, 0.0, 0.001, 0.02); // 0.015, 0, 0
 		//0.03, 0.0, 0.00555														// 0.035, 0,
 																// 0.005, 0.02
 		resources = new Resources();
@@ -223,6 +223,12 @@ public class Collector implements Subsystem {
 				else if (manualMode)
 					manualMode = false;
 			}
+			
+			if(systems.getButton(Controls.Button.BACK, false)){
+				systems.getRobotEncoder(SysObj.Sensors.ARM_ENCODER_1).reset();
+				systems.getRobotEncoder(SysObj.Sensors.ARM_ENCODER_2).reset();
+				if(manualMode) manualMode = false; 
+			}
 
 			/*
 			 * if(systems.getDPadButton(Controls.POV.UP, false)){ double i =
@@ -245,16 +251,18 @@ public class Collector implements Subsystem {
 
 					System.out.println("motorVAlue :" + motorValue + "    SETPOINT:" + goodArmPID.getSetPoint()
 							+ "  CurrentValue:" + averageArmEncoderPos);
-					collectorArm1.set(ControlMode.PercentOutput, motorValue);
-					collectorArm2.set(ControlMode.PercentOutput, motorValue);
+					if(!cubeThrowThread.isAlive()) {
+						collectorArm1.set(ControlMode.PercentOutput, motorValue);
+						collectorArm2.set(ControlMode.PercentOutput, motorValue);
+					}
 				}
 			}
 
 			// Manual operator controls
 			if (manualMode) {
 				systems.setRumbleOperator(0.1);
-				collectorArm1.set(ControlMode.PercentOutput, armConstant * systems.getOperatorLJoystick());
-				collectorArm2.set(ControlMode.PercentOutput, armConstant * systems.getOperatorLJoystick());
+				collectorArm1.set(ControlMode.PercentOutput, armConstant * -systems.getOperatorLJoystick());
+				collectorArm2.set(ControlMode.PercentOutput, armConstant * -systems.getOperatorLJoystick());
 			
 			}
 
@@ -284,7 +292,7 @@ public class Collector implements Subsystem {
 	public void intakeCube(double speed) {
 		intakeLeft.set(speed);
 		intakeRight.set(speed);
-		try {
+		try { 
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block

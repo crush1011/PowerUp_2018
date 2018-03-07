@@ -86,8 +86,8 @@ public class DriveTrain implements Subsystem {
 
 		distancePerPulse = 0.064;
 
-		leftAlign = new Thread(new LeftAlign());
-		rightAlign = new Thread(new RightAlign());
+		//leftAlign = new Thread(new LeftAlign());
+		//rightAlign = new Thread(new RightAlign());
 
 	}
 
@@ -97,7 +97,7 @@ public class DriveTrain implements Subsystem {
 	 * Aligns the robot to the multiple of 90 degrees to the left of the robot's
 	 * current direction
 	 */
-	private class LeftAlign implements Runnable {
+	/*private class LeftAlign implements Runnable {
 
 		@Override
 		public void run() {
@@ -115,7 +115,7 @@ public class DriveTrain implements Subsystem {
 			turnTo(dAngle, 1, 1500);
 		}
 
-	}
+	}*/
 
 	/*
 	 * RightAlign Author: Finny Collaborators: Nitesh Puri, Ethan Yes, Jeremiah
@@ -123,7 +123,7 @@ public class DriveTrain implements Subsystem {
 	 * Aligns the robot to the multiple of 90 degrees to the right of the
 	 * robot's current direction
 	 */
-	private class RightAlign implements Runnable {
+	/*private class RightAlign implements Runnable {
 
 		@Override
 		public void run() {
@@ -142,7 +142,7 @@ public class DriveTrain implements Subsystem {
 
 		}
 
-	}
+	}*/
 
 	@Override
 	public void update() {
@@ -152,9 +152,9 @@ public class DriveTrain implements Subsystem {
 			systems.setDistancePerPulse(Systems.getRobotEncoder(SysObj.Sensors.RIGHT_ENCODER), distancePerPulse);
 		}
 
-		if (leftAlign.isAlive() || rightAlign.isAlive()) {
+		/*if (leftAlign.isAlive() || rightAlign.isAlive()) {
 			return;
-		}
+		}*/
 
 		if (systems.inAuto) {
 			return;
@@ -168,11 +168,11 @@ public class DriveTrain implements Subsystem {
 			driveConstant = 0.9;
 		}
 
-		if (systems.getDriverLtTrigger() > 0.5) {
+		/*if (systems.getDriverLtTrigger() > 0.5) {
 			leftAlign.start();
 		} else if (systems.getDriverRtTrigger() > 0.5) {
 			rightAlign.start();
-		}
+		}*/
 
 		arcadeDrive(driveConstant * systems.getDriverAxisLeftY(), turnConstant * systems.getDriverAxisRightX(),
 				true);

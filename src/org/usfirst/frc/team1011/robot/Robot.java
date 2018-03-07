@@ -77,7 +77,11 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putData("Auto choices", m_chooser);
 		
 		visionCam = new UsbCamera("cam0", 1);
-		visionCam.setVideoMode(PixelFormat.kYUYV, 320, 240, 15);  // start ObjectDetect		
+		visionCam.setVideoMode(PixelFormat.kYUYV, 320, 240, 15);  // start ObjectDetect	
+		visionCam.setResolution(320, 240);
+		visionCam.setFPS(15);
+		visionCam.setBrightness(900);
+		visionCam.setExposureAuto();
 		camServer = CameraServer.getInstance();
 		camServer.addCamera(visionCam);
 		camServer.startAutomaticCapture();
@@ -163,6 +167,8 @@ public class Robot extends IterativeRobot {
 		System.out.println("Right Motor: " + systems.getMotorCurrent(11));*/
 		//System.out.println("Encoder1: " + (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1)));
 		//System.out.println("Encoder2: " + (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2)));
+		systems.printEncoderInfo(true, false, false, SysObj.Sensors.ARM_ENCODER_1);
+		systems.printEncoderInfo(true, false, false, SysObj.Sensors.ARM_ENCODER_2);
 		
 	}
 

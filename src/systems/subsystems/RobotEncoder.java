@@ -52,10 +52,13 @@ public class RobotEncoder implements Subsystem{
 		return e.getRate();
 	}
 	
+	
 	public void reset(){
 		e.reset();
 		startPos = e.getDistance();
 	}
+	
+	
 
 	public void setDistancePerPulse(double x){
 		e.setDistancePerPulse(x);
