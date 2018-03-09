@@ -160,8 +160,8 @@ public class Collector implements Subsystem {
 			// Controls for intake
 			if (systems.getMotorCurrent(10) < 75 && systems.getMotorCurrent(11) < 75) {
 				if (systems.getOperatorRtTrigger() > .1) {
-					intakeLeft.set(-0.65 * systems.getOperatorRtTrigger());
-					intakeRight.set(-0.65 * systems.getOperatorRtTrigger());
+					intakeLeft.set(-0.70 * systems.getOperatorRtTrigger());
+					intakeRight.set(-0.70 * systems.getOperatorRtTrigger());
 					if (position == 3 && !collecting) {
 						goodArmPID.setSetPoint(135);
 						collecting = true;

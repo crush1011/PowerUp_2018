@@ -22,7 +22,7 @@ public class FourCubeLeftAuto implements Runnable{
 		
 		collector.moveArm(70); //move arm to switch angle
 
-		driveTrain.driveLine(125, -28, 140); //drive for 110 inches to switch
+		driveTrain.driveLine(132, -28, 140); //drive for 110 inches to switch
 		
 		collector.outtakeCube(0.5); //outtake	
 		
@@ -32,7 +32,7 @@ public class FourCubeLeftAuto implements Runnable{
 		
 		driveTrain.turnTo(60, 0.8, 600); //turn to the furthest forward cube
 		
-		collector.intakeCubeAuto(1.0, 200, 2500); //intake thread starts
+		collector.intakeCubeAuto(1.0, 200, 3500); //intake thread starts
 		
 		driveTrain.driveLine(42, 60, 140); //drive towards the first cube while intaking
 		
