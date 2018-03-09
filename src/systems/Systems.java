@@ -117,6 +117,7 @@ public class Systems{
 		sysObjects.put(SysObj.Sensors.RIGHT_ENCODER, new Encoder(6,7, true, Encoder.EncodingType.k4X));
 		//((Encoder) sysObjects.get(SysObj.Sensors.LEFT_ENCODER)).setDistancePerPulse(Math.PI);
 		lEncoder = new RobotEncoder((Encoder) sysObjects.get(SysObj.Sensors.LEFT_ENCODER));
+		lEncoder.setNegative(true);
 		rEncoder = new RobotEncoder((Encoder) sysObjects.get(SysObj.Sensors.RIGHT_ENCODER));
 		armEncoder1 = new RobotEncoder((Encoder) sysObjects.get(SysObj.Sensors.ARM_ENCODER_1));
 		armEncoder2 = new RobotEncoder((Encoder) sysObjects.get(SysObj.Sensors.ARM_ENCODER_2));          
@@ -186,8 +187,8 @@ public class Systems{
 		if(controls.getButton(Controls.Button.BACK, SysObj.Sensors.OPERATOR_STICK)){
 			System.out.println("Hi Ethan");
 		}
-		lEncoder.toSmartDashboard();
-		collector.toSmartDashboard();
+		//lEncoder.toSmartDashboard();
+		//collector.toSmartDashboard();
 		
 	}
 	
@@ -564,7 +565,8 @@ public class Systems{
 			return resources.returnGreater(lEncoder.getValue(), rEncoder.getValue());
 		}
 		*/
-		return rEncoder.getValue();	
+	//	return (rEncoder.getValue() + lEncoder.getValue())/2.0;	
+		return lEncoder.getValue();
 	}
 	
 	/*

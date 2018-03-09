@@ -249,8 +249,8 @@ public class Collector implements Subsystem {
 					double feedForward = Math.sin(Math.toRadians(angleFromTop)) * 0.1;
 					double motorValue = goodArmPID.crunch(averageArmEncoderPos) + feedForward;
 
-					System.out.println("motorVAlue :" + motorValue + "    SETPOINT:" + goodArmPID.getSetPoint()
-							+ "  CurrentValue:" + averageArmEncoderPos);
+					//System.out.println("motorVAlue :" + motorValue + "    SETPOINT:" + goodArmPID.getSetPoint()
+					//		+ "  CurrentValue:" + averageArmEncoderPos);
 					if(!cubeThrowThread.isAlive()) {
 						collectorArm1.set(ControlMode.PercentOutput, motorValue);
 						collectorArm2.set(ControlMode.PercentOutput, motorValue);

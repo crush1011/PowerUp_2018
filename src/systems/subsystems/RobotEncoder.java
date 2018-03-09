@@ -30,6 +30,7 @@ public class RobotEncoder implements Subsystem{
 		this.e=e;
 		startPos=e.getDistance();
 		e.setDistancePerPulse(0.05875);
+		negative=false;
 	}
 	
 	/*
@@ -58,6 +59,10 @@ public class RobotEncoder implements Subsystem{
 		startPos = e.getDistance();
 	}
 	
+	public void setNegative(boolean val) {
+		this.negative=val;
+	}
+	
 	
 
 	public void setDistancePerPulse(double x){
@@ -69,7 +74,7 @@ public class RobotEncoder implements Subsystem{
 		// TODO Auto-generated method stub
 		if(e!=null){
 			currentPos = e.getDistance()-startPos;
-
+			currentPos *= negative? -1:1;
 		}
 	}
 

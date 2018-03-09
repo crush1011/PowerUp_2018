@@ -77,7 +77,7 @@ public class Robot extends IterativeRobot {
 		m_chooser.addObject("My Auto", kCustomAuto);
 		SmartDashboard.putData("Auto choices", m_chooser);
 		
-		visionCam = new UsbCamera("cam0", 1);
+		/*visionCam = new UsbCamera("cam0", 1);
 		visionCam.setVideoMode(PixelFormat.kYUYV, 320, 240, 15);  // start ObjectDetect	
 		visionCam.setResolution(320, 240);
 		visionCam.setFPS(15);
@@ -85,7 +85,7 @@ public class Robot extends IterativeRobot {
 		visionCam.setExposureAuto();
 		camServer = CameraServer.getInstance();
 		camServer.addCamera(visionCam);
-		camServer.startAutomaticCapture();
+		camServer.startAutomaticCapture();*/
 		
 	}
 	
@@ -136,6 +136,8 @@ public class Robot extends IterativeRobot {
 			
 		}
 		
+		//driveTrain.driveLine(60, 0, 140);
+		
 		auton.start();
 		
 		//systems.getDriveTrain().turnTo(90, 0.95, 5500);
@@ -164,14 +166,14 @@ public class Robot extends IterativeRobot {
 		systems.update();
 		//systems.printEncoderInfo(false, false, true, SysObj.Sensors.ARM_ENCODER_1);
 		//systems.printEncoderInfo(false, false, true, SysObj.Sensors.ARM_ENCODER_2);
-		//systems.printEncoderInfo(true, false, false, SysObj.Sensors.LEFT_ENCODER);
-		//systems.printEncoderInfo(true, false, false, SysObj.Sensors.RIGHT_ENCODER);
+		systems.printEncoderInfo(true, false, false, SysObj.Sensors.LEFT_ENCODER);
+		systems.printEncoderInfo(true, false, false, SysObj.Sensors.RIGHT_ENCODER);
 		/*System.out.println("Left Motor: " + systems.getMotorCurrent(10));
 		System.out.println("Right Motor: " + systems.getMotorCurrent(11));*/
 		//System.out.println("Encoder1: " + (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1)));
 		//System.out.println("Encoder2: " + (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2)));
-		systems.printEncoderInfo(true, false, false, SysObj.Sensors.ARM_ENCODER_1);
-		systems.printEncoderInfo(true, false, false, SysObj.Sensors.ARM_ENCODER_2);
+		//systems.printEncoderInfo(true, false, false, SysObj.Sensors.ARM_ENCODER_1);
+		//systems.printEncoderInfo(true, false, false, SysObj.Sensors.ARM_ENCODER_2);
 		
 	}
 
