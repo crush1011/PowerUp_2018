@@ -22,7 +22,7 @@ public class FourCubeRightAuto implements Runnable{
 		
 		collector.moveArm(70); //move arm to switch angle
 
-		driveTrain.driveLine(117, 20, 140); //drive for 110 inches to switch
+		driveTrain.driveLine(117, 16, 140); //drive for 110 inches to switch
 		collector.outtakeCube(0.5); //outtake		
 	
 		

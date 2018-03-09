@@ -160,15 +160,15 @@ public class Collector implements Subsystem {
 			// Controls for intake
 			if (systems.getMotorCurrent(10) < 75 && systems.getMotorCurrent(11) < 75) {
 				if (systems.getOperatorRtTrigger() > .1) {
-					intakeLeft.set(-Math.pow(0.87 * systems.getOperatorRtTrigger(), 2));
-					intakeRight.set(-Math.pow(0.87 * systems.getOperatorRtTrigger(), 2));
+					intakeLeft.set(-0.65 * systems.getOperatorRtTrigger());
+					intakeRight.set(-0.65 * systems.getOperatorRtTrigger());
 					if (position == 3 && !collecting) {
 						goodArmPID.setSetPoint(135);
 						collecting = true;
 					}
 				} else if (systems.getOperatorLtTrigger() > .1) {
-					intakeLeft.set(Math.pow(systems.getOperatorLtTrigger(), 2));
-					intakeRight.set(Math.pow(systems.getOperatorLtTrigger(), 2));
+					intakeLeft.set(systems.getOperatorLtTrigger());
+					intakeRight.set(systems.getOperatorLtTrigger());
 				} else {
 					if (!systems.inAuto) {
 						intakeLeft.set(idleTurnConstant);

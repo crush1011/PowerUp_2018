@@ -8,6 +8,7 @@
 package org.usfirst.frc.team1011.robot;
 
 import autonomous.AutonLine;
+import autonomous.CrossLineAuto;
 import autonomous.FourCubeLeftAuto;
 import autonomous.FourCubeRightAuto;
 import autonomous.LeftSideLeftScore;
@@ -123,6 +124,8 @@ public class Robot extends IterativeRobot {
 		}*/
 		
 		switch (m_autoSelected) {
+		case (kCustomAuto):
+			auton = new Thread(new CrossLineAuto());
 		default:
 			if (gameData.charAt(0) == 'L') 
 				auton = new Thread(new FourCubeLeftAuto());
