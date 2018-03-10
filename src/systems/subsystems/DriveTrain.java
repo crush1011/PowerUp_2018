@@ -13,6 +13,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import autonomous.AutonLine;
+import autonomous.AutonLineDontStop;
 import autonomous.RPID;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -162,10 +163,13 @@ public class DriveTrain implements Subsystem {
 
 		if (systems.getButton(Controls.Button.LEFT_BUMPER, true)) {
 			driveConstant = 0.6;
+			turnConstant = 0.6;
 		} else if (systems.getButton(Controls.Button.RIGHT_BUMPER, true)) {
 			driveConstant = 0.8;
+			turnConstant = 0.8;
 		} else {
 			driveConstant = 0.9;
+			turnConstant = 0.9;
 		}
 
 		/*if (systems.getDriverLtTrigger() > 0.5) {
@@ -402,6 +406,9 @@ public class DriveTrain implements Subsystem {
 		new AutonLine(systems.getDriveTrain(), systems.getNavX(), distance, speed, angle).run();
 	}
 	
+	public void driveLineDontStop(double distance, double angle, double speed){
+		new AutonLineDontStop(systems.getDriveTrain(), systems.getNavX(), distance, speed, angle).run();
+	}
 	
 	/*
 	 * drive Author: Finlay Parsons Collaborators: Jeremiah Hanson

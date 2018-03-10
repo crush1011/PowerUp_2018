@@ -11,7 +11,7 @@ import systems.Systems;
 import systems.subsystems.DriveTrain;
 import systems.subsystems.NavX;
 
-public class AutonLine implements Runnable {
+public class AutonLineDontStop implements Runnable {
 
 	double angle, topSpeed, distance;
 	double rotateOutput;
@@ -26,7 +26,7 @@ public class AutonLine implements Runnable {
 
 	private static final double P = 0.02;
 
-	public AutonLine(DriveTrain driveTrain, NavX navx, double distance, double topSpeed, double angle) {
+	public AutonLineDontStop(DriveTrain driveTrain, NavX navx, double distance, double topSpeed, double angle) {
 
 		this.angle = angle;
 		this.topSpeed = topSpeed;
@@ -99,7 +99,12 @@ public class AutonLine implements Runnable {
 			
 			pastCount = loopCount;
 			double actualVelocity = currentVelocity / 150;
-			drive.drive(actualVelocity + (kA * currentAcceleration), rotateOutput, false);
+			if(Math.abs(actualVelocity) < 0.5 && deAccelerate) {
+				drive.drive(actualVelocity >0? 0.25 : -0.25, 0, false);
+
+			} else {
+				drive.drive(actualVelocity + (kA * currentAcceleration), rotateOutput, false);
+			}
 			if (backwards) {
 				if (currentVelocity >= 0 && lastVelocity < 0) {
 					stop = true;
@@ -112,7 +117,7 @@ public class AutonLine implements Runnable {
 			if((Math.abs(distanceTravelled - pastDistanceTravelled) < 0.1 )){
 				counter++;
 			}
-			if(counter>20){
+			if(counter>5){
 				stop = true;
 			}
 			lastVelocity = currentVelocity;
@@ -126,8 +131,8 @@ public class AutonLine implements Runnable {
 			}
 		}
 		long startTime = System.currentTimeMillis();
-		while (System.currentTimeMillis() - startTime < 300) {
-			drive.drive(backwards ? 0.5 : -0.5, 0);
+		while (System.currentTimeMillis() - startTime < 200) {
+			drive.drive(backwards ? 0.2 : -0.2, 0);
 			try {
 				Thread.sleep(300);
 			} catch (InterruptedException e) {

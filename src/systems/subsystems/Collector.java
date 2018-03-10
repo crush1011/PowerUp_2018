@@ -159,7 +159,10 @@ public class Collector implements Subsystem {
 		if (true) {
 			// Controls for intake
 			if (systems.getMotorCurrent(10) < 75 && systems.getMotorCurrent(11) < 75) {
-				if (systems.getOperatorRtTrigger() > .1) {
+				if(systems.getButton(Controls.Button.X, false)) {
+					intakeLeft.set(0.35);
+					intakeRight.set(0.35);
+				} else if(systems.getOperatorRtTrigger() > .1) {
 					intakeLeft.set(-0.70 * systems.getOperatorRtTrigger());
 					intakeRight.set(-0.70 * systems.getOperatorRtTrigger());
 					if (position == 3 && !collecting) {
@@ -205,12 +208,6 @@ public class Collector implements Subsystem {
 				position = 4;
 				goodArmPID.setSetPoint(15);
 			}
-			if (systems.getButton(Controls.Button.X, false)) {
-				position = 5;
-				cubeThrowThread = new Thread(new CubeThrow());
-				cubeThrowThread.start();
-			}
-
 			if (systems.getButton(Controls.Button.Y, false)) {
 				idleTurnConstant = -0.2; // might be different for real robot
 			} else {
@@ -225,10 +222,12 @@ public class Collector implements Subsystem {
 			}
 			
 			if(systems.getButton(Controls.Button.BACK, false)){
-				systems.getRobotEncoder(SysObj.Sensors.ARM_ENCODER_1).reset();
-				systems.getRobotEncoder(SysObj.Sensors.ARM_ENCODER_2).reset();
+				//systems.getRobotEncoder(SysObj.Sensors.ARM_ENCODER_1).reset();
+				//systems.getRobotEncoder(SysObj.Sensors.ARM_ENCODER_2).reset();
 				if(manualMode) manualMode = false; 
 			}
+			
+				
 
 			/*
 			 * if(systems.getDPadButton(Controls.POV.UP, false)){ double i =
@@ -310,14 +309,18 @@ public class Collector implements Subsystem {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			intakeLeft.set(-speed);
-			intakeRight.set(-speed);
-			try {
-				Thread.sleep((long) time);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			long startTime = System.currentTimeMillis();
+			while(System.currentTimeMillis() - startTime < time) {
+				intakeLeft.set(-speed);
+				intakeRight.set(-speed);
+				try {
+					Thread.sleep((long) 50);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}	
 			}
+			
 			intakeLeft.set(0);
 			intakeRight.set(0);
 		};
@@ -334,6 +337,7 @@ public class Collector implements Subsystem {
 		while (System.currentTimeMillis() - startTime < 500) {
 			intakeLeft.set(speed);
 			intakeRight.set(speed);
+			systems.getDriveTrain().drive(.5, 0);
 			try {
 				Thread.sleep(300);
 			} catch (InterruptedException e) {
@@ -341,6 +345,7 @@ public class Collector implements Subsystem {
 				e.printStackTrace();
 			}
 		}
+		systems.getDriveTrain().drive(0, 0);
 		intakeLeft.set(0);
 		intakeRight.set(0);
 	}

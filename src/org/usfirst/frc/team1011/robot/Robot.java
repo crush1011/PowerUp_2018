@@ -77,7 +77,7 @@ public class Robot extends IterativeRobot {
 		m_chooser.addObject("My Auto", kCustomAuto);
 		SmartDashboard.putData("Auto choices", m_chooser);
 		
-		/*visionCam = new UsbCamera("cam0", 1);
+		visionCam = new UsbCamera("cam0", 1);
 		visionCam.setVideoMode(PixelFormat.kYUYV, 320, 240, 15);  // start ObjectDetect	
 		visionCam.setResolution(320, 240);
 		visionCam.setFPS(15);
@@ -85,7 +85,7 @@ public class Robot extends IterativeRobot {
 		visionCam.setExposureAuto();
 		camServer = CameraServer.getInstance();
 		camServer.addCamera(visionCam);
-		camServer.startAutomaticCapture();*/
+		camServer.startAutomaticCapture();
 		
 	}
 	
@@ -136,6 +136,8 @@ public class Robot extends IterativeRobot {
 			
 		}
 		
+		//auton = new Thread(new CrossLineAuto());
+		
 		//driveTrain.driveLine(60, 0, 140);
 		
 		auton.start();
@@ -154,7 +156,7 @@ public class Robot extends IterativeRobot {
 	public void autonomousPeriodic() {
 		//System.out.println("Angle: " + systems.getNavXAngle());
 		//System.out.println("LeftEncoder: " + systems.getEncoderDistance(SysObj.Sensors.LEFT_ENCODER));
-		System.out.println("RightEncoder: " + systems.getEncoderDistance(SysObj.Sensors.RIGHT_ENCODER));
+		System.out.println("LeftEncoder: " + systems.getEncoderDistance(SysObj.Sensors.LEFT_ENCODER));
 	}
 
 	/**

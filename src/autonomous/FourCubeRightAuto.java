@@ -20,9 +20,9 @@ public class FourCubeRightAuto implements Runnable{
 	public void run() {
 		// TODO Auto-generated method stub
 		
-		collector.moveArm(70); //move arm to switch angle
+		collector.moveArm(65); //move arm to switch angle
 
-		driveTrain.driveLine(110, 16, 140); //drive for 110 inches to switch
+		driveTrain.driveLineDontStop(148, 18, 140); //drive for 110 inches to switch
 		collector.outtakeCube(0.5); //outtake		
 	
 		
@@ -34,15 +34,15 @@ public class FourCubeRightAuto implements Runnable{
 		
 		collector.intakeCubeAuto(1.0, 200, 3500); //intake thread starts
 		
-		driveTrain.driveLine(60, -60, 140); //drive towards the second cube while intaking
+		driveTrain.driveLine(65, -60, 140); //drive towards the second cube while intaking
 		
 		driveTrain.driveLine(-58, -60, 140); //back up 
 		
-		collector.moveArm(70); // move arm to switch position
+		collector.moveArm(65); // move arm to switch position
 		
 		driveTrain.turnTo(0, 0.8, 600); //turn towards the fence
 		
-		driveTrain.driveLine(66, 0, 140); //drive into the fence
+		driveTrain.driveLineDontStop(65, 0, 140); //drive into the fence
 		
 		collector.outtakeCube(0.5); //outtake
 		
@@ -54,15 +54,15 @@ public class FourCubeRightAuto implements Runnable{
 		
 		collector.intakeCubeAuto(1.0, 200, 2500); //start intake thread
 	
-		driveTrain.driveLine(50, -60, 140); //drive into the cube intaking
+		driveTrain.driveLine(53, -60, 140); //drive into the cube intaking
 	
 		driveTrain.driveLine(-52, -60, 140); //back up
 		
-		collector.moveArm(70); //switch position
+		collector.moveArm(65); //switch position
 		
 		driveTrain.turnTo(0, 0.8, 600); //turn towards fence
 		
-		driveTrain.driveLine(44, 0, 140); //drive into fence
+		driveTrain.driveLineDontStop(42, 0, 140); //drive into fence
 		
 		collector.outtakeCube(0.5); //outtake
 		

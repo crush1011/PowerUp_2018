@@ -20,13 +20,13 @@ public class FourCubeLeftAuto implements Runnable{
 	public void run() {
 		// TODO Auto-generated method stub
 		
-		collector.moveArm(70); //move arm to switch angle
+		collector.moveArm(65); //move arm to switch angle
 
-		driveTrain.driveLine(143, -28, 140); //drive for 110 inches to switch
+		driveTrain.driveLineDontStop(148, -28, 140); //drive for 110 inches to switch
 		
 		collector.outtakeCube(0.5); //outtake	
 		
-		driveTrain.driveLine(-64, 0, 140); //back up to grab first cube from PC Zone
+		driveTrain.driveLine(-65, 0, 140); //back up to grab first cube from PC Zone
 		
 		collector.moveArm(130); //move arm down to collecting position
 		
@@ -34,15 +34,15 @@ public class FourCubeLeftAuto implements Runnable{
 		
 		collector.intakeCubeAuto(1.0, 200, 3500); //intake thread starts
 		
-		driveTrain.driveLine(42, 60, 140); //drive towards the first cube while intaking
+		driveTrain.driveLine(50, 60, 140); //drive towards the first cube while intaking
 		
-		driveTrain.driveLine(-62, 60, 140); //back up 
+		driveTrain.driveLine(-55, 60, 140); //back up 
 		
-		collector.moveArm(70); // move arm to switch position
+		collector.moveArm(65); // move arm to switch position
 		
 		driveTrain.turnTo(0, 0.8, 600); //turn towards the fence
 		
-		driveTrain.driveLine(76, 0, 140); //drive into the fence
+		driveTrain.driveLineDontStop(80, 0, 140); //drive into the fence
 		
 		collector.outtakeCube(0.5); //outtake
 		
@@ -52,17 +52,17 @@ public class FourCubeLeftAuto implements Runnable{
 		
 		driveTrain.turnTo(60, 0.8, 600); //turn towards second cube
 		
-		collector.intakeCubeAuto(1.0, 200, 2500); //start intake thread
+		collector.intakeCubeAuto(1.0, 200, 3200); //start intake thread
 	
 		driveTrain.driveLine(50, 60, 140); //drive into the cube intaking
 	
 		driveTrain.driveLine(-55, 60, 140); //back up
 		
-		collector.moveArm(70); //switch position
+		collector.moveArm(65); //switch position
 		
 		driveTrain.turnTo(0, 0.8, 600); //turn towards fence
 		
-		driveTrain.driveLine(44, 0, 140); //drive into fence
+		driveTrain.driveLineDontStop(55, 0, 140); //drive into fence
 		
 		collector.outtakeCube(0.5); //outtake
 		
