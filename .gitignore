@@ -2,6 +2,8 @@
 .metadata
 bin/
 tmp/
+build/
+dist/
 *.tmp
 *.bak
 *.swp
@@ -11,7 +13,8 @@ local.properties
 .loadpath
 .recommenders
 .classpath
-.project
+*.jar
+*.class
 
 # External tool builders
 .externalToolBuilders/

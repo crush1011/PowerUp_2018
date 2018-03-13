@@ -2,7 +2,8 @@
 This is an initial repository for the 2018 FRC season. The game is Power Up.
 
 Programming mentor: Jeremiah Hanson
-Lead Student Programmer: Ethan ngo
+Lead Student Programmer: Ethan Ngo
+Student Programmers: Nitesh Puri, Finlay Parsons
 
 ## Rules for program
 1) All classes MUST contain a header comment with primary author and all contributors as well as a brief summary of all class responsibilities.
