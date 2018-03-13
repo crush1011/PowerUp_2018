@@ -3,7 +3,7 @@
 bin/
 tmp/
 build/
-dst/
+dist/
 *.tmp
 *.bak
 *.swp
