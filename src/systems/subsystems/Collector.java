@@ -40,7 +40,7 @@ public class Collector implements Subsystem {
 	private double averageArmEncoderPos;
 	private double encoderRange;
 	private double angleConstant, armConstant;
-	private double idleTurnConstant;
+	private double idleTurnConstant, slowConst;
 
 	private boolean idleTurn, manualMode, collecting, fast;
 
@@ -156,6 +156,9 @@ public class Collector implements Subsystem {
 		 * systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
 		 */
 		averageArmEncoderPos = -systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1);
+		System.out.println("1: " + averageArmEncoderPos);
+		double averageArmEncoderPos0 = systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2);
+		System.out.println("2: " + averageArmEncoderPos0);
 		if (true) {
 			// Controls for intake
 			if (systems.getMotorCurrent(10) < 75 && systems.getMotorCurrent(11) < 75) {
@@ -190,11 +193,17 @@ public class Collector implements Subsystem {
 			}
 
 			// goodArmPID.setCValue(averageArmEncoderPos);
+			
+			if (averageArmEncoderPos > 125 && position == 1) {
+				slowConst = 0.2;
+			} else {
+				slowConst = 1;
+			}
 
 			// Controls for arm
 			if (systems.getButton(Controls.Button.LEFT_BUMPER, false)) {
 				position = 1;
-				goodArmPID.setSetPoint(127);
+				goodArmPID.setSetPoint(155);
 			}
 			if (systems.getButton(Controls.Button.RIGHT_BUMPER, false)) {
 				position = 2;
@@ -214,17 +223,11 @@ public class Collector implements Subsystem {
 				idleTurnConstant = 0;
 			}
 
-			if (systems.getButton(Controls.Button.START, false)) {
+			if (systems.getButton(Controls.Button.BACK, false)) {
 				if (!manualMode)
 					manualMode = true;
 				else if (manualMode)
 					manualMode = false;
-			}
-			
-			if(systems.getButton(Controls.Button.BACK, false)){
-				//systems.getRobotEncoder(SysObj.Sensors.ARM_ENCODER_1).reset();
-				//systems.getRobotEncoder(SysObj.Sensors.ARM_ENCODER_2).reset();
-				if(manualMode) manualMode = false; 
 			}
 			
 				
@@ -238,6 +241,7 @@ public class Collector implements Subsystem {
 			 */
 
 			// Automatic operator controls
+			// manualMode = true;
 			if (!manualMode) {
 				systems.setRumbleOperator(0);
 				if (fast) {
@@ -246,7 +250,7 @@ public class Collector implements Subsystem {
 				} else {
 					double angleFromTop = averageArmEncoderPos - 45.0;
 					double feedForward = Math.sin(Math.toRadians(angleFromTop)) * 0.1;
-					double motorValue = goodArmPID.crunch(averageArmEncoderPos) + feedForward;
+					double motorValue = (goodArmPID.crunch(averageArmEncoderPos) + feedForward) * slowConst;
 
 					//System.out.println("motorVAlue :" + motorValue + "    SETPOINT:" + goodArmPID.getSetPoint()
 					//		+ "  CurrentValue:" + averageArmEncoderPos);
@@ -274,7 +278,10 @@ public class Collector implements Subsystem {
 	}
 
 	/*
-	 * moveArm Author: Finlay Parsons ------------------------- Purpose: Moves
+	 * moveArm 
+	 * Author: Finlay Parsons 
+	 * ------------------------- 
+	 * Purpose: Moves
 	 * the arm to specified angle - all the way back is 0, all the way down is
 	 * 135 Parameters: angle: Desired angle of arm
 	 */
@@ -285,7 +292,10 @@ public class Collector implements Subsystem {
 	}
 
 	/*
-	 * intakeCube Author: Finlay Parsons ------------------------ Purpose: Spins
+	 * intakeCube 
+	 * Author: Finlay Parsons 
+	 * ------------------------ 
+	 * Purpose: Spins
 	 * the intake motors until the the cube is gained
 	 */
 	public void intakeCube(double speed) {
@@ -328,9 +338,13 @@ public class Collector implements Subsystem {
 	}
 
 	/*
-	 * outtakeCube Author: Nitesh Puri Collaborators: Ethan Ngo and Finlay
-	 * Parsons -------------------------------------------------- Parameters:
-	 * None Purpose: Outtakes the cube
+	 * outtakeCube 
+	 * Author: Nitesh Puri 
+	 * Collaborators: Ethan Ngo and Finlay Parsons 
+	 * -------------------------------------------------- 
+	 * Parameters:
+	 * 	None 
+	 * Purpose: Outtakes the cube
 	 */
 	public void outtakeCube(double speed) {
 		long startTime = System.currentTimeMillis();

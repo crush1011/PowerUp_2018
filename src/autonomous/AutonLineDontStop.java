@@ -17,7 +17,7 @@ public class AutonLineDontStop implements Runnable {
 	double rotateOutput;
 	double loopCount, pastCount;
 
-	final double acceleration = 150;
+	final double acceleration = 300;
 	final double kA = (1 / acceleration) * 0;
 
 	DriveTrain drive;
@@ -117,7 +117,7 @@ public class AutonLineDontStop implements Runnable {
 			if((Math.abs(distanceTravelled - pastDistanceTravelled) < 0.1 )){
 				counter++;
 			}
-			if(counter>5){
+			if(counter>15){
 				stop = true;
 			}
 			lastVelocity = currentVelocity;
@@ -131,8 +131,8 @@ public class AutonLineDontStop implements Runnable {
 			}
 		}
 		long startTime = System.currentTimeMillis();
-		while (System.currentTimeMillis() - startTime < 200) {
-			drive.drive(backwards ? 0.2 : -0.2, 0);
+		while (System.currentTimeMillis() - startTime < 3000) {
+			drive.drive(-0.7, 0);
 			try {
 				Thread.sleep(300);
 			} catch (InterruptedException e) {

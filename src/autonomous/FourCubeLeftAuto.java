@@ -22,21 +22,21 @@ public class FourCubeLeftAuto implements Runnable{
 		
 		collector.moveArm(65); //move arm to switch angle
 
-		driveTrain.driveLineDontStop(148, -28, 140); //drive for 110 inches to switch
+		driveTrain.driveLineDontStop(100, -28, 140); //drive for 110 inches to switch
 		
 		collector.outtakeCube(0.5); //outtake	
 		
-		driveTrain.driveLine(-65, 0, 140); //back up to grab first cube from PC Zone
+		driveTrain.driveLine(-72, 0, 140); //back up to grab second cube from PC Zone
 		
-		collector.moveArm(130); //move arm down to collecting position
+		collector.moveArm(160); //move arm down to collecting position
 		
 		driveTrain.turnTo(60, 0.8, 600); //turn to the furthest forward cube
 		
 		collector.intakeCubeAuto(1.0, 200, 3500); //intake thread starts
 		
-		driveTrain.driveLine(50, 60, 140); //drive towards the first cube while intaking
+		driveTrain.driveLine(54, 60, 140); //drive towards the second cube while intaking
 		
-		driveTrain.driveLine(-55, 60, 140); //back up 
+		driveTrain.driveLine(-60, 60, 140); //back up 
 		
 		collector.moveArm(65); // move arm to switch position
 		
@@ -46,17 +46,17 @@ public class FourCubeLeftAuto implements Runnable{
 		
 		collector.outtakeCube(0.5); //outtake
 		
-		driveTrain.driveLine(-40, 0, 140); //drive backwards for the second cube
+		driveTrain.driveLine(-40, 0, 140); //drive backwards for the third cube
 		
-		collector.moveArm(130); //collecting position
+		collector.moveArm(160); //collecting position
 		
-		driveTrain.turnTo(60, 0.8, 600); //turn towards second cube
+		driveTrain.turnTo(60, 0.8, 600); //turn towards  cube
 		
-		collector.intakeCubeAuto(1.0, 200, 3200); //start intake thread
+		collector.intakeCubeAuto(1.0, 200, 3500); //start intake thread
 	
 		driveTrain.driveLine(50, 60, 140); //drive into the cube intaking
 	
-		driveTrain.driveLine(-55, 60, 140); //back up
+		driveTrain.driveLine(-50, 60, 140); //back up
 		
 		collector.moveArm(65); //switch position
 		

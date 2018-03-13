@@ -9,6 +9,8 @@ package org.usfirst.frc.team1011.robot;
 
 import autonomous.AutonLine;
 import autonomous.CrossLineAuto;
+import autonomous.DriveShootLeft;
+import autonomous.DriveShootRight;
 import autonomous.FourCubeLeftAuto;
 import autonomous.FourCubeRightAuto;
 import autonomous.LeftSideLeftScore;
@@ -128,9 +130,12 @@ public class Robot extends IterativeRobot {
 			auton = new Thread(new CrossLineAuto());
 		default:
 			if (gameData.charAt(0) == 'L') 
-				auton = new Thread(new FourCubeLeftAuto());
+				//auton = new Thread(new FourCubeLeftAuto());
+				auton = new Thread(new DriveShootLeft());
 			else 
-				auton = new Thread(new FourCubeRightAuto());
+			//	auton = new Thread(new FourCubeRightAuto());
+				auton = new Thread(new DriveShootRight());
+
 			//System.out.println("No autonomous selected.");
 			break;
 			

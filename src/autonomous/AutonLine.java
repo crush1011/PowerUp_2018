@@ -17,7 +17,7 @@ public class AutonLine implements Runnable {
 	double rotateOutput;
 	double loopCount, pastCount;
 
-	final double acceleration = 150;
+	final double acceleration = 300;
 	final double kA = (1 / acceleration) * 0;
 
 	DriveTrain drive;
