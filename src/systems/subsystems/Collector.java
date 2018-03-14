@@ -73,8 +73,9 @@ public class Collector implements Subsystem {
 		// 0.005, 0.02
 		resources = new Resources();
 
-		slowConst = 0.8;
-		
+		slowConst = 0.7;
+		this.collectorArm1.configOpenloopRamp(0.2, 0);
+		this.collectorArm2.configOpenloopRamp(0.2, 0);
 		df = new DecimalFormat("#.##");
 
 		intakeRight.setInverted(true);
