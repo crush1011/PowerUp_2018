@@ -42,7 +42,7 @@ public class Collector implements Subsystem {
 	private double angleConstant, armConstant;
 	private double idleTurnConstant, slowConst;
 
-	private boolean idleTurn, manualMode, collecting, fast;
+	private boolean idleTurn, manualMode, pastManualMode, collecting, fast;
 
 	private int position, counter;
 
@@ -91,6 +91,7 @@ public class Collector implements Subsystem {
 
 		idleTurn = false;
 		manualMode = false;
+		pastManualMode = manualMode;
 		collecting = false;
 		fast = false;
 
@@ -162,9 +163,9 @@ public class Collector implements Subsystem {
 		if (true) {
 			// Controls for intake
 			if (systems.getMotorCurrent(10) < 75 && systems.getMotorCurrent(11) < 75) {
-				if(systems.getButton(Controls.Button.X, false)) {
-					intakeLeft.set(0.35);
-					intakeRight.set(0.35);
+				if(systems.getButton(Controls.Button.X, false) || systems.getDriverRtTrigger() > 0.1) {
+					intakeLeft.set(0.5);
+					intakeRight.set(0.5);
 				} else if(systems.getOperatorRtTrigger() > .1) {
 					intakeLeft.set(-0.70 * systems.getOperatorRtTrigger());
 					intakeRight.set(-0.70 * systems.getOperatorRtTrigger());
@@ -172,9 +173,9 @@ public class Collector implements Subsystem {
 						goodArmPID.setSetPoint(135);
 						collecting = true;
 					}
-				} else if (systems.getOperatorLtTrigger() > .1) {
-					intakeLeft.set(systems.getOperatorLtTrigger());
-					intakeRight.set(systems.getOperatorLtTrigger());
+				} else if (systems.getOperatorLtTrigger() > .1 || systems.getDriverLtTrigger() > 0.1) {
+					intakeLeft.set(1);
+					intakeRight.set(1);
 				} else {
 					if (!systems.inAuto) {
 						intakeLeft.set(idleTurnConstant);
@@ -182,12 +183,10 @@ public class Collector implements Subsystem {
 					}
 					if (collecting) {
 						goodArmPID.setSetPoint(120);
-						SmartDashboard.putString("DB/String 2", "Hellu");
 						collecting = false;
 					}
 				}
 			} else {
-
 				intakeLeft.set(0);
 				intakeRight.set(0);
 			}
@@ -201,33 +200,43 @@ public class Collector implements Subsystem {
 			}
 
 			// Controls for arm
-			if (systems.getButton(Controls.Button.LEFT_BUMPER, false)) {
+			if (systems.getButton(Controls.Button.LEFT_BUMPER, false) && !manualMode) {
 				position = 1;
 				goodArmPID.setSetPoint(155);
 			}
-			if (systems.getButton(Controls.Button.RIGHT_BUMPER, false)) {
+			if (systems.getButton(Controls.Button.RIGHT_BUMPER, false) && !manualMode) {
 				position = 2;
 				goodArmPID.setSetPoint(75);
 			}
-			if (systems.getButton(Controls.Button.B, false)) {
+			if (systems.getButton(Controls.Button.B, false) && !manualMode) {
 				position = 3;
 				goodArmPID.setSetPoint(115);
 			}
-			if (systems.getButton(Controls.Button.A, false)) {
+			if (systems.getButton(Controls.Button.A, false && !manualMode)) {
 				position = 4;
 				goodArmPID.setSetPoint(15);
 			}
-			if (systems.getButton(Controls.Button.Y, false)) {
+			if (systems.getButton(Controls.Button.Y, false) && !manualMode) {
 				idleTurnConstant = -0.2; // might be different for real robot
 			} else {
 				idleTurnConstant = 0;
 			}
-
+			
+			
+			
+			if(systems.getButton(Controls.Button.RIGHT_BUMPER, false) && manualMode) {
+				armConstant = 0.8;
+			}
+			else if(systems.getButton(Controls.Button.LEFT_BUMPER, false) && manualMode) {
+				armConstant = 0.6;
+			}
+			else {
+				armConstant = 1;
+			}
+			
 			if (systems.getButton(Controls.Button.BACK, false)) {
-				if (!manualMode)
-					manualMode = true;
-				else if (manualMode)
-					manualMode = false;
+				if(manualMode == pastManualMode)
+				manualMode = !manualMode;
 			}
 			
 				
@@ -275,6 +284,7 @@ public class Collector implements Subsystem {
 			// this.toSmartDashboard();
 		}
 		counter++;
+		pastManualMode = manualMode;
 	}
 
 	/*
