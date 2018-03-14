@@ -248,6 +248,14 @@ public class Collector implements Subsystem {
 			 * if(systems.getDPadButton(Controls.POV.DOWN, false)){ double i =
 			 * averageArmEncoderPos; goodArmPID.setSetPoint(i + 5); }
 			 */
+			
+			//TWITCH CODE
+			if(systems.getDPadButton(Controls.POV.UP, false)) {
+				armEncoder1.setDisplacement(armEncoder1.getDisplacement() - 5);
+			}
+			if(systems.getDPadButton(Controls.POV.DOWN, false)) {
+				armEncoder2.setDisplacement(armEncoder2.getDisplacement() + 5);
+			}
 
 			// Automatic operator controls
 			// manualMode = true;

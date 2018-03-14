@@ -18,7 +18,7 @@ public class RobotEncoder implements Subsystem{
 	private Function<Double, Double> conversion;
 	private boolean negative;
 	private double currentPos;
-	
+	private double displacement;
 	/*
 	 * Constructor
 	 * Author: Ethan Yes
@@ -31,6 +31,7 @@ public class RobotEncoder implements Subsystem{
 		startPos=e.getDistance();
 		e.setDistancePerPulse(0.05875);
 		negative=false;
+		displacement = 0;
 	}
 	
 	/*
@@ -63,8 +64,14 @@ public class RobotEncoder implements Subsystem{
 		this.negative=val;
 	}
 	
-	
+	public double getDisplacement() {
+		return displacement;
+	}
 
+	public void setDisplacement(double n) {
+		displacement = n;
+	}
+	
 	public void setDistancePerPulse(double x){
 		e.setDistancePerPulse(x);
 	}
@@ -73,7 +80,7 @@ public class RobotEncoder implements Subsystem{
 	public void update() {
 		// TODO Auto-generated method stub
 		if(e!=null){
-			currentPos = e.getDistance()-startPos;
+			currentPos = e.getDistance()-startPos + displacement;
 			currentPos *= negative? -1:1;
 		}
 	}
