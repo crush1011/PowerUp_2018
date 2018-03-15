@@ -72,6 +72,11 @@ public class Collector implements Subsystem {
 																// 0.005, 0.02
 		resources = new Resources();
 
+<<<<<<< HEAD
+=======
+		slowConst = 0.8;
+		
+>>>>>>> parent of aeea791... added a ramp to the arm motors
 		df = new DecimalFormat("#.##");
 
 		intakeRight.setInverted(true);
