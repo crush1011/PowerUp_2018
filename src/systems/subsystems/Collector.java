@@ -177,7 +177,7 @@ public class Collector implements Subsystem {
 						goodArmPID.setSetPoint(135);
 						collecting = true;
 					}
-				} else if (systems.getOperatorLtTrigger() > .1) {
+				} else if (systems.getOperatorLtTrigger() > .1 || systems.getDriverRtTrigger() > 0.1) {
 					intakeLeft.set(1);
 					intakeRight.set(1);
 				} else {
