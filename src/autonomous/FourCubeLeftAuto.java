@@ -66,7 +66,5 @@ public class FourCubeLeftAuto implements Runnable{
 		
 		collector.outtakeCube(0.5); //outtake
 		
-		
-		
-	}
+		}
 }
