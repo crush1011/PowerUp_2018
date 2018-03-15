@@ -68,21 +68,20 @@ public class Collector implements Subsystem {
 		this.armEncoder2 = armEncoder2;
 		this.armPID = new PIDManual(0.02, 0, 0.005, 0.02); // 0.015, 0, 0
 		this.goodArmPID = new RPID(0.018, 0.0, 0.001, 0.02); // 0.015, 0, 0
-		//0.03, 0.0, 0.00555														// 0.035, 0,
-																// 0.005, 0.02
+		//0.03, 0.0, 0.00555	
+		// 0.035, 0,
+		// 0.005, 0.02
 		resources = new Resources();
 
-<<<<<<< HEAD
-=======
-		slowConst = 0.8;
-		
->>>>>>> parent of aeea791... added a ramp to the arm motors
+		slowConst = 0.7;
+		this.collectorArm1.configOpenloopRamp(0.2, 0);
+		this.collectorArm2.configOpenloopRamp(0.2, 0);
 		df = new DecimalFormat("#.##");
 
 		intakeRight.setInverted(true);
 
-		talonSRX.setNeutralMode(NeutralMode.Brake);
-		talonSRX2.setNeutralMode(NeutralMode.Brake);
+		talonSRX.setNeutralMode(NeutralMode.Coast);
+		talonSRX2.setNeutralMode(NeutralMode.Coast);
 		averageArmEncoderPos = 0;
 
 		talonSRX2.setInverted(true);
@@ -161,9 +160,9 @@ public class Collector implements Subsystem {
 		 * (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1) +
 		 * systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
 		 */
-		averageArmEncoderPos = -systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1);
+		averageArmEncoderPos = -systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2);
 		System.out.println("1: " + averageArmEncoderPos);
-		double averageArmEncoderPos0 = systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2);
+		double averageArmEncoderPos0 = -systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1);
 		System.out.println("2: " + averageArmEncoderPos0);
 		if (true) {
 			// Controls for intake
@@ -178,7 +177,7 @@ public class Collector implements Subsystem {
 						goodArmPID.setSetPoint(135);
 						collecting = true;
 					}
-				} else if (systems.getOperatorLtTrigger() > .1 || systems.getDriverLtTrigger() > 0.1) {
+				} else if (systems.getOperatorLtTrigger() > .1) {
 					intakeLeft.set(1);
 					intakeRight.set(1);
 				} else {
@@ -195,40 +194,50 @@ public class Collector implements Subsystem {
 				intakeLeft.set(0);
 				intakeRight.set(0);
 			}
+			
+			if(systems.getDriverLtTrigger() > 0.1){
+				intakeLeft.set(systems.getDriverLtTrigger());
+				intakeRight.set(systems.getDriverLtTrigger());
+			}
 
 			// goodArmPID.setCValue(averageArmEncoderPos);
 			
+			/*
 			if (averageArmEncoderPos > 125 && position == 1) {
 				slowConst = 0.2;
 			} else {
 				slowConst = 1;
 			}
+			*/
 
 			// Controls for arm
 			if (systems.getButton(Controls.Button.LEFT_BUMPER, false) && !manualMode) {
 				position = 1;
-				goodArmPID.setSetPoint(155);
+				goodArmPID.setSetPoint(149);
 			}
 			if (systems.getButton(Controls.Button.RIGHT_BUMPER, false) && !manualMode) {
 				position = 2;
-				goodArmPID.setSetPoint(75);
+				goodArmPID.setSetPoint(85);
 			}
 			if (systems.getButton(Controls.Button.B, false) && !manualMode) {
 				position = 3;
-				goodArmPID.setSetPoint(115);
+				goodArmPID.setSetPoint(125);
 			}
 			if (systems.getButton(Controls.Button.A, false && !manualMode)) {
 				position = 4;
-				goodArmPID.setSetPoint(15);
+				goodArmPID.setSetPoint(25);
 			}
 			if (systems.getButton(Controls.Button.Y, false) && !manualMode) {
 				idleTurnConstant = -0.2; // might be different for real robot
 			} else {
 				idleTurnConstant = 0;
 			}
+			if(systems.getButton(Controls.Button.A, true)){
+				cubeThrowThread.start();
+			}
 			
 			
-			
+			//manual mode speed control for arm
 			if(systems.getButton(Controls.Button.RIGHT_BUMPER, false) && manualMode) {
 				armConstant = 0.8;
 			}
