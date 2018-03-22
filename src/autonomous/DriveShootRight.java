@@ -23,7 +23,7 @@ public class DriveShootRight implements Runnable{
 
 		driveTrain.driveLineDontStop(-100, 30, 140); //drive for 110 inches to switch
 		
-		collector.outtakeCube(0.5); //outtake	
+		collector.outtakeCube(0.5, false); //outtake	
 		
 	
 	}

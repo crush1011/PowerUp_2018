@@ -55,7 +55,7 @@ public class RightSideRightScore implements Runnable{
 		
 		collector.moveArm(75); //move collector to switch angle
 		
-		collector.outtakeCube(0.7); //outtake
+		collector.outtakeCube(0.7, true); //outtake
 	}
 	
 	

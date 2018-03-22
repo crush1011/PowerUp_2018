@@ -7,12 +7,15 @@
 
 package org.usfirst.frc.team1011.robot;
 
+import autonomous.AutonCircle;
 import autonomous.AutonLine;
 import autonomous.CrossLineAuto;
 import autonomous.DriveShootLeft;
 import autonomous.DriveShootRight;
-import autonomous.FourCubeLeftAuto;
-import autonomous.FourCubeRightAuto;
+import autonomous.ThreeCubeLeftAuto;
+import autonomous.FourCubeLeftCustom;
+import autonomous.ThreeCubeRightAuto;
+import autonomous.FourCubeRightCustom;
 import autonomous.LeftSideLeftScore;
 import autonomous.MidSideLeftScore;
 import autonomous.MidSideRightScore;
@@ -130,11 +133,11 @@ public class Robot extends IterativeRobot {
 			auton = new Thread(new CrossLineAuto());
 		default:
 			if (gameData.charAt(0) == 'L') 
-				//auton = new Thread(new FourCubeLeftAuto());
-				auton = new Thread(new DriveShootLeft());
+				auton = new Thread(new FourCubeLeftCustom());
+				//auton = new Thread(new DriveShootLeft());
 			else 
-			//	auton = new Thread(new FourCubeRightAuto());
-				auton = new Thread(new DriveShootRight());
+				auton = new Thread(new FourCubeRightCustom());
+				//auton = new Thread(new DriveShootRight());
 
 			//System.out.println("No autonomous selected.");
 			break;
@@ -148,10 +151,12 @@ public class Robot extends IterativeRobot {
 		auton.start();
 		
 		//systems.getDriveTrain().turnTo(90, 0.95, 5500);
-		//new AutonLine(systems.getDriveTrain(), systems.getNavX(), 150,140, 0).run();
+		//new AutonLine(systems.getDriveTrain(), systems.getNavX(), 60,140, 0).run();
 		//new FourCubeRightAuto().run();
-		//driveTrain.turnToOneSide(70, 0.8, 5500, false);
-		//driveTrain.driveLine(150, 10, 140);
+		//driveTrain.turnToOneSide(195, 0.8, 800, true);
+		//driveTrain.driveLine(-10, 0, 70);
+		//driveTrain.driveAuton(-0.5, 300);
+		//new AutonCircle(systems.getDriveTrain(), systems.getNavX(), 200, 3, true, false).run();
 	}
 
 	/**
@@ -161,7 +166,8 @@ public class Robot extends IterativeRobot {
 	public void autonomousPeriodic() {
 		//System.out.println("Angle: " + systems.getNavXAngle());
 		//System.out.println("LeftEncoder: " + systems.getEncoderDistance(SysObj.Sensors.LEFT_ENCODER));
-		System.out.println("LeftEncoder: " + systems.getEncoderDistance(SysObj.Sensors.LEFT_ENCODER));
+//		System.out.println("LeftEncoder: " + systems.getEncoderDistance(SysObj.Sensors.LEFT_ENCODER));
+		//System.out.println("Current Angle: " + systems.getNavXAngle());
 	}
 
 	/**
@@ -171,10 +177,10 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		systems.inAuto = false;
 		systems.update();
-		//systems.printEncoderInfo(false, false, true, SysObj.Sensors.ARM_ENCODER_1);
-		//systems.printEncoderInfo(false, false, true, SysObj.Sensors.ARM_ENCODER_2);
-		systems.printEncoderInfo(true, false, false, SysObj.Sensors.LEFT_ENCODER);
-		systems.printEncoderInfo(true, false, false, SysObj.Sensors.RIGHT_ENCODER);
+		//systems.printEncoderInfo(true, false, false, SysObj.Sensors.ARM_ENCODER_1);
+		//systems.printEncoderInfo(true, false, false, SysObj.Sensors.ARM_ENCODER_2);
+		//systems.printEncoderInfo(true, false, false, SysObj.Sensors.LEFT_ENCODER);
+		//systems.printEncoderInfo(true, false, false, SysObj.Sensors.RIGHT_ENCODER);
 		/*System.out.println("Left Motor: " + systems.getMotorCurrent(10));
 		System.out.println("Right Motor: " + systems.getMotorCurrent(11));*/
 		//System.out.println("Encoder1: " + (systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1)));

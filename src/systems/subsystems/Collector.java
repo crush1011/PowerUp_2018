@@ -11,16 +11,17 @@ package systems.subsystems;
 import java.text.DecimalFormat;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import com.sun.org.apache.bcel.internal.Constants;
 
-import autonomous.Loop;
-import autonomous.RPID;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import autonomous.Loop;
 import systems.Resources;
 import systems.Subsystem;
 import systems.SysObj;
@@ -76,8 +77,42 @@ public class Collector implements Subsystem {
 
 		intakeRight.setInverted(true);
 
-		talonSRX.setNeutralMode(NeutralMode.Brake);
-		talonSRX2.setNeutralMode(NeutralMode.Brake);
+		collectorArm1.setNeutralMode(NeutralMode.Coast);
+		collectorArm2.setNeutralMode(NeutralMode.Coast);
+		
+		talonSRX.configClosedloopRamp(0.3, 0);
+		talonSRX2.configClosedloopRamp(0.3, 0);
+		
+		talonSRX.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 20);
+		talonSRX2.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 20);
+		
+		talonSRX.setSensorPhase(true);
+		talonSRX2.setSensorPhase(true);
+		
+		talonSRX.configNominalOutputForward(0, 20);
+		talonSRX2.configNominalOutputForward(0, 20);
+		talonSRX.configNominalOutputReverse(0, 20);
+		talonSRX2.configNominalOutputReverse(0, 20);
+		talonSRX.configPeakOutputForward(1, 20);
+		talonSRX2.configPeakOutputForward(1, 20);
+		talonSRX.configPeakOutputReverse(-1, 20);
+		talonSRX2.configPeakOutputReverse(-1, 20);
+		
+		talonSRX.config_kF(0, 0.0, 20);
+		talonSRX.config_kP(0, 0.1, 20);
+		talonSRX.config_kI(0, 0.0, 20);
+		talonSRX.config_kD(0, 0.0, 20);
+		talonSRX2.config_kF(0, 0.0, 20);
+		talonSRX2.config_kP(0, 0.1, 20);
+		talonSRX2.config_kI(0, 0.0, 20);
+		talonSRX2.config_kD(0, 0.0, 20);
+		
+		int absolutePosition1 = talonSRX.getSensorCollection().getPulseWidthPosition();
+		int absolutePosition2 = talonSRX2.getSensorCollection().getPulseWidthPosition();
+		
+		absolutePosition1 &= 0xFFF;
+		absolutePosition2 &= 0xFFF;
+		
 		averageArmEncoderPos = 0;
 
 		talonSRX2.setInverted(true);
@@ -127,7 +162,7 @@ public class Collector implements Subsystem {
 				collectorArm2.set(ControlMode.PercentOutput, goodArmPID.crunch(averageArmEncoderPos));
 
 				if (averageArmEncoderPos <= 50) {
-					outtakeCube(.6);
+					outtakeCube(.6, false);
 					stop = true;
 				}
 				if (stop)
@@ -156,25 +191,26 @@ public class Collector implements Subsystem {
 		 * systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
 		 */
 		averageArmEncoderPos = -systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1);
-		System.out.println("1: " + averageArmEncoderPos);
+		//System.out.println("1: " + averageArmEncoderPos);
 		double averageArmEncoderPos0 = systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2);
-		System.out.println("2: " + averageArmEncoderPos0);
+		//System.out.println("2: " + averageArmEncoderPos0);
 		if (true) {
 			// Controls for intake
+			//TODO MIGHT BE DIFFERENT FOR REAL ROBOT (negative/positive intake values) 
 			if (systems.getMotorCurrent(10) < 75 && systems.getMotorCurrent(11) < 75) {
-				if(systems.getButton(Controls.Button.X, false)) {
-					intakeLeft.set(0.35);
-					intakeRight.set(0.35);
+				if(systems.getButton(Controls.Button.LEFT_BUMPER, false) || systems.getDriverRtTrigger() > 0.1) {
+					intakeLeft.set(-0.4);
+					intakeRight.set(-0.4);
 				} else if(systems.getOperatorRtTrigger() > .1) {
-					intakeLeft.set(-0.70 * systems.getOperatorRtTrigger());
-					intakeRight.set(-0.70 * systems.getOperatorRtTrigger());
+					intakeLeft.set(0.70);
+					intakeRight.set(0.70);
 					if (position == 3 && !collecting) {
 						goodArmPID.setSetPoint(135);
 						collecting = true;
 					}
-				} else if (systems.getOperatorLtTrigger() > .1) {
-					intakeLeft.set(systems.getOperatorLtTrigger());
-					intakeRight.set(systems.getOperatorLtTrigger());
+				} else if (systems.getOperatorLtTrigger() > .1 || systems.getDriverLtTrigger() > 0.1) {
+					intakeLeft.set(-1.0);
+					intakeRight.set(-1.0);
 				} else {
 					if (!systems.inAuto) {
 						intakeLeft.set(idleTurnConstant);
@@ -202,25 +238,38 @@ public class Collector implements Subsystem {
 
 			// Controls for arm
 			if (systems.getButton(Controls.Button.LEFT_BUMPER, false)) {
-				position = 1;
-				goodArmPID.setSetPoint(155);
+				intakeLeft.set(-0.5);
+				intakeRight.set(-0.5);
 			}
 			if (systems.getButton(Controls.Button.RIGHT_BUMPER, false)) {
-				position = 2;
-				goodArmPID.setSetPoint(75);
+				idleTurnConstant = 0.5; // might be different for real robot
+			} else {
+				idleTurnConstant = 0;
 			}
 			if (systems.getButton(Controls.Button.B, false)) {
 				position = 3;
-				goodArmPID.setSetPoint(115);
+				collectorArm1.set(ControlMode.Position, 115);
+				collectorArm2.set(ControlMode.Position, 115);
+				//goodArmPID.setSetPoint(115);
 			}
 			if (systems.getButton(Controls.Button.A, false)) {
 				position = 4;
-				goodArmPID.setSetPoint(15);
+				collectorArm1.set(ControlMode.Position, 15);
+				collectorArm2.set(ControlMode.Position, 15);
+				//goodArmPID.setSetPoint(15);
 			}
+			//TODO MIGHT BE DIFFERENT FOR REAL ROBOT (negative/positive intake values)
 			if (systems.getButton(Controls.Button.Y, false)) {
-				idleTurnConstant = -0.2; // might be different for real robot
-			} else {
-				idleTurnConstant = 0;
+				position = 1;
+				collectorArm1.set(ControlMode.Position, 120);
+				collectorArm2.set(ControlMode.Position, 120);
+				//goodArmPID.setSetPoint(120);
+			}
+			if(systems.getButton(Controls.Button.X, false)) {
+				position = 2;
+				collectorArm1.set(ControlMode.Position, 70);
+				collectorArm2.set(ControlMode.Position, 70);
+				//goodArmPID.setSetPoint(70);
 			}
 
 			if (systems.getButton(Controls.Button.BACK, false)) {
@@ -229,6 +278,9 @@ public class Collector implements Subsystem {
 				else if (manualMode)
 					manualMode = false;
 			}
+			
+			System.out.println("Collector.update(): arm1 pos: " + collectorArm1.getSelectedSensorPosition(0));
+			System.out.println("                    arm2 pos: " + collectorArm2.getSelectedSensorPosition(0));
 			
 				
 
@@ -310,7 +362,7 @@ public class Collector implements Subsystem {
 		intakeLeft.set(0);
 		intakeRight.set(0);
 	}
-
+	//TODO INTAKE AND OUTTAKE VALUES ARE SWITCHED
 	public void intakeCubeAuto(double speed, double delay, double time) {
 		Runnable intake = () -> {
 			try {
@@ -321,8 +373,8 @@ public class Collector implements Subsystem {
 			}
 			long startTime = System.currentTimeMillis();
 			while(System.currentTimeMillis() - startTime < time) {
-				intakeLeft.set(-speed);
-				intakeRight.set(-speed);
+				intakeLeft.set(speed);
+				intakeRight.set(speed);
 				try {
 					Thread.sleep((long) 50);
 				} catch (InterruptedException e) {
@@ -346,12 +398,12 @@ public class Collector implements Subsystem {
 	 * 	None 
 	 * Purpose: Outtakes the cube
 	 */
-	public void outtakeCube(double speed) {
+	public void outtakeCube(double speed, boolean forward) {
 		long startTime = System.currentTimeMillis();
 		while (System.currentTimeMillis() - startTime < 500) {
-			intakeLeft.set(speed);
-			intakeRight.set(speed);
-			systems.getDriveTrain().drive(.5, 0);
+			intakeLeft.set(-speed);
+			intakeRight.set(-speed);
+			systems.getDriveTrain().drive(forward ? 0.5 : -0.5, 0);
 			try {
 				Thread.sleep(300);
 			} catch (InterruptedException e) {
@@ -359,6 +411,7 @@ public class Collector implements Subsystem {
 				e.printStackTrace();
 			}
 		}
+		
 		systems.getDriveTrain().drive(0, 0);
 		intakeLeft.set(0);
 		intakeRight.set(0);

@@ -4,12 +4,12 @@ import systems.Systems;
 import systems.subsystems.Collector;
 import systems.subsystems.DriveTrain;
 
-public class FourCubeRightAuto implements Runnable{
+public class ThreeCubeRightAuto implements Runnable{
 	private Systems systems;
 	private DriveTrain driveTrain;
 	private Collector collector;
 	
-	public FourCubeRightAuto(){
+	public ThreeCubeRightAuto(){
 		
 		systems = Systems.getInstance();
 		driveTrain = Systems.getDriveTrain();
@@ -23,12 +23,12 @@ public class FourCubeRightAuto implements Runnable{
 		collector.moveArm(65); //move arm to switch angle
 
 		driveTrain.driveLineDontStop(108, 18, 140); //drive for 110 inches to switch
-		collector.outtakeCube(0.5); //outtake		
+		collector.outtakeCube(0.5, true); //outtake		
 	
 		
 		driveTrain.driveLine(-68, 0, 140); //back up to grab second cube from PC Zone
 		
-		collector.moveArm(150); //move arm down to collecting position
+		collector.moveArm(135); //move arm down to collecting position
 		
 		driveTrain.turnTo(-60, 0.8, 600); //turn to the furthest forward cube
 		
@@ -44,11 +44,11 @@ public class FourCubeRightAuto implements Runnable{
 		
 		driveTrain.driveLineDontStop(62, 0, 140); //drive into the fence
 		
-		collector.outtakeCube(0.5); //outtake
+		collector.outtakeCube(0.5, true); //outtake
 		
 		driveTrain.driveLine(-40, 0, 140); //drive backwards for the third cube
 		
-		collector.moveArm(150); //collecting position
+		collector.moveArm(135); //collecting position
 		
 		driveTrain.turnTo(-60, 0.8, 600); //turn towards third cube
 		
@@ -64,7 +64,7 @@ public class FourCubeRightAuto implements Runnable{
 		
 		driveTrain.driveLineDontStop(45, 0, 140); //drive into fence
 		
-		collector.outtakeCube(0.5); //outtake
+		collector.outtakeCube(0.5, true); //outtake
 		
 		
 		

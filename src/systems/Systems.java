@@ -185,7 +185,7 @@ public class Systems{
 			navX.zeroAngler();
 		}
 		if(controls.getButton(Controls.Button.BACK, SysObj.Sensors.OPERATOR_STICK)){
-			System.out.println("Hi Ethan");
+			//System.out.println("Hi Ethan");
 		}
 		//lEncoder.toSmartDashboard();
 		//collector.toSmartDashboard();
@@ -566,7 +566,7 @@ public class Systems{
 		}
 		*/
 	//	return (rEncoder.getValue() + lEncoder.getValue())/2.0;	
-		return lEncoder.getValue();
+		return rEncoder.getValue();
 	}
 	
 	/*
@@ -586,9 +586,9 @@ public class Systems{
 	 * ------------------------
 	 * Purpose: Shoots out the cube
 	 */
-	public void eject(double speed){
+	public void eject(double speed, boolean forward){
 		
-			collector.outtakeCube(speed);
+			collector.outtakeCube(speed, forward);
 		
 	}
 }

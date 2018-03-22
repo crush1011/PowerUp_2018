@@ -1,7 +1,7 @@
 package autonomous;
 
-import com.kauailabs.navx.frc.AHRS;
 
+import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
@@ -131,8 +131,8 @@ public class AutonLineDontStop implements Runnable {
 			}
 		}
 		long startTime = System.currentTimeMillis();
-		while (System.currentTimeMillis() - startTime < 3000) {
-			drive.drive(-0.7, 0);
+		while (System.currentTimeMillis() - startTime < 300) {
+			drive.drive(-0.5, 0);
 			try {
 				Thread.sleep(300);
 			} catch (InterruptedException e) {
