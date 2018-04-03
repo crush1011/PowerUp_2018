@@ -37,7 +37,7 @@ public class MidSideLeftScore implements Runnable{
 		
 		driveTrain.circleTurn(50, 0, 0.7, true, false);
 		
-		collector.outtakeCube(0.5, false);
+		collector.outtakeCubeAuto(0.5, false);
 		
 		driveTrain.driveDistance(15, 0.7);
 		
@@ -53,7 +53,7 @@ public class MidSideLeftScore implements Runnable{
 		
 		collector.moveArm(10);
 		
-		collector.outtakeCube(0.5, false);
+		collector.outtakeCubeAuto(0.5, false);
 		
 		driveTrain.driveDistance(10, 0.7);
 		
@@ -69,7 +69,7 @@ public class MidSideLeftScore implements Runnable{
 		
 		collector.moveArm(10);
 		
-		collector.outtakeCube(0.5, false);
+		collector.outtakeCubeAuto(0.5, false);
 		
 	}
 	

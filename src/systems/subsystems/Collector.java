@@ -19,6 +19,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.sun.org.apache.bcel.internal.Constants;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import autonomous.Loop;
@@ -37,11 +38,17 @@ public class Collector implements Subsystem {
 	private PIDManual armPID;
 	private RPID goodArmPID; // Just in case
 	private Resources resources;
+	private Solenoid punch;
 
-	private double averageArmEncoderPos;
+	private double averageArmEncoderPos, desiredPos, startPos;
 	private double encoderRange;
 	private double angleConstant, armConstant;
 	private double idleTurnConstant, slowConst;
+	
+	private static final double DISTANCE_CONSTANT = 0.023; //135/5800;
+	private Controls.Button prevButt;
+	
+	private boolean broke;
 
 	private boolean idleTurn, manualMode, collecting, fast;
 
@@ -60,18 +67,20 @@ public class Collector implements Subsystem {
 	 */
 
 	public Collector(TalonSRX talonSRX, TalonSRX talonSRX2, WPI_VictorSPX intakeLeft, WPI_VictorSPX intakeRight,
-			RobotEncoder armEncoder1, RobotEncoder armEncoder2) {
+			RobotEncoder armEncoder1, RobotEncoder armEncoder2, Solenoid punch) {
 		this.collectorArm1 = talonSRX;
 		this.collectorArm2 = talonSRX2;
 		this.intakeLeft = intakeLeft;
 		this.intakeRight = intakeRight;
 		this.armEncoder1 = armEncoder1;
 		this.armEncoder2 = armEncoder2;
+		this.punch = punch;
 		this.armPID = new PIDManual(0.02, 0, 0.005, 0.02); // 0.015, 0, 0
 		this.goodArmPID = new RPID(0.018, 0.0, 0.001, 0.02); // 0.015, 0, 0
 		//0.03, 0.0, 0.00555														// 0.035, 0,
 																// 0.005, 0.02
 		resources = new Resources();
+		broke = true;
 
 		df = new DecimalFormat("#.##");
 
@@ -80,11 +89,14 @@ public class Collector implements Subsystem {
 		collectorArm1.setNeutralMode(NeutralMode.Coast);
 		collectorArm2.setNeutralMode(NeutralMode.Coast);
 		
-		talonSRX.configClosedloopRamp(0.3, 0);
-		talonSRX2.configClosedloopRamp(0.3, 0);
+		/*
+		talonSRX.configOpenloopRamp(0.3, 0);
+		talonSRX2.configOpenloopRamp(0.3, 0);
+		
 		
 		talonSRX.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 20);
 		talonSRX2.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 20);
+		
 		
 		talonSRX.setSensorPhase(true);
 		talonSRX2.setSensorPhase(true);
@@ -98,22 +110,27 @@ public class Collector implements Subsystem {
 		talonSRX.configPeakOutputReverse(-1, 20);
 		talonSRX2.configPeakOutputReverse(-1, 20);
 		
-		talonSRX.config_kF(0, 0.0, 20);
+		talonSRX.config_kF(0, 0.1, 20);
 		talonSRX.config_kP(0, 0.1, 20);
 		talonSRX.config_kI(0, 0.0, 20);
 		talonSRX.config_kD(0, 0.0, 20);
-		talonSRX2.config_kF(0, 0.0, 20);
+		talonSRX2.config_kF(0, 0.1, 20);
 		talonSRX2.config_kP(0, 0.1, 20);
 		talonSRX2.config_kI(0, 0.0, 20);
 		talonSRX2.config_kD(0, 0.0, 20);
 		
 		int absolutePosition1 = talonSRX.getSensorCollection().getPulseWidthPosition();
 		int absolutePosition2 = talonSRX2.getSensorCollection().getPulseWidthPosition();
+		absolutePosition1 *= -1;
+		
+		talonSRX.setSelectedSensorPosition(absolutePosition1, 0, 20);
 		
 		absolutePosition1 &= 0xFFF;
 		absolutePosition2 &= 0xFFF;
+		*/
 		
 		averageArmEncoderPos = 0;
+		startPos = Math.abs(collectorArm1.getSelectedSensorPosition(0));
 
 		talonSRX2.setInverted(true);
 
@@ -123,6 +140,8 @@ public class Collector implements Subsystem {
 		goodArmPID.setOutputRange(-1, 1);
 		armConstant = 1;
 		idleTurnConstant = 0;
+		
+		prevButt = Controls.Button.RIGHTJOY;
 
 		idleTurn = false;
 		manualMode = false;
@@ -162,7 +181,7 @@ public class Collector implements Subsystem {
 				collectorArm2.set(ControlMode.PercentOutput, goodArmPID.crunch(averageArmEncoderPos));
 
 				if (averageArmEncoderPos <= 50) {
-					outtakeCube(.6, false);
+					outtakeCubeAuto(.6, false);
 					stop = true;
 				}
 				if (stop)
@@ -191,6 +210,7 @@ public class Collector implements Subsystem {
 		 * systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
 		 */
 		averageArmEncoderPos = -systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1);
+		double newEncoderPos = (Math.abs(collectorArm1.getSelectedSensorPosition(0)) - startPos) * DISTANCE_CONSTANT;
 		//System.out.println("1: " + averageArmEncoderPos);
 		double averageArmEncoderPos0 = systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2);
 		//System.out.println("2: " + averageArmEncoderPos0);
@@ -202,9 +222,10 @@ public class Collector implements Subsystem {
 					intakeLeft.set(-0.4);
 					intakeRight.set(-0.4);
 				} else if(systems.getOperatorRtTrigger() > .1) {
-					intakeLeft.set(0.70);
-					intakeRight.set(0.70);
+					intakeLeft.set(0.80);
+					intakeRight.set(0.80);
 					if (position == 3 && !collecting) {
+						//collectorArm1.set(ControlMode.Position, -5200);
 						goodArmPID.setSetPoint(135);
 						collecting = true;
 					}
@@ -218,6 +239,7 @@ public class Collector implements Subsystem {
 					}
 					if (collecting) {
 						goodArmPID.setSetPoint(120);
+						//collectorArm1.set(ControlMode.Position, -4900);
 						SmartDashboard.putString("DB/String 2", "Hellu");
 						collecting = false;
 					}
@@ -240,48 +262,69 @@ public class Collector implements Subsystem {
 			if (systems.getButton(Controls.Button.LEFT_BUMPER, false)) {
 				intakeLeft.set(-0.5);
 				intakeRight.set(-0.5);
+				prevButt = Controls.Button.LEFT_BUMPER;
 			}
 			if (systems.getButton(Controls.Button.RIGHT_BUMPER, false)) {
 				idleTurnConstant = 0.5; // might be different for real robot
+				prevButt = Controls.Button.RIGHT_BUMPER;
 			} else {
 				idleTurnConstant = 0;
 			}
 			if (systems.getButton(Controls.Button.B, false)) {
-				position = 3;
-				collectorArm1.set(ControlMode.Position, 115);
-				collectorArm2.set(ControlMode.Position, 115);
-				//goodArmPID.setSetPoint(115);
+				/*position = 3;
+				//collectorArm1.set(ControlMode.Position, 115); //4900
+				//collectorArm2.set(ControlMode.Position, 115);
+				goodArmPID.setSetPoint(115);
+				prevButt = Controls.Button.B;*/
+				position = 5;
+				goodArmPID.setSetPoint(68);
+				toggle(true);
+				outtakeCube(1, 500, 500);
 			}
-			if (systems.getButton(Controls.Button.A, false)) {
+			if (systems.getButton(Controls.Button.A, false) || systems.getButton(Controls.Button.A, true)) {
 				position = 4;
-				collectorArm1.set(ControlMode.Position, 15);
-				collectorArm2.set(ControlMode.Position, 15);
-				//goodArmPID.setSetPoint(15);
+				//collectorArm1.set(ControlMode.Position, 15); //250
+				//collectorArm2.set(ControlMode.Position, 15);
+				goodArmPID.setSetPoint(15);
+				prevButt = Controls.Button.A;
 			}
 			//TODO MIGHT BE DIFFERENT FOR REAL ROBOT (negative/positive intake values)
-			if (systems.getButton(Controls.Button.Y, false)) {
+			if (systems.getButton(Controls.Button.Y, false) || systems.getButton(Controls.Button.Y, true)) {
 				position = 1;
-				collectorArm1.set(ControlMode.Position, 120);
-				collectorArm2.set(ControlMode.Position, 120);
-				//goodArmPID.setSetPoint(120);
+				//collectorArm1.set(ControlMode.Position, 120); //5200
+				//collectorArm2.set(ControlMode.Position, 120);
+				goodArmPID.setSetPoint(120);
+				prevButt = Controls.Button.Y;
 			}
-			if(systems.getButton(Controls.Button.X, false)) {
+			if(systems.getButton(Controls.Button.X, false) || systems.getButton(Controls.Button.X, true)) {
 				position = 2;
-				collectorArm1.set(ControlMode.Position, 70);
-				collectorArm2.set(ControlMode.Position, 70);
-				//goodArmPID.setSetPoint(70);
+				//collectorArm1.set(ControlMode.Position, 70); //2875
+				//collectorArm2.set(ControlMode.Position, 70);
+				goodArmPID.setSetPoint(70);
+				prevButt = Controls.Button.X;
 			}
+			/*if(systems.getButton(Controls.Button.LEFTJOY, false)) {
+				position = 5;
+				goodArmPID.setSetPoint(55);
+				toggle(true);
+				prevButt = Controls.Button.LEFTJOY;
+			}*/
 
-			if (systems.getButton(Controls.Button.BACK, false)) {
-				if (!manualMode)
-					manualMode = true;
-				else if (manualMode)
-					manualMode = false;
+			if (systems.getButton(Controls.Button.BACK, false) && prevButt != Controls.Button.BACK) {
+				manualMode = !manualMode;
+				prevButt = Controls.Button.BACK;
 			}
 			
-			System.out.println("Collector.update(): arm1 pos: " + collectorArm1.getSelectedSensorPosition(0));
-			System.out.println("                    arm2 pos: " + collectorArm2.getSelectedSensorPosition(0));
+			/*
+			if (systems.getButton(Controls.Button.START, false) && prevButt != Controls.Button.START) {
+				broke = !broke;
+				prevButt = Controls.Button.START;
+			}
 			
+			System.out.println("Collector.update(): arm1 pos: " + newEncoderPos);
+			System.out.println("                    arm2 pos: " + collectorArm1.getSelectedSensorPosition(0));
+			System.out.println("                    start: " + startPos);
+			*/
 				
 
 			/*
@@ -295,15 +338,23 @@ public class Collector implements Subsystem {
 			// Automatic operator controls
 			// manualMode = true;
 			if (!manualMode) {
-				systems.setRumbleOperator(0);
+				systems.setRumbleOperator(0, true);
 				if (fast) {
 					collectorArm1.set(ControlMode.PercentOutput, 0.75);
 					collectorArm2.set(ControlMode.PercentOutput, 0.75);
 				} else {
-					double angleFromTop = averageArmEncoderPos - 45.0;
-					double feedForward = Math.sin(Math.toRadians(angleFromTop)) * 0.1;
-					double motorValue = (goodArmPID.crunch(averageArmEncoderPos) + feedForward) * slowConst;
-
+					double angleFromTop, motorValue, feedForward;
+					if (!broke) {
+						angleFromTop = newEncoderPos - 45.0;
+						feedForward = Math.sin(Math.toRadians(angleFromTop)) * 0.1;
+						motorValue = (goodArmPID.crunch(newEncoderPos) + feedForward) * slowConst;
+					}
+					else {
+						angleFromTop = averageArmEncoderPos - 45.0;
+						feedForward = Math.sin(Math.toRadians(angleFromTop)) * 0.1;
+						motorValue = (goodArmPID.crunch(averageArmEncoderPos) + feedForward) * slowConst;
+					}
+					
 					//System.out.println("motorVAlue :" + motorValue + "    SETPOINT:" + goodArmPID.getSetPoint()
 					//		+ "  CurrentValue:" + averageArmEncoderPos);
 					if(!cubeThrowThread.isAlive()) {
@@ -315,12 +366,13 @@ public class Collector implements Subsystem {
 
 			// Manual operator controls
 			if (manualMode) {
-				systems.setRumbleOperator(0.1);
+				systems.setRumbleOperator(0.1, true);
 				collectorArm1.set(ControlMode.PercentOutput, armConstant * -systems.getOperatorLJoystick());
 				collectorArm2.set(ControlMode.PercentOutput, armConstant * -systems.getOperatorLJoystick());
-			
 			}
-
+			/*if(broke) {
+				systems.setRumbleOperator(0.2, false);
+			}*/
 		}
 
 		if (counter % 2000 == 0) {
@@ -342,6 +394,35 @@ public class Collector implements Subsystem {
 		goodArmPID.setSetPoint(angle);
 
 	}
+	
+	/*
+	 *toggle
+	 *Author: Ethan Yes
+	 *Collaborators: Nitesh Puri
+	 *-------------------------------------------------------------
+	 *Purpose: Piston toggling for scaling
+	 *Parameters: state && back 
+	 */
+	public void toggle(boolean state) {
+		Runnable toggle = () ->{
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			punch.set(state);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			punch.set(!state);
+		};
+		new Thread(toggle).start();
+	}
+	
 
 	/*
 	 * intakeCube 
@@ -388,17 +469,52 @@ public class Collector implements Subsystem {
 		};
 		new Thread(intake).start();
 	}
+	
+	/*
+	 * outtakeCube
+	 * Author: Ethan Yes
+	 * Collaborators: Jeremiah Hanson
+	 * --------------------------------------------
+	 * Parameters: speed, delay, time
+	 * 
+	 * Purpose: Thread to outtake cube during teleop for scaling
+	 */
+	public void outtakeCube(double speed, double delay, double time) {
+		Runnable outtake = () -> {
+			try {
+				Thread.sleep((long) delay);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			long startTime = System.currentTimeMillis();
+			while(System.currentTimeMillis() - startTime < time) {
+				intakeLeft.set(-speed);
+				intakeRight.set(-speed);
+				try {
+					Thread.sleep((long) 50);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}	
+			}
+			
+			intakeLeft.set(0);
+			intakeRight.set(0);
+		};
+		new Thread(outtake).start();
+	}
 
 	/*
-	 * outtakeCube 
+	 * outtakeCubeAuto 
 	 * Author: Nitesh Puri 
 	 * Collaborators: Ethan Ngo and Finlay Parsons 
 	 * -------------------------------------------------- 
 	 * Parameters:
 	 * 	None 
-	 * Purpose: Outtakes the cube
+	 * Purpose: Outtakes the cube in auto
 	 */
-	public void outtakeCube(double speed, boolean forward) {
+	public void outtakeCubeAuto(double speed, boolean forward) {
 		long startTime = System.currentTimeMillis();
 		while (System.currentTimeMillis() - startTime < 500) {
 			intakeLeft.set(-speed);

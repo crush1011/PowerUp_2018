@@ -21,9 +21,9 @@ public class DriveShootRight implements Runnable{
 		// TODO Auto-generated method stub
 		
 
-		driveTrain.driveLineDontStop(-100, 30, 140); //drive for 110 inches to switch
+		driveTrain.driveLineDontStop(-100, 30, 140, false); //drive for 110 inches to switch
 		
-		collector.outtakeCube(0.5, false); //outtake	
+		collector.outtakeCubeAuto(0.5, false); //outtake	
 		
 	
 	}

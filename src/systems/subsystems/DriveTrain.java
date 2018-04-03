@@ -421,8 +421,8 @@ public class DriveTrain implements Subsystem {
 		drive(0,0);
 	}
 	
-	public void driveLineDontStop(double distance, double angle, double speed){
-		new AutonLineDontStop(systems.getDriveTrain(), systems.getNavX(), distance, speed, angle).run();
+	public void driveLineDontStop(double distance, double angle, double speed, boolean straighten){
+		new AutonLineDontStop(systems.getDriveTrain(), systems.getNavX(), distance, speed, angle, straighten).run();
 	}
 	
 	public void driveCircle(double radius, double angle, boolean forward, boolean right, int counter) {

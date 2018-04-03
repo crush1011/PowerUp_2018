@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.Victor;
 import systems.SysObj.Sensors;
@@ -53,6 +54,7 @@ public class Systems{
 	private static PIDManual pidManual;
 	private static PowerDistributionPanel pdp;
 	private Resources resources;
+	private Solenoid solenoid;
 	
 	public boolean inAuto;
 	
@@ -94,14 +96,17 @@ public class Systems{
 									(TalonSRX) sysObjects.get(SysObj.MotorController.RIGHT_3));
 		
 		// Arm Motor Controllers
-		sysObjects.put(SysObj.MotorController.COLLECTOR_ARM_1, new TalonSRX(7));
-		sysObjects.put(SysObj.MotorController.COLLECTOR_ARM_2, new TalonSRX(8));
+		sysObjects.put(SysObj.MotorController.COLLECTOR_ARM_1, new TalonSRX(7)); // right
+		sysObjects.put(SysObj.MotorController.COLLECTOR_ARM_2, new TalonSRX(8)); // left
 		sysObjects.put(SysObj.MotorController.INTAKE_LEFT, new WPI_VictorSPX(10));
 		sysObjects.put(SysObj.MotorController.INTAKE_RIGHT, new WPI_VictorSPX(9));
 		
 		
 		// Climber Motor Controller(s)
 		sysObjects.put(SysObj.MotorController.CLIMBER, new Spark(11));
+		
+		//Solenoid Controller
+		sysObjects.put(SysObj.Solenoid.SOLENOID, new Solenoid(1));
 
 //=======================================================================================
 // Sensors
@@ -146,8 +151,10 @@ public class Systems{
 										  (TalonSRX) sysObjects.get(SysObj.MotorController.COLLECTOR_ARM_2),
 										  (WPI_VictorSPX) sysObjects.get(SysObj.MotorController.INTAKE_LEFT), 
 										  (WPI_VictorSPX) sysObjects.get(SysObj.MotorController.INTAKE_RIGHT),
-										  (RobotEncoder) sysObjects.get(armEncoder1),
-										  (RobotEncoder) sysObjects.get(armEncoder2));
+										  armEncoder1,
+										  armEncoder2,
+										  (Solenoid) sysObjects.get(SysObj.Solenoid.SOLENOID));
+										  
 				
 	}
 	
@@ -215,8 +222,8 @@ public class Systems{
 	}
 	
 	
-	public void setRumbleOperator(double val){
-		controls.setRumbleOperator(val);
+	public void setRumbleOperator(double val, boolean both){
+		controls.setRumbleOperator(val, both);
 	}
 	
 	public void setRumbleDriver(double val){
@@ -588,7 +595,7 @@ public class Systems{
 	 */
 	public void eject(double speed, boolean forward){
 		
-			collector.outtakeCube(speed, forward);
+			collector.outtakeCubeAuto(speed, forward);
 		
 	}
 }

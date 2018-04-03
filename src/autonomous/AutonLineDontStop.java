@@ -16,6 +16,7 @@ public class AutonLineDontStop implements Runnable {
 	double angle, topSpeed, distance;
 	double rotateOutput;
 	double loopCount, pastCount;
+	boolean straighten;
 
 	final double acceleration = 300;
 	final double kA = (1 / acceleration) * 0;
@@ -26,11 +27,12 @@ public class AutonLineDontStop implements Runnable {
 
 	private static final double P = 0.02;
 
-	public AutonLineDontStop(DriveTrain driveTrain, NavX navx, double distance, double topSpeed, double angle) {
+	public AutonLineDontStop(DriveTrain driveTrain, NavX navx, double distance, double topSpeed, double angle, boolean straighten) {
 
 		this.angle = angle;
 		this.topSpeed = topSpeed;
 		this.distance = distance;
+		this.straighten = straighten;
 
 		this.drive = driveTrain;
 		this.navx = navx;
@@ -85,17 +87,17 @@ public class AutonLineDontStop implements Runnable {
 				currentAcceleration = 0;
 			}
 			currentVelocity = Math.max(Math.min(topSpeed, currentVelocity), -topSpeed);
-			System.out.println(
+			/*System.out.println(
 					"CurrentTime:" + (System.currentTimeMillis() - startTimeLine) + "    currentV:" + currentVelocity
 							+ "    CURRENTP" + distanceTravelled + "    DistanceToSTOP" + distanceNeededToStop);
-			System.out.println("DEACC" + deAccelerate);
+			System.out.println("DEACC" + deAccelerate);*/
 
 			double currentError = Resources.getAngleError(angle, navx.getCurrentAngle());
 			
 
 			double rotateOutput = currentError * P;
 			
-			System.out.println("CurrentError: " + currentError  + "   rotateOutput: " + rotateOutput + "   Angle: " + navx.getCurrentAngle());
+			//System.out.println("CurrentError: " + currentError  + "   rotateOutput: " + rotateOutput + "   Angle: " + navx.getCurrentAngle());
 			
 			pastCount = loopCount;
 			double actualVelocity = currentVelocity / 150;
@@ -123,7 +125,7 @@ public class AutonLineDontStop implements Runnable {
 			lastVelocity = currentVelocity;
 			try {
 				long sleepTime = ((long) delT - (System.currentTimeMillis() - startTime));
-				System.out.println("SLEEP" + sleepTime);
+				//System.out.println("SLEEP" + sleepTime);
 				Thread.sleep(sleepTime);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -132,7 +134,7 @@ public class AutonLineDontStop implements Runnable {
 		}
 		long startTime = System.currentTimeMillis();
 		while (System.currentTimeMillis() - startTime < 300) {
-			drive.drive(-0.5, 0);
+			drive.drive(-0.3, 0);
 			try {
 				Thread.sleep(300);
 			} catch (InterruptedException e) {
@@ -140,6 +142,7 @@ public class AutonLineDontStop implements Runnable {
 				e.printStackTrace();
 			}
 		}
+		if(straighten) new AutonLine(drive, navx, 20, 100, 0).run();
 		drive.drive(0, 0);
 
 	}
