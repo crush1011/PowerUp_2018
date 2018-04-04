@@ -52,7 +52,7 @@ public class Collector implements Subsystem {
 
 	private boolean idleTurn, manualMode, collecting, fast;
 
-	private int position, counter;
+	private int position, counter, curCount;
 
 	DecimalFormat df;
 
@@ -77,60 +77,63 @@ public class Collector implements Subsystem {
 		this.punch = punch;
 		this.armPID = new PIDManual(0.02, 0, 0.005, 0.02); // 0.015, 0, 0
 		this.goodArmPID = new RPID(0.018, 0.0, 0.001, 0.02); // 0.015, 0, 0
-		//0.03, 0.0, 0.00555														// 0.035, 0,
-																// 0.005, 0.02
+		//0.03, 0.0, 0.00555
+		// 0.035, 0,
+		// 0.005, 0.02
 		resources = new Resources();
 		broke = true;
+		
+		curCount = 0;
 
 		df = new DecimalFormat("#.##");
 
 		intakeRight.setInverted(true);
 
-		collectorArm1.setNeutralMode(NeutralMode.Coast);
+		//collectorArm1.setNeutralMode(NeutralMode.Coast);
 		collectorArm2.setNeutralMode(NeutralMode.Coast);
 		
-		/*
-		talonSRX.configOpenloopRamp(0.3, 0);
+		
+		//talonSRX.configOpenloopRamp(0.3, 0);
 		talonSRX2.configOpenloopRamp(0.3, 0);
 		
 		
-		talonSRX.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 20);
-		talonSRX2.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 20);
+		//talonSRX.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 20);
+		talonSRX2.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 20);
 		
 		
-		talonSRX.setSensorPhase(true);
-		talonSRX2.setSensorPhase(true);
+		//talonSRX.setSensorPhase(true);
+		talonSRX2.setSensorPhase(false);
 		
-		talonSRX.configNominalOutputForward(0, 20);
+		//talonSRX.configNominalOutputForward(0, 20);
 		talonSRX2.configNominalOutputForward(0, 20);
-		talonSRX.configNominalOutputReverse(0, 20);
+		//talonSRX.configNominalOutputReverse(0, 20);
 		talonSRX2.configNominalOutputReverse(0, 20);
-		talonSRX.configPeakOutputForward(1, 20);
+		//talonSRX.configPeakOutputForward(1, 20);
 		talonSRX2.configPeakOutputForward(1, 20);
-		talonSRX.configPeakOutputReverse(-1, 20);
+		//talonSRX.configPeakOutputReverse(-1, 20);
 		talonSRX2.configPeakOutputReverse(-1, 20);
 		
-		talonSRX.config_kF(0, 0.1, 20);
-		talonSRX.config_kP(0, 0.1, 20);
-		talonSRX.config_kI(0, 0.0, 20);
-		talonSRX.config_kD(0, 0.0, 20);
-		talonSRX2.config_kF(0, 0.1, 20);
+		//talonSRX.config_kF(0, 0.1, 20);
+		//talonSRX.config_kP(0, 0.1, 20);
+		//talonSRX.config_kI(0, 0.0, 20);
+		//talonSRX.config_kD(0, 0.0, 20);
+		talonSRX2.config_kF(0, 0.0, 20);
 		talonSRX2.config_kP(0, 0.1, 20);
 		talonSRX2.config_kI(0, 0.0, 20);
 		talonSRX2.config_kD(0, 0.0, 20);
 		
-		int absolutePosition1 = talonSRX.getSensorCollection().getPulseWidthPosition();
+		//int absolutePosition1 = talonSRX.getSensorCollection().getPulseWidthPosition();
 		int absolutePosition2 = talonSRX2.getSensorCollection().getPulseWidthPosition();
-		absolutePosition1 *= -1;
+		//absolutePosition1 *= -1;
 		
-		talonSRX.setSelectedSensorPosition(absolutePosition1, 0, 20);
+		talonSRX.setSelectedSensorPosition(absolutePosition2, 0, 20);
 		
-		absolutePosition1 &= 0xFFF;
+		//absolutePosition1 &= 0xFFF;
 		absolutePosition2 &= 0xFFF;
-		*/
+		
 		
 		averageArmEncoderPos = 0;
-		startPos = Math.abs(collectorArm1.getSelectedSensorPosition(0));
+		startPos = Math.abs(collectorArm2.getSelectedSensorPosition(0));
 
 		talonSRX2.setInverted(true);
 
@@ -210,7 +213,7 @@ public class Collector implements Subsystem {
 		 * systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
 		 */
 		averageArmEncoderPos = -systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1);
-		double newEncoderPos = (Math.abs(collectorArm1.getSelectedSensorPosition(0)) - startPos) * DISTANCE_CONSTANT;
+		double newEncoderPos = (collectorArm2.getSelectedSensorPosition(0) - startPos) * DISTANCE_CONSTANT;
 		//System.out.println("1: " + averageArmEncoderPos);
 		double averageArmEncoderPos0 = systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2);
 		//System.out.println("2: " + averageArmEncoderPos0);
@@ -277,9 +280,10 @@ public class Collector implements Subsystem {
 				goodArmPID.setSetPoint(115);
 				prevButt = Controls.Button.B;*/
 				position = 5;
-				goodArmPID.setSetPoint(68);
-				toggle(true);
-				outtakeCube(1, 500, 500);
+				//goodArmPID.setSetPoint(68);
+				goodArmPID.setSetPoint(15);
+				outtakeCube(1, 400, 1000);
+				toggle(true, 450);
 			}
 			if (systems.getButton(Controls.Button.A, false) || systems.getButton(Controls.Button.A, true)) {
 				position = 4;
@@ -315,16 +319,20 @@ public class Collector implements Subsystem {
 				prevButt = Controls.Button.BACK;
 			}
 			
-			/*
+			
 			if (systems.getButton(Controls.Button.START, false) && prevButt != Controls.Button.START) {
 				broke = !broke;
 				prevButt = Controls.Button.START;
 			}
 			
-			System.out.println("Collector.update(): arm1 pos: " + newEncoderPos);
-			System.out.println("                    arm2 pos: " + collectorArm1.getSelectedSensorPosition(0));
-			System.out.println("                    start: " + startPos);
-			*/
+			if (curCount == 50) {
+				System.out.println("Collector.update(): arm1 pos: " + newEncoderPos);
+				//System.out.println("                    arm2 pos: " + collectorArm1.getSelectedSensorPosition(0));
+				//System.out.println("                    start: " + startPos);
+				curCount = 0;
+			}
+			curCount++;
+			
 				
 
 			/*
@@ -370,15 +378,24 @@ public class Collector implements Subsystem {
 				collectorArm1.set(ControlMode.PercentOutput, armConstant * -systems.getOperatorLJoystick());
 				collectorArm2.set(ControlMode.PercentOutput, armConstant * -systems.getOperatorLJoystick());
 			}
-			/*if(broke) {
+			if(!broke) {
 				systems.setRumbleOperator(0.2, false);
-			}*/
+			}
 		}
 
 		if (counter % 2000 == 0) {
 			// this.toSmartDashboard();
 		}
 		counter++;
+	}
+	
+	/**
+	 * resetNewEncoder<p>
+	 * Author: Jeremiah Hanson<p>
+	 * Resets the start position for the new encoders
+	 */
+	public void resetNewEncoder() {
+		startPos = Math.abs(collectorArm2.getSelectedSensorPosition(0));
 	}
 
 	/*
@@ -403,10 +420,10 @@ public class Collector implements Subsystem {
 	 *Purpose: Piston toggling for scaling
 	 *Parameters: state && back 
 	 */
-	public void toggle(boolean state) {
+	public void toggle(boolean state, int time) {
 		Runnable toggle = () ->{
 			try {
-				Thread.sleep(500);
+				Thread.sleep(time);
 			} catch (InterruptedException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -561,6 +578,7 @@ public class Collector implements Subsystem {
 			armEncoder2 = Systems.getRobotEncoder(SysObj.Sensors.ARM_ENCODER_2);
 			armEncoder1.setDistancePerPulse(0.42);
 			armEncoder2.setDistancePerPulse(0.42);
+			startPos = Math.abs(collectorArm2.getSelectedSensorPosition(0));
 
 		//	 System.out.println("Collector.update(): " +
 			// systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
