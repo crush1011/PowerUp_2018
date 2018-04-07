@@ -47,4 +47,16 @@ public interface SysObj {
 			this.sensor = sensor;
 		}
 	}
+	
+	//This is the enum for the solenoid
+	public enum Solenoid implements SysObj{
+		SOLENOID("solenoid");
+		
+		public String solenoid;
+		
+		// Constructor for the Solenoid Enum
+		private Solenoid(String solenoid) {
+			this.solenoid = solenoid;
+		}
+	}
 }

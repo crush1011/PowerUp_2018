@@ -292,9 +292,13 @@ public class Controls implements Subsystem{
 		
 	}
 	
-	public void setRumbleOperator(double val){
-		operatorJoystick.setRumble(RumbleType.kLeftRumble, val);
-		operatorJoystick.setRumble(RumbleType.kRightRumble, val);
+	public void setRumbleOperator(double val, boolean both) {
+		if (both) {
+			operatorJoystick.setRumble(RumbleType.kLeftRumble, val);
+			operatorJoystick.setRumble(RumbleType.kRightRumble, val);
+		}else {
+			operatorJoystick.setRumble(RumbleType.kLeftRumble, val);
+		}
 	}
 
 	

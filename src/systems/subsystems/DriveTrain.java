@@ -12,12 +12,12 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-import autonomous.AutonLine;
-import autonomous.AutonLineDontStop;
-import autonomous.RPID;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import autonomous.AutonCircle;
+import autonomous.AutonLine;
+import autonomous.AutonLineDontStop;
 import systems.Resources;
 import systems.Subsystem;
 import systems.SysObj;
@@ -236,8 +236,8 @@ public class DriveTrain implements Subsystem {
 	 */
 	public void driveDistance(double distance, double speed) {
 		SmartDashboard.putString("DB/String 6", "lol");
-		System.out.println(systems.getEncoderDistance(SysObj.Sensors.LEFT_ENCODER));
-		System.out.println(systems.getEncoderDistance(SysObj.Sensors.RIGHT_ENCODER));
+		//System.out.println(systems.getEncoderDistance(SysObj.Sensors.LEFT_ENCODER));
+		//System.out.println(systems.getEncoderDistance(SysObj.Sensors.RIGHT_ENCODER));
 		double desiredDriveAngle = systems.getNavXAngle();
 		double rotateConstant = 0;
 
@@ -262,8 +262,8 @@ public class DriveTrain implements Subsystem {
 			// drive.arcadeDrive(0.5, 0);
 			arcadeDrive(speed, -(speed / (Math.abs(speed)) * driveStraightPID.getOutput()));
 		}
-		System.out.print(systems.getEncoderDistance(SysObj.Sensors.LEFT_ENCODER));
-		System.out.println(systems.getEncoderDistance(SysObj.Sensors.RIGHT_ENCODER));
+		//System.out.print(systems.getEncoderDistance(SysObj.Sensors.LEFT_ENCODER));
+		//System.out.println(systems.getEncoderDistance(SysObj.Sensors.RIGHT_ENCODER));
 
 		arcadeDrive(0, 0);
 		systems.resetEncoders();
@@ -298,7 +298,7 @@ public class DriveTrain implements Subsystem {
 
 			double rotateOutput = Resources.limit(turnPID.crunch(systems.getNavXAngle()), -speed, speed);
 			rotateOutput += rotateOutput > 0 ? 0.07 : -0.07;
-			System.out.println("CURRENTANGLE:" + systems.getNavXAngle() +"  SETPOINT:" + turnPID.getSetPoint() + "      output" + rotateOutput);
+			//System.out.println("CURRENTANGLE:" + systems.getNavXAngle() +"  SETPOINT:" + turnPID.getSetPoint() + "      output" + rotateOutput);
 			arcadeDrive(0, Resources.limit(rotateOutput,-1,1), false);
 			try {
 				Thread.sleep(20);
@@ -326,7 +326,7 @@ public class DriveTrain implements Subsystem {
 
 			double rotateOutput = Resources.limit(turnSidePID.crunch(systems.getNavXAngle()), -speed, speed);
 			rotateOutput += rotateOutput > 0 ? 0.04 : -0.04;
-			System.out.println("CURRENTANGLE:" + systems.getNavXAngle() +"  SETPOINT:" + turnPID.getSetPoint() + "      output" + rotateOutput);
+			//System.out.println("CURRENTANGLE:" + systems.getNavXAngle() +"  SETPOINT:" + turnPID.getSetPoint() + "      output" + rotateOutput);
 			tankDrive(Resources.limit(right? 0:rotateOutput,-1,1), Resources.limit(right? -rotateOutput:0,-1,1), false);
 			try {
 				Thread.sleep(20);
@@ -406,8 +406,27 @@ public class DriveTrain implements Subsystem {
 		new AutonLine(systems.getDriveTrain(), systems.getNavX(), distance, speed, angle).run();
 	}
 	
-	public void driveLineDontStop(double distance, double angle, double speed){
-		new AutonLineDontStop(systems.getDriveTrain(), systems.getNavX(), distance, speed, angle).run();
+	public void driveAuton(double speed,double time){
+		long startTime = System.currentTimeMillis();
+		while(System.currentTimeMillis() - startTime < time && DriverStation.getInstance().isAutonomous()) {
+			drive(speed, 0, false);
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		drive(0,0);
+	}
+	
+	public void driveLineDontStop(double distance, double angle, double speed, boolean straighten){
+		new AutonLineDontStop(systems.getDriveTrain(), systems.getNavX(), distance, speed, angle, straighten).run();
+	}
+	
+	public void driveCircle(double radius, double angle, boolean forward, boolean right, int counter) {
+		new AutonCircle(systems.getDriveTrain(), systems.getNavX(), angle, radius, forward, right, counter).run();
 	}
 	
 	/*
@@ -474,7 +493,7 @@ public class DriveTrain implements Subsystem {
 		}
 	 
 	 public void setVoltage(double left, double right){
-		 System.out.println("LEFT: " + left  +"   RIGHT" + right);
+		 //System.out.println("LEFT: " + left  +"   RIGHT" + right);
 		 ltMain.set(ControlMode.PercentOutput, left);
 		 rtMain.set(ControlMode.PercentOutput,- right);
 		

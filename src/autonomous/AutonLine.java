@@ -85,17 +85,17 @@ public class AutonLine implements Runnable {
 				currentAcceleration = 0;
 			}
 			currentVelocity = Math.max(Math.min(topSpeed, currentVelocity), -topSpeed);
-			System.out.println(
+			/*System.out.println(
 					"CurrentTime:" + (System.currentTimeMillis() - startTimeLine) + "    currentV:" + currentVelocity
 							+ "    CURRENTP" + distanceTravelled + "    DistanceToSTOP" + distanceNeededToStop);
-			System.out.println("DEACC" + deAccelerate);
+			System.out.println("DEACC" + deAccelerate);*/
 
 			double currentError = Resources.getAngleError(angle, navx.getCurrentAngle());
 			
 
 			double rotateOutput = currentError * P;
 			
-			System.out.println("CurrentError: " + currentError  + "   rotateOutput: " + rotateOutput + "   Angle: " + navx.getCurrentAngle());
+			//System.out.println("CurrentError: " + currentError  + "   rotateOutput: " + rotateOutput + "   Angle: " + navx.getCurrentAngle());
 			
 			pastCount = loopCount;
 			double actualVelocity = currentVelocity / 150;
@@ -118,7 +118,7 @@ public class AutonLine implements Runnable {
 			lastVelocity = currentVelocity;
 			try {
 				long sleepTime = ((long) delT - (System.currentTimeMillis() - startTime));
-				System.out.println("SLEEP" + sleepTime);
+				//System.out.println("SLEEP" + sleepTime);
 				Thread.sleep(sleepTime);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block

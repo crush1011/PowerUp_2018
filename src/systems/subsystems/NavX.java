@@ -85,7 +85,7 @@ public class NavX implements Subsystem {
 	 *Returns nothing
 	 */
 	public void zeroAngler() {
-		navX.reset();
+		navX.zeroYaw();
 	}
 
 	@Override

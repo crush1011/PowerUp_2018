@@ -36,7 +36,7 @@ public class MidSideRightScore implements Runnable{
 		
 		driveTrain.driveDistance(96, -.7);
 		
-		collector.outtakeCube(0.5);
+		collector.outtakeCubeAuto(0.5, false);
 		
 		driveTrain.driveDistance(15, 0.7);
 		
@@ -52,7 +52,7 @@ public class MidSideRightScore implements Runnable{
 		
 		collector.moveArm(10);
 		
-		collector.outtakeCube(0.5);
+		collector.outtakeCubeAuto(0.5, false);
 		
 		driveTrain.driveDistance(10, 0.7);
 		
@@ -68,7 +68,7 @@ public class MidSideRightScore implements Runnable{
 		
 		collector.moveArm(10);
 		
-		collector.outtakeCube(0.5);
+		collector.outtakeCubeAuto(0.5, false);
 		
 	}
 	
