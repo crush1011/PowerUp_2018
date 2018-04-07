@@ -28,7 +28,7 @@ public class FourCubeLeftCustom implements Runnable {
 
 		driveTrain.driveCircle(60, 65, false, false, 1); //back up while turning towards cubes
 
-		collector.moveArm(131); // move arm down to collecting position
+		collector.moveArm(104); // move arm down to collecting position 131 if broke
 
 		collector.intakeCubeAuto(1.0, 200, 2000); // intake thread starts
 
@@ -42,7 +42,7 @@ public class FourCubeLeftCustom implements Runnable {
 
 		collector.outtakeCubeAuto(0.6, false); //outtake
 
-		collector.moveArm(131); //move arm down
+		collector.moveArm(104); //move arm down 131 if broke
 
 		collector.intakeCubeAuto(1.0, 200, 2500); //intake thread starts
 
@@ -56,7 +56,7 @@ public class FourCubeLeftCustom implements Runnable {
 
 		collector.outtakeCubeAuto(0.5, false); //outtake
 
-		collector.moveArm(131); //move arm down
+		collector.moveArm(104); //move arm down 131 if broke
 
 		collector.intakeCubeAuto(1.0, 200, 3000); //intake thread starts
 

@@ -28,7 +28,7 @@ public class ThreeCubeRightAuto implements Runnable{
 		
 		driveTrain.driveLine(-68, 0, 140); //back up to grab second cube from PC Zone
 		
-		collector.moveArm(131); //move arm down to collecting position
+		collector.moveArm(104); //move arm down to collecting position 131 if broke
 		
 		driveTrain.turnTo(-60, 0.8, 600); //turn to the furthest forward cube
 		
@@ -48,7 +48,7 @@ public class ThreeCubeRightAuto implements Runnable{
 		
 		driveTrain.driveLine(-40, 0, 140); //drive backwards for the third cube
 		
-		collector.moveArm(131); //collecting position
+		collector.moveArm(104); //collecting position 131 if broke
 		
 		driveTrain.turnTo(-60, 0.8, 600); //turn towards third cube
 		

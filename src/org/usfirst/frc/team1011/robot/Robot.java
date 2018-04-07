@@ -19,6 +19,7 @@ import autonomous.FourCubeRightCustom;
 import autonomous.LeftSideLeftScore;
 import autonomous.MidSideLeftScore;
 import autonomous.MidSideRightScore;
+import autonomous.MoveArmTest;
 import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoMode.PixelFormat;
@@ -82,7 +83,7 @@ public class Robot extends IterativeRobot {
 		m_chooser.addObject("My Auto", kCustomAuto);
 		SmartDashboard.putData("Auto choices", m_chooser);
 		
-		/*visionCam = new UsbCamera("cam0", 1);
+		visionCam = new UsbCamera("cam0", 1);
 		visionCam.setVideoMode(PixelFormat.kYUYV, 320, 240, 15);  // start ObjectDetect	
 		visionCam.setResolution(320, 240);
 		visionCam.setFPS(15);
@@ -90,7 +91,7 @@ public class Robot extends IterativeRobot {
 		visionCam.setExposureAuto();
 		camServer = CameraServer.getInstance();
 		camServer.addCamera(visionCam);
-		camServer.startAutomaticCapture();*/
+		camServer.startAutomaticCapture();
 		
 	}
 	
@@ -152,6 +153,8 @@ public class Robot extends IterativeRobot {
 		}
 		
 		//auton = new Thread(new CrossLineAuto());
+		
+		//auton = new Thread(new MoveArmTest());
 		
 		//driveTrain.driveLine(60, 0, 140);
 		

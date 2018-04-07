@@ -76,12 +76,12 @@ public class Collector implements Subsystem {
 		this.armEncoder2 = armEncoder2;
 		this.punch = punch;
 		this.armPID = new PIDManual(0.02, 0, 0.005, 0.02); // 0.015, 0, 0
-		this.goodArmPID = new RPID(0.018, 0.0, 0.001, 0.02); // 0.015, 0, 0
+		this.goodArmPID = new RPID(0.015, 0.0, 0.001, 0.02); // 0.015, 0, 0
 		//0.03, 0.0, 0.00555
 		// 0.035, 0,
 		// 0.005, 0.02
 		resources = new Resources();
-		broke = true;
+		broke = false;
 		
 		curCount = 0;
 
@@ -102,7 +102,7 @@ public class Collector implements Subsystem {
 		
 		
 		//talonSRX.setSensorPhase(true);
-		talonSRX2.setSensorPhase(false);
+		talonSRX2.setSensorPhase(true);
 		
 		//talonSRX.configNominalOutputForward(0, 20);
 		talonSRX2.configNominalOutputForward(0, 20);
@@ -133,7 +133,7 @@ public class Collector implements Subsystem {
 		
 		
 		averageArmEncoderPos = 0;
-		startPos = Math.abs(collectorArm2.getSelectedSensorPosition(0));
+		startPos = collectorArm2.getSelectedSensorPosition(0);
 
 		talonSRX2.setInverted(true);
 
@@ -213,7 +213,7 @@ public class Collector implements Subsystem {
 		 * systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
 		 */
 		averageArmEncoderPos = -systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_1);
-		double newEncoderPos = (collectorArm2.getSelectedSensorPosition(0) - startPos) * DISTANCE_CONSTANT;
+		double newEncoderPos = 118 - Math.abs(collectorArm2.getSelectedSensorPosition(0) - startPos) * DISTANCE_CONSTANT;
 		//System.out.println("1: " + averageArmEncoderPos);
 		double averageArmEncoderPos0 = systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2);
 		//System.out.println("2: " + averageArmEncoderPos0);
@@ -229,7 +229,8 @@ public class Collector implements Subsystem {
 					intakeRight.set(0.80);
 					if (position == 3 && !collecting) {
 						//collectorArm1.set(ControlMode.Position, -5200);
-						goodArmPID.setSetPoint(135);
+						if (!broke) goodArmPID.setSetPoint(104);
+						else goodArmPID.setSetPoint(120);
 						collecting = true;
 					}
 				} else if (systems.getOperatorLtTrigger() > .1 || systems.getDriverLtTrigger() > 0.1) {
@@ -241,7 +242,8 @@ public class Collector implements Subsystem {
 						intakeRight.set(idleTurnConstant);
 					}
 					if (collecting) {
-						goodArmPID.setSetPoint(120);
+						if (!broke) goodArmPID.setSetPoint(95);
+						else goodArmPID.setSetPoint(110);
 						//collectorArm1.set(ControlMode.Position, -4900);
 						SmartDashboard.putString("DB/String 2", "Hellu");
 						collecting = false;
@@ -279,11 +281,12 @@ public class Collector implements Subsystem {
 				//collectorArm2.set(ControlMode.Position, 115);
 				goodArmPID.setSetPoint(115);
 				prevButt = Controls.Button.B;*/
-				position = 5;
-				//goodArmPID.setSetPoint(68);
-				goodArmPID.setSetPoint(15);
-				outtakeCube(1, 400, 1000);
-				toggle(true, 450);
+				position = 3;
+				//goodArmPID.setSetPoint(115);
+				if (!broke) goodArmPID.setSetPoint(95);
+				else goodArmPID.setSetPoint(110);
+				//outtakeCube(1, 400, 1000);
+				//toggle(true, 450);
 			}
 			if (systems.getButton(Controls.Button.A, false) || systems.getButton(Controls.Button.A, true)) {
 				position = 4;
@@ -297,7 +300,8 @@ public class Collector implements Subsystem {
 				position = 1;
 				//collectorArm1.set(ControlMode.Position, 120); //5200
 				//collectorArm2.set(ControlMode.Position, 120);
-				goodArmPID.setSetPoint(120);
+				if (!broke) goodArmPID.setSetPoint(104);
+				else goodArmPID.setSetPoint(120);
 				prevButt = Controls.Button.Y;
 			}
 			if(systems.getButton(Controls.Button.X, false) || systems.getButton(Controls.Button.X, true)) {
@@ -321,17 +325,19 @@ public class Collector implements Subsystem {
 			
 			
 			if (systems.getButton(Controls.Button.START, false) && prevButt != Controls.Button.START) {
+				if (!broke) this.goodArmPID = new RPID(0.015, 0.0, 0.001, 0.02);
+				else this.goodArmPID = new RPID(0.018, 0.0, 0.001, 0.02);
 				broke = !broke;
 				prevButt = Controls.Button.START;
 			}
 			
-			if (curCount == 50) {
-				System.out.println("Collector.update(): arm1 pos: " + newEncoderPos);
-				//System.out.println("                    arm2 pos: " + collectorArm1.getSelectedSensorPosition(0));
-				//System.out.println("                    start: " + startPos);
+			/*if (curCount == 50) {
+				System.out.println("Collector.update(): arm2 minus start: " + newEncoderPos);
+				System.out.println("                    arm2 pos: " + collectorArm2.getSelectedSensorPosition(0));
+				System.out.println("                    start: " + startPos);
 				curCount = 0;
 			}
-			curCount++;
+			curCount++;*/
 			
 				
 
@@ -378,7 +384,7 @@ public class Collector implements Subsystem {
 				collectorArm1.set(ControlMode.PercentOutput, armConstant * -systems.getOperatorLJoystick());
 				collectorArm2.set(ControlMode.PercentOutput, armConstant * -systems.getOperatorLJoystick());
 			}
-			if(!broke) {
+			if(broke) {
 				systems.setRumbleOperator(0.2, false);
 			}
 		}
@@ -578,7 +584,7 @@ public class Collector implements Subsystem {
 			armEncoder2 = Systems.getRobotEncoder(SysObj.Sensors.ARM_ENCODER_2);
 			armEncoder1.setDistancePerPulse(0.42);
 			armEncoder2.setDistancePerPulse(0.42);
-			startPos = Math.abs(collectorArm2.getSelectedSensorPosition(0));
+			//startPos = Math.abs(collectorArm2.getSelectedSensorPosition(0));
 
 		//	 System.out.println("Collector.update(): " +
 			// systems.getEncoderDistance(SysObj.Sensors.ARM_ENCODER_2));
