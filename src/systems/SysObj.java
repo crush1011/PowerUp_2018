@@ -38,7 +38,7 @@ public interface SysObj {
 		NAVX("NavX"), PDP("PowerDistributionPanel"),
 		ARM_ENCODER_1("ArmEncoder1"), ARM_ENCODER_2("ArmEncoder2"), CLIMB_ENCODER("ClimbEncoder"), 
 		LEFT_ENCODER("LeftEncoder"), RIGHT_ENCODER("RightEncoder"),
-		VISION("Vision");
+		VISION("Vision"), ULTRA_SONIC("UltraSonic"), LED("LED");
 		
 		public String sensor;
 		

@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.Victor;
 import systems.SysObj.Sensors;
 import systems.subsystems.Collector;
@@ -125,7 +126,12 @@ public class Systems{
 		lEncoder.setNegative(true);
 		rEncoder = new RobotEncoder((Encoder) sysObjects.get(SysObj.Sensors.RIGHT_ENCODER));
 		armEncoder1 = new RobotEncoder((Encoder) sysObjects.get(SysObj.Sensors.ARM_ENCODER_1));
-		armEncoder2 = new RobotEncoder((Encoder) sysObjects.get(SysObj.Sensors.ARM_ENCODER_2));          
+		armEncoder2 = new RobotEncoder((Encoder) sysObjects.get(SysObj.Sensors.ARM_ENCODER_2));  
+		
+		// ultrasonic sensor
+		Ultrasonic ultra = new Ultrasonic(0,8);
+		sysObjects.put(SysObj.Sensors.ULTRA_SONIC, ultra);
+		
 		
 		System.out.println("Don't forget controls");
 		
