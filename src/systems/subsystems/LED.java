@@ -15,11 +15,13 @@ public class LED implements Subsystem{
 	private Ultrasonic ultra;
 	private Solenoid leds;
 	private double range;
+	private int count;
 	
 	public LED(Ultrasonic ultra) {
 		this.ultra = ultra;
 		leds = new Solenoid(0);
 		ultra.setAutomaticMode(true);
+		count = 0;
 	}
 	
 	/**
@@ -29,11 +31,17 @@ public class LED implements Subsystem{
 	public void update() {
 		range = ultra.getRangeInches();
 		
-		if (range < 0.5) {
+		if (range < 4.0) {
 			solidLEDs();
 		} else {
 			offLEDs();
 		}
+		
+		/*if (count == 20) {
+			System.out.println("LED.update(): range is " + range);
+			count = 0;
+		}
+		count++;*/
 	}
 	
 	/**

@@ -37,6 +37,7 @@ import systems.subsystems.Controls.Axis;
 import systems.subsystems.Controls.Button;
 import systems.subsystems.Controls.POV;
 import systems.subsystems.DriveTrain;
+import systems.subsystems.LED;
 import systems.subsystems.NavX;
 import systems.subsystems.PIDManual;
 import systems.subsystems.RobotEncoder;
@@ -56,6 +57,7 @@ public class Systems{
 	private static PowerDistributionPanel pdp;
 	private Resources resources;
 	private Solenoid solenoid;
+	private static LED led;
 	
 	public boolean inAuto;
 	
@@ -116,7 +118,7 @@ public class Systems{
 		System.out.println("Next, encoders");
 		
 		// Encoders
-		sysObjects.put(SysObj.Sensors.CLIMB_ENCODER, new Encoder(8,9));
+		//sysObjects.put(SysObj.Sensors.CLIMB_ENCODER, new Encoder(8,9));
 		sysObjects.put(SysObj.Sensors.ARM_ENCODER_1, new Encoder(0,1));
 		sysObjects.put(SysObj.Sensors.ARM_ENCODER_2, new Encoder(2,3));
 		sysObjects.put(SysObj.Sensors.LEFT_ENCODER, new Encoder(4,5, true, Encoder.EncodingType.k4X));
@@ -129,9 +131,9 @@ public class Systems{
 		armEncoder2 = new RobotEncoder((Encoder) sysObjects.get(SysObj.Sensors.ARM_ENCODER_2));  
 		
 		// ultrasonic sensor
-		Ultrasonic ultra = new Ultrasonic(0,8);
+		Ultrasonic ultra = new Ultrasonic(8,9);
 		sysObjects.put(SysObj.Sensors.ULTRA_SONIC, ultra);
-		
+		led = new LED(ultra);
 		
 		System.out.println("Don't forget controls");
 		
@@ -194,6 +196,7 @@ public class Systems{
 		rEncoder.update();
 		armEncoder1.update();
 		armEncoder2.update();
+		led.update();
 		if(controls.getButton(Controls.Button.BACK, SysObj.Sensors.DRIVER_STICK)){
 			navX.zeroAngler();
 		}
